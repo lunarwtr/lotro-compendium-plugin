@@ -1,12 +1,31 @@
+--[[
+   Copyright 2011 Kelly Riley (lunarwater)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+	--------------
+
+	Found this addon class in AltInventory ( 2.02 ) by Garan	
+	Modified to allow 
+		1) optional click event on dropdown 
+		2) a select by value function
+
+]]
+
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
 DropDownList = class( Turbine.UI.Control );
 
---[[
-	Found this class from addon from AltInventory ( 2.02 ) by Garan	
-	Modified to allow optional click event on dropdown and a select by value function
-
-]]
 function DropDownList:Constructor()
 	Turbine.UI.Label.Constructor( self );
 -- we use a Label as the default container for this control so that we can get a border
