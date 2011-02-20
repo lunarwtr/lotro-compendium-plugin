@@ -1,3 +1,18 @@
+--[[
+   Copyright 2011 Kelly Riley (lunarwater)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+]]
 questtable = {
 {["next"] = {2243}, ["prev"] = {2457}, ["name"] = "A Bag of Tricks", ["arcs"] = "The Path of the Mischief Maker", ["money"] = {"27s 65c"}, ["description"] = "Celofa has tasked you with slaying the Orc Bidroi to further your advancement as a Burglar.", ["level"] = 58, ["minlevel"] = 58, ["category"] = "Burglar", ["id"] = 1, ["repeatable"] = "No", ["scope"] = "n/a", ["instanced"] = "No", ["faction"] = "FrP"},
 {["reputation"] = {"+500 with Malledhrim"}, ["zone"] = "Mirkwood", ["area"] = "Taur Morvith", ["money"] = {"28s 35c"}, ["mobs"] = {{["locations"] = {"16.60S, 50.55W"}, ["name"] = "Iavassúl"}}, ["category"] = "Mirkwood", ["id"] = 2, ["scope"] = "n/a", ["prev"] = {1276, 2025}, ["name"] = "A Banner Day", ["arcs"] = "Forts of Taur Morvith", ["description"] = "The Elf Iavassúl and his companions are tasked with preventing the Orcs of Taur Morvith from closing in behind the main force of the Malledhrim.", ["receive"] = {"Malledhrim Bronze Feather (x3)"}, ["pois"] = {{["locations"] = {"16.60S, 50.11W", "16.90S, 50.31W", "17.09S, 50.12W", "17.12S, 50.41W", "16.74S, 50.98W", "17.28S, 50.56W", "17.01S, 50.76W", "17.32S, 50.92W"}, ["name"] = "Orc War-banner"}}, ["level"] = 64, ["minlevel"] = 59, ["repeatable"] = "No", ["faction"] = "FrP", ["instanced"] = "No"},
