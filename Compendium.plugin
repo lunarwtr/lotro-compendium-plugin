@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Plugin>
+	<Information>
+		<Name>Compendium</Name>
+		<Author>Lunarwater</Author>
+		<Version>1.0-beta</Version>
+	</Information>
+	<Package>Compendium.Quests.Main</Package>
+	<Configuration Apartment="Compendium" />
+</Plugin>
