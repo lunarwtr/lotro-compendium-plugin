@@ -13,6 +13,5 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ]]
-import "Compendium.Quests.CompendiumQuestWindow";
-import "Compendium.Quests.CompendiumDB";
-import "Compendium.Quests.Main";
+import "Compendium.Common.Class";
+import "Compendium.Common.UI";
