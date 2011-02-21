@@ -4,6 +4,7 @@
 		<Name>Compendium</Name>
 		<Author>Lunarwater</Author>
 		<Version>1.0-beta</Version>
+		<website>http://lotrocompendium.sourceforge.net/</website>
 	</Information>
 	<Package>Compendium.Quests.Main</Package>
 	<Configuration Apartment="Compendium" />
