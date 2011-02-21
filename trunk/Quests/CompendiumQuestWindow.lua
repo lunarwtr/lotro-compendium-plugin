@@ -19,9 +19,8 @@ import "Turbine.UI";
 import "Turbine.UI.Lotro";
 
 import "Compendium.Quests.CompendiumDB";
-import "Compendium.Common.Class";
-import "Compendium.Common.UI.DropDownList";
-import "Compendium.Common.UI.CompendiumWindow";
+import "Compendium.Common";
+import "Compendium.Common.UI";
 
 CompendiumQuestWindow = class( Compendium.Common.UI.CompendiumWindow );
 function CompendiumQuestWindow:Constructor()
@@ -40,9 +39,40 @@ function CompendiumQuestWindow:Constructor()
 	self.logo = Turbine.UI.Control();
 	self.logo:SetBlendMode(Turbine.UI.BlendMode.Screen)
 	self.logo:SetBackground( "Compendium/Common/Resources/images/CompendiumLogoSmall.tga" );
-	self.logo:SetPosition(self.MainPanel:GetWidth() - 80 ,30);
+	self.logo:SetPosition(self.MainPanel:GetWidth() - 80 ,0);
 	self.logo:SetSize(75,100);
-	self.logo:SetParent( self );
+	self.logo:SetParent( self.MainPanel );
+    
+    self.about = Compendium.Common.UI.CompendiumAboutWindow();
+    
+    self.footer=Turbine.UI.Control();
+    self.footer:SetSize(self:GetWidth() - 30, 20);
+    self.footer:SetPosition(30, self.MainPanel:GetHeight() - 18);
+    self.footer:SetParent(self);
+    
+    local footerText = Turbine.UI.Label();
+    footerText:SetSize(300,18);
+    footerText:SetPosition(18, 1);
+    footerText:SetParent(self.footer);
+    footerText:SetFont(self.fontFace);
+    footerText:SetForeColor(self.fontColor);
+    footerText:SetOutlineColor(Turbine.UI.Color(0,0,0));
+    footerText:SetFontStyle(Turbine.UI.FontStyle.Outline);   
+    footerText:SetSelectable(true);
+    footerText:SetText('http://lotrocompendium.sourceforge.net/');
+       
+    -- add help/about button
+    local help = Turbine.UI.Label();
+    help:SetParent( self.footer );
+    help:SetText( "[?]" );
+    help:SetPosition( 0, 1 );
+    help:SetSize( 12, 18 );
+    help:SetFont(self.fontFace);
+    help:SetForeColor(self.white); 
+    help.MouseClick = function( sender, args )
+		self.about:SetVisible( true );
+		self.about:Activate();
+    end    
     
     self.ZoneCaption=Turbine.UI.Label();
     self.ZoneCaption:SetParent(self.MainPanel);
