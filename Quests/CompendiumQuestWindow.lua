@@ -459,6 +459,21 @@ function CompendiumQuestWindow:Reset()
 	self.searchDisabled = false;
 end
 
+function CompendiumQuestWindow:FormatItem(record)
+	local item = '';
+	if record['id'] ~= nil then
+		item = string.format(self.itemExampleTpl,record['id'],record['val']);
+	else
+		item = '['..record['val']..']';
+	end
+	
+	if record['q'] ~= nil and record['q'] ~= '' then
+		item = item .. ' ' .. record['q'];
+	end
+	
+	return item; 
+end
+
 function CompendiumQuestWindow:LoadQuestDetails(record)
     
     --[[{
@@ -491,16 +506,16 @@ function CompendiumQuestWindow:LoadQuestDetails(record)
     if record['zone'] ~= nil then self:AddQuestDetail("Zone: " .. record['zone']); end
     if record['area'] ~= nil then self:AddQuestDetail("Area: " .. record['area']); end
     if record['faction'] ~= nil then self:AddQuestDetail("Faction: " .. record['faction']); end
-    if record['money'] ~= nil then self:AddQuestDetail("Money: " .. record['money'][1]); end
+    if record['money'] ~= nil then self:AddQuestDetail("Money: " .. record['money'][1]['val']); end
     if record['reputation'] ~= nil then 
     	if #record['reputation'] > 1 then
     		for i,rep in pairs(record['reputation']) do
     			local prefix = "     ";
     			if i == 1 then prefix = "Rep: "; end
-    			self:AddQuestDetail(prefix .. rep)
+    			self:AddQuestDetail(prefix .. rep['val'])
     		end
     	else
-    		self:AddQuestDetail("Rep: " .. record['reputation'][1]);
+    		self:AddQuestDetail("Rep: " .. record['reputation'][1]['val']);
     	end
     end
     if record['receive'] ~= nil then 
@@ -508,10 +523,11 @@ function CompendiumQuestWindow:LoadQuestDetails(record)
     		for i,item in pairs(record['receive']) do
     			local prefix = "     ";
     			if i == 1 then prefix = "Recieve: "; end
-    			self:AddQuestDetail(prefix .. item)
+    			
+    			self:AddQuestDetail(prefix .. self:FormatItem(item))
     		end
     	else
-    		self:AddQuestDetail("Recieve: " .. record['receive'][1]);
+    		self:AddQuestDetail("Recieve: " .. self:FormatItem(record['receive'][1]));
     	end
     end     
         		
@@ -596,3 +612,4 @@ function CompendiumQuestWindow:LoadQuestDetails(record)
     self.QuestComments:SetText(record['description']);
 
 end
+

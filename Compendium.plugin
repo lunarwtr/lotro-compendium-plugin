@@ -3,7 +3,7 @@
 	<Information>
 		<Name>Compendium</Name>
 		<Author>Lunarwater</Author>
-		<Version>1.0-beta</Version>
+		<Version>1.0.1-beta</Version>
 		<website>http://lotrocompendium.sourceforge.net/</website>
 	</Information>
 	<Package>Compendium.Quests.Main</Package>
