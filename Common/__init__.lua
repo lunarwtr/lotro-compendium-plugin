@@ -14,4 +14,3 @@
    limitations under the License.
 ]]
 import "Compendium.Common.Class";
-import "Compendium.Common.UI";

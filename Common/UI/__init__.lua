@@ -13,6 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ]]
-import "Compendium.Common.UI.CompendiumAboutWindow";
-import "Compendium.Common.UI.CompendiumWindow";
 import "Compendium.Common.UI.DropDownList";
+import "Compendium.Common.UI.CompendiumControl";
+import "Compendium.Common.UI.CompendiumWindow";
+import "Compendium.Common.UI.CompendiumAboutWindow";
