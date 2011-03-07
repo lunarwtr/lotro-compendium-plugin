@@ -23,6 +23,7 @@ import "Compendium.Items.DataCursor";
 import "Compendium.Items.CategoryMenu";
 import "Compendium.Common";
 import "Compendium.Common.UI";
+import "Compendium.Items.ItemAliasMenu";
 
 local rowHeight = 25;
 	
@@ -121,6 +122,8 @@ function CompendiumItemControl:Constructor()
     filtersLabel:SetText("No filters set");	
 	self.filtersLabel = filtersLabel;
 
+
+
     self.itemContainer=Turbine.UI.Control();
     self.itemContainer:SetParent(self);
     self.itemContainer:SetPosition(5, filtersLabel:GetTop() +  filtersLabel:GetHeight());
@@ -139,6 +142,27 @@ function CompendiumItemControl:Constructor()
     self.itemContainer.ItemList.VScrollBar:SetWidth(12);
     self.itemContainer.ItemList.VScrollBar:SetHeight(self.itemContainer:GetHeight()-2);
     self.itemContainer.ItemList:SetVerticalScrollBar(self.itemContainer.ItemList.VScrollBar);
+    
+    local aliasMenu = Compendium.Items.ItemAliasMenu();
+    aliasMenu:SetParent(self.itemContainer.ItemList);
+    self.aliasMenu = aliasMenu;
+    
+    self.ClickEvent = function( item, args )
+    	if args.Button == Turbine.UI.MouseButton.Right then
+    		-- right mouse button
+    		self.aliasMenu:ShowAliasMenu(item.record);
+    		local lh = self.itemContainer.ItemList:GetHeight();
+    		local mh = self.aliasMenu:GetHeight();
+    		local left = item:GetLeft() + args.X - 3;
+    		local top = item:GetTop() + args.Y - 3;
+    		
+    		if (top + mh) > lh then
+    			top = lh - mh;
+    		end 
+    		
+    		self.aliasMenu:SetPosition(left, top);
+    	end
+    end 
     
     local pagination = Turbine.UI.Label();
     pagination:SetParent(self);
@@ -344,6 +368,8 @@ function CompendiumItemControl:LoadItems(records)
         label:SetBackColor(bgColor);
         label:SetFont(self.fontFaceSmall);
         label:SetSelectable(true);
+        label.record = { id = rec['id'], name = rec['n'] };
+        label.MouseClick = self.ClickEvent;        
         
         local color = self.fontColor;
         if level ~= nil and level ~= '' then

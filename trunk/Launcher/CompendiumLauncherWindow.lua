@@ -31,6 +31,8 @@ function CompendiumLauncherWindow:Constructor()
 	self:LoadSettings();
 	self:SetPosition(self.Settings.WindowPos.left,self.Settings.WindowPos.top);
 	self:SetSize(self.Settings.WindowSize.width, self.Settings.WindowSize.height);
+	self:SetVisible(self.Settings.WindowVisible);
+	
 	local shortcut = CompendiumShortcut();
 	shortcut:SetPosition(self.Settings.IconPos.left,self.Settings.IconPos.top);
 	shortcut.ShortcutClick = function() 
@@ -46,6 +48,10 @@ function CompendiumLauncherWindow:Constructor()
 		self.Settings.WindowPos.left = self:GetLeft();
 		self.Settings.WindowPos.top = self:GetTop();
 		self:SaveSettings();		
+	end
+	self.VisibleChanged = function() 
+		self.Settings.WindowVisible = self:IsVisible();
+		self:SaveSettings();
 	end
 
     self:SetText( "Compendium" );
@@ -171,6 +177,7 @@ function CompendiumLauncherWindow:LoadSettings()
 	
 	if self.Settings == nil then
 		self.Settings = { 
+			WindowVisible = true,
 			WindowPos = {  
 				["left"] = tostring(( Turbine.UI.Display:GetWidth() - 560) / 2),
 				["top"] = tostring(( Turbine.UI.Display:GetHeight() - 480) / 2)
@@ -184,6 +191,11 @@ function CompendiumLauncherWindow:LoadSettings()
 				["top"] = "230";
 			}
 		};
+	else
+		-- for backwards compatibility
+		if self.Settings.WindowVisible == nil then
+			self.Settings.WindowVisible = true;
+		end
 	end
 end
 
