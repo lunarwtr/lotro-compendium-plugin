@@ -69,18 +69,6 @@ local categories = {
 		["Champion"] = 0, 
 		["Minstrel"] = 0, 
 		["Hunter"] = 0
-		--[[
-		["Burglar Class Items"] = 0,
-		["Captain Class Items"] = 0,
-		["Champion Horns"] = 0,		
-		["Champion Class Items"] = 0,
-		["Guardian Class Items"] = 0,
-		["Hunter Class Items"] = 0,
-		["Loremaster Class Items"] = 0,
-		["Minstrel Class Items"] = 0,
-		["Rune-keeper Class Items"] = 0,
-		["Warden Class Items"] = 0
-		]]
 	},
 	["Craft"] = {
 		["Crafting"] = 0,
@@ -113,6 +101,24 @@ local categories = {
 		["Cowbell"] = 0,
 		["Horn"] = 0
 	},	
+	 ["Jewellery"] = {
+	 	 ["All"] = 0,
+	     ["Wrist"] = 0,
+	     ["Pocket"] = 0,
+	     ["Ear"] = 0,
+	     ["Finger"] = 0,
+	     ["Neck"] = 0
+	 },
+	 ["Level Ranges"] = {
+	 	["1-10"] = 0,
+	 	["11-20"] = 0, 
+	 	["21-30"] = 0, 
+	 	["31-40"] = 0,
+	 	["41-50"] = 0, 
+	 	["51-60"] = 0, 
+	 	["61-70"] = 0, 
+	 	["71-80"] = 0  
+	 },
 	["Other"] = {
 		["A-M"] = {
 			["Bait"] = 0,
@@ -125,7 +131,6 @@ local categories = {
 			["Dye"] = 0,
 			["Fish"] = 0,
 			["Food"] = 0,	
-			["Jewellery"] = 0,
 			["Key"] = 0,
 			["Misc."] = 0,
 			["Mounts"] = 0,		

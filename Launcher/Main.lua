@@ -16,8 +16,6 @@
 import "Compendium.Launcher.CompendiumLauncherWindow";
 
 Compendium = CompendiumLauncherWindow();
-Compendium:SetVisible( true );
-
 CompendiumWindowCommand = Turbine.ShellCommand();
 
 function CompendiumWindowCommand:Execute( command, arguments )
