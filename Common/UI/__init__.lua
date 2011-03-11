@@ -16,5 +16,6 @@
 import "Compendium.Common.UI.DropDownList";
 import "Compendium.Common.UI.LabelMenu";
 import "Compendium.Common.UI.CompendiumControl";
+import "Compendium.Common.UI.TabControl";
 import "Compendium.Common.UI.CompendiumWindow";
 import "Compendium.Common.UI.CompendiumAboutWindow";

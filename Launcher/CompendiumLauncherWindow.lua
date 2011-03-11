@@ -30,7 +30,6 @@ function CompendiumLauncherWindow:Constructor()
 
 	self:LoadSettings();
 	self:SetPosition(self.Settings.WindowPos.left,self.Settings.WindowPos.top);
-	self:SetSize(self.Settings.WindowSize.width, self.Settings.WindowSize.height);
 	self:SetVisible(self.Settings.WindowVisible);
 	
 	local shortcut = CompendiumShortcut();
@@ -57,7 +56,7 @@ function CompendiumLauncherWindow:Constructor()
     self:SetText( "Compendium" );
  
     self.footer=Turbine.UI.Control();
-    self.footer:SetSize(self:GetWidth() - 30, 20);
+    self.footer:SetSize(self:GetWidth() - 50, 20);
     self.footer:SetPosition(30, self:GetHeight() - 25);
     self.footer:SetParent(self);
     
@@ -86,90 +85,128 @@ function CompendiumLauncherWindow:Constructor()
 		self.about:Activate();
     end  
 
-    local quest = Turbine.UI.Label();
-    quest:SetParent( self );
-    quest:SetText( "Quests" );
-    quest:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
-    quest:SetFont(self.fontFace);
-    quest:SetForeColor(self.fontColor);
-    quest:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    quest:SetFontStyle(Turbine.UI.FontStyle.Outline); 
-   	quest:SetBackground( "Compendium/Common/Resources/images/compendium-tab-selected.tga" );
-    quest:SetPosition( 30, 30 );
-    quest:SetSize( 111, 23 );
-    quest:SetZOrder(100);
-    quest:SetBlendMode(Turbine.UI.BlendMode.Screen);
-    
-    local items = Turbine.UI.Label();
-    items:SetParent( self );
-    items:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
-    items:SetText( "Items" );
-    items:SetFont(self.fontFace);
-    items:SetForeColor(self.fontColor);
-    items:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    items:SetFontStyle(Turbine.UI.FontStyle.Outline);    
-    items:SetPosition( 145, 30 );
-    items:SetSize( 111, 23 );
-   	items:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );    
-    items:SetZOrder(101);
-    items:SetBlendMode(Turbine.UI.BlendMode.Screen);
-    
-    quest.MouseClick = function( sender, args )
-    	self.activeTab = quest;
-	   	quest:SetBackground( "Compendium/Common/Resources/images/compendium-tab-selected.tga" );
-		items:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );
-		self.questControl:SetVisible(true);
-		self.itemsControl:SetVisible(false);
-    end
-	quest.MouseEnter = function( sender, args )
-	   	quest:SetBackground( "Compendium/Common/Resources/images/compendium-tab-selected.tga" );
-	end
-	quest.MouseLeave = function( sender, args )
-		if sender ~= self.activeTab then
-			quest:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );
-		end
+	local tabs = Compendium.Common.UI.TabControl();
+	tabs:SetParent(self);
+	tabs:SetSize(self:GetWidth() - 18, self:GetHeight() - 50);
+	tabs:SetPosition(9,30);
+	tabs:AddTab("Quests",  Compendium.Quests.CompendiumQuestControl());
+	tabs:AddTab("Items",  Compendium.Items.CompendiumItemControl());
+	tabs:SetActiveIndex(self.Settings.ActiveTabIndex);
+
+	tabs.OnActiveTabChange = function (sender,index) 
+		self.Settings.ActiveTabIndex = index;
+		self:SaveSettings();
 	end
 
-	items.MouseClick = function( sender, args )
-    	self.activeTab = items;
-	   	quest:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );
-	   	items:SetBackground( "Compendium/Common/Resources/images/compendium-tab-selected.tga" );    
-		self.questControl:SetVisible(false);
-		self.itemsControl:SetVisible(true);
+ 	self.SetHeight = function(sender,height)
+        if height<150 then height=150 end;
+        Turbine.UI.Lotro.Window.SetHeight(self,height);
+        tabs:SetHeight(height - 35);
+		self.footer:SetTop(height - 25);        
     end
-	items.MouseEnter = function( sender, args )
-	   	items:SetBackground( "Compendium/Common/Resources/images/compendium-tab-selected.tga" );
-	end
-	items.MouseLeave = function( sender, args )
-		if sender ~= self.activeTab then
-			items:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );
-		end
-	end
+ 	self.SetWidth = function(sender,width)
+        if width<110 then width=110 end;
+        Turbine.UI.Lotro.Window.SetWidth(self,width);
+        tabs:SetWidth(width - 18);
+		self.footer:SetWidth(self:GetWidth() - 50);
+    end
+	self.SetSize = function(sender,width, height) 
+		self:SetWidth(width);
+		self:SetHeight(height);
+	end	
+	
+    self.Resizing=false;
+    self.MoveX=-1;
+    self.MoveY=-1;
+    self.MovingIcon=Turbine.UI.Control();
+    self.MovingIcon:SetParent(self);
+    self.MovingIcon:SetSize(32,32);
+    self.MovingIcon:SetBackground(0x410081c0)
+    self.MovingIcon:SetStretchMode(2);
+    self.MovingIcon:SetPosition(self:GetWidth()/2-15,self:GetHeight()-21);
+    self.MovingIcon:SetVisible(false);
+    self.MouseDown=function(sender,args)
+        if (args.Y>self:GetHeight()-50) and (args.X>self:GetWidth()-50) then
+            self.MoveX=args.X;
+            self.MoveY=args.Y;
+            self.MovingIcon:SetLeft(args.X-12);
+            self.MovingIcon:SetTop(args.Y-12);
+            self.MovingIcon:SetSize(32,32);
+            self.MovingIcon:SetBackground(0x41007e20)
+            self.MovingIcon:SetVisible(true);
+        elseif (args.Y>self:GetHeight()-12) then
+            self.MoveY=args.Y;
+            self.MovingIcon:SetLeft(args.X-22);
+            self.MovingIcon:SetTop(args.Y-12);
+            self.MovingIcon:SetSize(32,32);
+            self.MovingIcon:SetBackground(0x410081c0)
+            self.MovingIcon:SetVisible(true);
+        elseif (args.X>self:GetWidth()-12) then
+            self.MoveX=args.X;
+            self.MovingIcon:SetLeft(args.X-12);
+            self.MovingIcon:SetTop(args.Y-22);
+            self.MovingIcon:SetSize(32,32);
+            self.MovingIcon:SetBackground(0x410081bf)
+            self.MovingIcon:SetVisible(true);
+        elseif (args.Y<2) then
+            self.MoveX=args.X;
+            self.MoveY=args.Y;
+            self.MovingIcon:SetLeft(args.X-12);
+            self.MovingIcon:SetTop(args.Y-12);
+            self.MovingIcon:SetSize(16,16);
+            self.MovingIcon:SetBackground(0x41007e0c)
+            self.MovingIcon:SetVisible(true);
+        else
+            self.MoveX=-1;
+            self.MoveY=-1;
+        end
+    end
 
-    local tabBorder = Turbine.UI.Control();
-    tabBorder:SetParent(self);
-    tabBorder:SetPosition(7,52);
-    tabBorder:SetSize(self:GetWidth()-14,self:GetHeight() - quest:GetHeight() - 55);
-    tabBorder:SetBackColor(Turbine.UI.Color(0.18,0.19,0.29)); 
-    tabBorder:SetZOrder(99);
-	local tabContainer = Turbine.UI.Control();
-    tabContainer:SetParent(tabBorder);
-    tabContainer:SetPosition(1,1);
-    tabContainer:SetSize(tabBorder:GetWidth()-2,tabBorder:GetHeight()-2);
-    tabContainer:SetBackColor(Turbine.UI.Color(0.9,0,0,0));
+    self.MouseMove=function(sender,args)
+        if (self.MoveY>-1) then
+            if args.Y~= self.MoveY then
+                self.Resizing=true;
+                local newHeight=self:GetHeight()-(self.MoveY-args.Y);
+                if newHeight<156 then newHeight=156 end;
+                if newHeight>(Turbine.UI.Display.GetHeight()-self:GetTop()) then newHeight=Turbine.UI.Display.GetHeight()-self:GetTop() end;
+                local newX=args.X-22;
+                if newX<-13 then newX=-13 end
+                if newX>(self:GetWidth()-18) then newX=self:GetWidth()-18 end
+                self.MovingIcon:SetLeft(newX);
+                self.MovingIcon:SetPosition(newX,args.Y - 9);
+                self:SetHeight(newHeight);
+                self.MoveY=args.Y;
+            end
+        end
+        if (self.MoveX>-1) then
+            if args.X~= self.MoveX then
+                self.Resizing=true;
+                local newWidth=self:GetWidth()-(self.MoveX-args.X);
+                if newWidth<414 then newWidth=414 end;
+                if newWidth>(Turbine.UI.Display.GetWidth()-self:GetLeft()) then newWidth=Turbine.UI.Display.GetWidth()-self:GetLeft() end;
+                local newY=args.Y-22;
+                if newY<-13 then newY=-13 end
+                if newY>(self:GetHeight()-18) then newY=self:GetHeight()-18 end
+                self.MovingIcon:SetPosition(args.X - 9,newY);
+                self:SetWidth(newWidth);
+                self.MoveX=args.X;
+            end
+        end
+    end
+    self.MouseUp=function(sender,args)
+        self.MovingIcon:SetVisible(false);
+        self.MoveX=-1;
+        self.MoveY=-1;
+        if self.Resizing == true then
+        	self.Resizing = false;
+			self.Settings.WindowSize.width = self:GetWidth();
+			self.Settings.WindowSize.height = self:GetHeight();
+			self:SaveSettings();
+		end	        
+    end
+    
+	self:SetSize(self.Settings.WindowSize.width, self.Settings.WindowSize.height);
 	
-	self.questControl = Compendium.Quests.CompendiumQuestControl();
-    self.questControl:SetParent(tabContainer);
-    self.questControl:SetSize(tabContainer:GetWidth()-4,tabContainer:GetHeight()-3);
-    self.questControl:SetPosition(2,1);
-    self.questControl:SetVisible(true);
-	
-	self.itemsControl = Compendium.Items.CompendiumItemControl();
-    self.itemsControl:SetVisible(false);
-    self.itemsControl:SetParent(tabContainer);
-    self.itemsControl:SetSize(tabContainer:GetWidth()-4,tabContainer:GetHeight()-3);
-    self.itemsControl:SetPosition(2,1);
-        
 end
 
 function CompendiumLauncherWindow:LoadSettings()
@@ -189,13 +226,17 @@ function CompendiumLauncherWindow:LoadSettings()
 			IconPos = {
 				["left"] = tostring(Turbine.UI.Display.GetWidth()-55),
 				["top"] = "230";
-			}
+			},
+			ActiveTabIndex = 1
 		};
 	else
 		-- for backwards compatibility
 		if self.Settings.WindowVisible == nil then
 			self.Settings.WindowVisible = true;
 		end
+		if self.Settings.ActiveTabIndex == nil then
+			self.Settings.ActiveTabIndex = 1;
+		end		
 	end
 end
 

@@ -122,8 +122,6 @@ function CompendiumItemControl:Constructor()
     filtersLabel:SetText("No filters set");	
 	self.filtersLabel = filtersLabel;
 
-
-
     self.itemContainer=Turbine.UI.Control();
     self.itemContainer:SetParent(self);
     self.itemContainer:SetPosition(5, filtersLabel:GetTop() +  filtersLabel:GetHeight());
@@ -142,7 +140,7 @@ function CompendiumItemControl:Constructor()
     self.itemContainer.ItemList.VScrollBar:SetWidth(12);
     self.itemContainer.ItemList.VScrollBar:SetHeight(self.itemContainer:GetHeight()-2);
     self.itemContainer.ItemList:SetVerticalScrollBar(self.itemContainer.ItemList.VScrollBar);
-    
+	
     local aliasMenu = Compendium.Items.ItemAliasMenu();
     aliasMenu:SetParent(self.itemContainer.ItemList);
     self.aliasMenu = aliasMenu;
@@ -227,6 +225,53 @@ function CompendiumItemControl:Constructor()
 	
 	-- build default cursor
 	self:BuildCursor();
+	
+	-- build resizing functions
+ 	self.SetHeight = function(sender,height)
+        if height<80 then height=80 end;
+        Turbine.UI.Control.SetHeight(self,height);
+        local icheight = height - self.itemContainer:GetTop() - pagination:GetHeight();
+        self.itemContainer:SetHeight(icheight);
+        self.itemContainer.ItemList:SetHeight(icheight - 3);
+        self.itemContainer.ItemList.VScrollBar:SetHeight(icheight - 2);
+        pagination:SetTop(self.itemContainer:GetTop() + self.itemContainer:GetHeight());
+
+		-- recalculate # of rows we can show on screen per page
+        self:CalcPageSize();
+        if self.cursor ~= nil then
+        	self.cursor:SetPageSize(self.pagesize);
+	   		self:ClearItems();
+			self:LoadItems(self.cursor:CurPage());
+			self:UpdatePagination();  
+		end       
+    end
+    
+ 	self.SetWidth = function(sender,width)
+ 		--Turbine.Shell.WriteLine(width);	
+        if width<100 then width=100 end;
+        Turbine.UI.Control.SetWidth(self,width);
+		local swidth = width - (searchLabel:GetWidth()+searchLabel:GetLeft())-55;
+    	self.SearchBorder:SetWidth(swidth);
+    	self.SearchText:SetWidth(swidth);
+	    reset:SetLeft( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 1 );
+	
+        local icwidth = width - 7;
+        self.itemContainer:SetWidth(icwidth);
+        self.itemContainer.ItemList:SetWidth(icwidth - 4);
+		self.itemContainer.ItemList.VScrollBar:SetLeft(icwidth-16,0)        
+		for index=1,self.itemContainer.ItemList:GetItemCount() do
+			local label = self.itemContainer.ItemList:GetItem(index);
+			label:SetWidth(icwidth - 13);
+		end
+		pagination:SetWidth(icwidth);
+		nextBtn:SetLeft(icwidth - nextBtn:GetWidth());
+    end
+	
+	self.SetSize = function(sender,width, height) 
+		self:SetWidth(width);
+		self:SetHeight(height);
+	end	
+	
 end
 
 function CompendiumItemControl:ClearItems()
@@ -363,7 +408,7 @@ function CompendiumItemControl:LoadItems(records)
         if rec['ib'] ~= nil then name = name .. ' | ' .. rec['ib'] end;
         
         local label = Turbine.UI.Label();
-        label:SetSize(width - 10, rowHeight);
+        label:SetSize(width - 13, rowHeight);
         label:SetText(name);
         label:SetBackColor(bgColor);
         label:SetFont(self.fontFaceSmall);

@@ -54,6 +54,10 @@ function DataCursor:CurPageNum()
 	return math.ceil(self.offset / self.pagesize);
 end
 
+function DataCursor:SetPageSize( pagesize )
+	self.pagesize = pagesize;
+end
+
 function DataCursor:tostring()
 	if self.total > 1 then
 		return "Page " .. self:CurPageNum() .. "/" .. self:PageCount() .. " | " .. self.total .. " Results";

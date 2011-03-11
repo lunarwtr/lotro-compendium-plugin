@@ -27,7 +27,7 @@ function CompendiumQuestControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 
 	self.searchDisabled = true;
-    
+        
 	self.logo = Turbine.UI.Control();
 	self.logo:SetBlendMode(Turbine.UI.BlendMode.Screen);
 	self.logo:SetBackground( "Compendium/Common/Resources/images/CompendiumLogoSmall.tga" );
@@ -193,7 +193,7 @@ function CompendiumQuestControl:Constructor()
     self.QuestComments.VScrollBar:SetPosition(self.commentsCtr:GetWidth()-16,0)
     self.QuestComments.VScrollBar:SetWidth(12);
     self.QuestComments.VScrollBar:SetHeight(self.commentsCtr:GetHeight()-2);
-    self.QuestComments:SetVerticalScrollBar(self.QuestComments.VScrollBar);     
+    self.QuestComments:SetVerticalScrollBar(self.QuestComments.VScrollBar);
 --    Turbine.Shell.WriteLine("Top: " .. self.qdContainer:GetTop() .. " Height: " .. self.qdContainer:GetHeight());
 
     
@@ -251,6 +251,65 @@ function CompendiumQuestControl:Constructor()
     
     self:ClearQuests();
 	self.searchDisabled = false;
+
+    
+ 	self.SetWidth = function(sender,width)
+        if width<100 then width=100 end;
+        Turbine.UI.Control.SetWidth(self,width);
+        
+        self.logo:SetLeft(width - 80);
+        
+        local qlwidth = (width/2) - 7;
+        self.qlContainer:SetWidth(qlwidth);
+        self.qdContainer:SetLeft(self.qlContainer:GetLeft() + qlwidth + 5);
+        self.qdContainer:SetWidth(qlwidth);
+        self.qlContainer.QuestList:SetWidth(qlwidth - 4);
+        self.qdContainer.QuestDetails:SetWidth(qlwidth - 4);
+        self.qlContainer.QuestList.VScrollBar:SetLeft(qlwidth-16);
+        self.qdContainer.QuestDetails.VScrollBar:SetLeft(qlwidth-16);
+        
+        local ddwidth = width-(self.ZoneCaption:GetWidth()+self.ZoneCaption:GetLeft())-92;
+    	self.ZoneList:SetSize(ddwidth,20);    
+        self.LevelList:SetSize(ddwidth,20);     
+        self.ArcList:SetSize(ddwidth,20);     
+        
+		local swidth = width - (self.SearchCaption:GetWidth()+self.SearchCaption:GetLeft())-137;
+    	self.SearchBorder:SetWidth(swidth);
+    	self.SearchText:SetWidth(swidth);
+	    reset:SetLeft( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 2 );
+		
+	    self.QuestComments.VScrollBar:SetLeft(width - 23);
+		self.QuestComments:SetWidth(width - 11);
+		self.commentsCtr:SetWidth(width - 7);
+		
+		for index=1,self.qlContainer.QuestList:GetItemCount() do
+			local label = self.qlContainer.QuestList:GetItem(index);
+			label:SetWidth(qlwidth - 14);
+		end
+		for index=1,self.qdContainer.QuestDetails:GetItemCount() do
+			local label = self.qdContainer.QuestDetails:GetItem(index);
+			label:SetWidth(qlwidth - 14);
+		end
+
+    end
+		
+ 	self.SetHeight = function(sender,height)
+        if height<300 then height=300 end;
+        local lheight = height - self.commentsCtr:GetHeight() - self.qlContainer:GetTop() - 5;
+        Turbine.UI.Control.SetHeight(self,height);
+		self.qlContainer:SetHeight(lheight);
+		self.qlContainer.QuestList:SetHeight(lheight - 3);
+		self.qlContainer.QuestList.VScrollBar:SetHeight(lheight - 2);
+		self.qdContainer:SetHeight(lheight);
+		self.qdContainer.QuestDetails:SetHeight(lheight - 3);
+		self.qdContainer.QuestDetails.VScrollBar:SetHeight(lheight - 2);
+	    self.commentsCtr:SetTop(self.qdContainer:GetTop() + lheight + 5);	
+    end	
+	
+	self.SetSize = function(sender,width, height) 
+		self:SetWidth(width);
+		self:SetHeight(height);
+	end	
 		    
 end
 
