@@ -24,6 +24,7 @@ ItemAliasMenu = class( Compendium.Common.UI.LabelMenu );
 local channelConfig = {
 	{ label = 'Say', shortcut = '/say <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>(from compendium)</rgb>' },  
 	{ label = 'Kinship', shortcut = '/k <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>(from compendium)</rgb>' }, 
+	{ label = 'Fellowship', shortcut = '/f <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>(from compendium)</rgb>' }, 
 	{ label = 'Raid', shortcut = '/ra <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>(from compendium)</rgb>' }, 
 	{ label = 'Trade WTB', shortcut = '/trade WTB <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine>' }  
 };

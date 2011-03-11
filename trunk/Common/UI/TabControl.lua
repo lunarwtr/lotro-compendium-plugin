@@ -1,0 +1,161 @@
+--[[
+   Copyright 2011 Kelly Riley (lunarwater)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+]]
+import "Turbine";
+import "Turbine.Gameplay";
+import "Turbine.UI";
+import "Turbine.UI.Lotro";
+import "Compendium.Common";
+import "Compendium.Common.UI";
+
+TabControl = class( Compendium.Common.UI.CompendiumControl );
+function TabControl:Constructor()
+    Compendium.Common.UI.CompendiumControl.Constructor( self );
+    
+    self.tabs = {};
+    self.activeTab = nil;
+	self.tabCount = 1;
+	
+	self.events = {
+		MouseClick = function( sender, args )
+	    	self:SetActiveTabById(sender.id);
+			self:OnActiveTabChange(self:GetActiveIndex());
+	    end,
+		MouseEnter = function( sender, args )
+		   	sender:SetBackground( "Compendium/Common/Resources/images/compendium-tab-selected.tga" );
+		end,
+		MouseLeave = function( sender, args )
+			if sender.id ~= self.activeTab then
+				sender:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );
+			end
+		end
+	};
+
+    local tabBorder = Turbine.UI.Control();
+    tabBorder:SetParent(self);
+    tabBorder:SetPosition(0,22);
+    tabBorder:SetSize(self:GetWidth(),self:GetHeight() - 43);
+    tabBorder:SetBackColor(Turbine.UI.Color(0.18,0.19,0.29)); 
+    tabBorder:SetZOrder(99);
+	local tabContainer = Turbine.UI.Control();
+    tabContainer:SetParent(tabBorder);
+    tabContainer:SetPosition(1,1);
+    tabContainer:SetSize(tabBorder:GetWidth()-2,tabBorder:GetHeight()-2);
+    tabContainer:SetBackColor(Turbine.UI.Color(0.9,0,0,0));
+	self.tabContainer = tabContainer;
+ 
+ 	self.SetHeight = function(sender,height)
+        if height<100 then height=100 end;
+        Turbine.UI.Control.SetHeight(self,height);
+        tabBorder:SetHeight(height-43);
+        local contHeight = tabBorder:GetHeight()-2;
+        tabContainer:SetHeight(contHeight);
+       	for index, rec in pairs(self.tabs) do
+			rec.control:SetHeight(contHeight-3);
+		end
+    end
+ 	self.SetWidth = function(sender,width)
+        if width<100 then width=100 end;
+        Turbine.UI.Control.SetWidth(self,width);
+        tabBorder:SetWidth(width);
+        local contWidth = tabBorder:GetWidth()-2;
+        tabContainer:SetWidth(contWidth);
+       	for index, rec in pairs(self.tabs) do
+			rec.control:SetWidth(contWidth-4);
+		end
+    end
+     
+end
+
+function TabControl:OnActiveTabChange(index)
+	-- for folks to override
+end
+
+function TabControl:AddTab(title, control)
+	-- build label
+    local tab = Turbine.UI.Label();
+	tab:SetVisible(false);
+    tab:SetParent( self );
+    tab:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
+    tab:SetText( title );
+    tab:SetFont(self.fontFace);
+    tab:SetForeColor(self.fontColor);
+    tab:SetOutlineColor(Turbine.UI.Color(0,0,0));
+    tab:SetFontStyle(Turbine.UI.FontStyle.Outline);    
+    tab:SetPosition( 30, 0 );
+    tab:SetSize( 111, 23 );
+   	tab:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );    
+    tab:SetZOrder(101);
+    tab:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);
+	
+	-- apply events to tab
+	for name, func in pairs(self.events) do
+		tab[name] = func;
+	end
+	
+    control:SetVisible(false);
+    control:SetParent(self.tabContainer);
+	control:SetSize(self.tabContainer:GetWidth()-4,self.tabContainer:GetHeight()-3);
+    control:SetPosition(1,1);
+    
+	local id = self.tabCount;
+	tab.id = id;
+	self.tabCount = self.tabCount + 1; 
+
+	table.insert(self.tabs, { id = id, tab = tab , control = control });
+	
+	if self.activeTab == nil then
+		self.activeTab = id;
+	end	
+	
+	self:RefreshUI();
+end
+
+function TabControl:RefreshUI()
+	local left = 30;
+	for index, rec in pairs(self.tabs) do
+		local tab = rec.tab;
+		tab:SetPosition(left,0);
+		tab:SetVisible(true);
+		if index == self.activeTab then 
+			tab:SetBackground( "Compendium/Common/Resources/images/compendium-tab-selected.tga" );
+			rec.control:SetVisible(true);
+		else
+			tab:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );
+			rec.control:SetVisible(false);
+		end
+		left = left + tab:GetWidth() + 4;
+	end
+end
+
+function TabControl:SetActiveIndex(index)
+	local id = self.tabs[index].id;
+	self:SetActiveTabById(id);
+end
+
+function TabControl:SetActiveTabById(id)
+	if self.activeTab ~= id then
+		self.activeTab = id;
+		self:RefreshUI();
+	end
+end
+
+function TabControl:GetActiveIndex()
+	for index, rec in pairs(self.tabs) do
+		if index == self.activeTab then return index end;
+	end
+	return -1;
+end
