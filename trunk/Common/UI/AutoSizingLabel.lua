@@ -22,6 +22,8 @@ AutoSizingLabel = class( Turbine.UI.Label );
 function AutoSizingLabel:Constructor()
     Turbine.UI.Label.Constructor( self );
     
+    Turbine.UI.Label.SetSize(self,1,1);
+    
     local vert =Turbine.UI.Lotro.ScrollBar();
     vert:SetOrientation(Turbine.UI.Orientation.Vertical);
     vert:SetBackColor(Turbine.UI.Color(0,0,0));
@@ -55,8 +57,9 @@ function AutoSizingLabel:SetWidth(w)
 	if w == 'auto' then
 		self:SetHorizontalScrollBar(self.bars.hor);
 		local count = 1;
+		--Turbine.UI.Label.SetWidth(self,1);
 		while self.bars.hor:IsVisible() do
-			Turbine.UI.Label.SetWidth(self,self:GetWidth() + 5);
+			Turbine.UI.Label.SetWidth(self,self:GetWidth() + 2);
 			count = count + 1;
 		end			
 	else
@@ -69,8 +72,9 @@ function AutoSizingLabel:SetHeight(h)
 	if h == 'auto' then
 		self:SetVerticalScrollBar(self.bars.vert);
 		local count = 1;
+		--Turbine.UI.Label.SetHeight(self,1);
 		while self.bars.vert:IsVisible() and count < 100 do
-			Turbine.UI.Label.SetHeight(self,self:GetHeight() + 5);
+			Turbine.UI.Label.SetHeight(self,self:GetHeight() + 2);
 			count = count + 1;
 		end
 	else

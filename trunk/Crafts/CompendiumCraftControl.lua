@@ -23,7 +23,7 @@ import "Compendium.Common.UI";
 import "Compendium.Crafts.CompendiumCraftsDB";
 import "Compendium.Crafts.CraftCategoryMenu";
 
-local rowHeight = 40;
+local rowHeight = 45;
 	
 CompendiumCraftControl = class( Compendium.Common.UI.CompendiumControl );
 function CompendiumCraftControl:Constructor()
@@ -149,8 +149,8 @@ function CompendiumCraftControl:Constructor()
     		self.aliasMenu:ShowAliasMenu(item.record);
     		local lh = self.craftContainer.CraftList:GetHeight();
     		local mh = self.aliasMenu:GetHeight();
-    		local left = item:GetLeft() + args.X - 3;
-    		local top = item:GetTop() + args.Y - 3;
+    		local left = item:GetParent():GetLeft() + item:GetLeft() + args.X - 3;
+    		local top = item:GetParent():GetTop() + item:GetTop() + args.Y - 3;
     		
     		if (top + mh) > lh then
     			top = lh - mh;
@@ -415,32 +415,97 @@ function CompendiumCraftControl:LoadItems(records)
 
 
     for i,rec in pairs(records) do
-        local level = rec["l"];
         --Turbine.Shell.WriteLine(rec['n']);
-        local name = rec['n'] .. ' : Regular ' .. self:FormatItem(rec['r']);
-        if rec['c'] ~= nil then
-        	name = name .. ', Crit: ' .. self:FormatItem(rec['c']);
-        end 
-        name = name .. ' | ' .. rec['t'];
+        
+        local det = rec['t'];
         if rec['tr'] ~= '' then
-        	name = name .. ' Tier ' .. rec['tr'];
+        	det = det .. ' Tier ' .. rec['tr'];
         end
-        name = name .. ' | Usage: ' .. rec['u'];
-        if rec['f'] ~= nil then
-        	name = name .. ' | Learned from ' .. self:FormatItem(rec['f']);
-        end
-        
-        local label = Turbine.UI.Label();
-        label:SetSize(width - 13, rowHeight);
-        
-        label:SetText(name);
+        det = det .. ' | Usage: ' .. rec['u'];
+
+        local row = Turbine.UI.Control();
+        row:SetSize(width - 13, rowHeight);
+
+		local lwidth = (row:GetWidth() / 2) - 80; 
+        local label = Compendium.Common.UI.AutoSizingLabel(); --Turbine.UI.Label();
+        label:SetSize(lwidth, 13);
+        label:SetText(rec['n']);
         label:SetBackColor(bgColor);
-        label:SetFont(Turbine.UI.Lotro.Font.Verdana13);
+        label:SetFont(Turbine.UI.Lotro.Font.Verdana14);
         label:SetSelectable(true);
-        label.record = { name = rec['n'] };
-        label.MouseClick = self.ClickEvent;        
-        label:SetForeColor(self.white);
-        self.craftContainer.CraftList:AddItem(label);
+        label:SetParent(row);
+        label:SetForeColor(self.fontColor);
+        label:SetPosition(0,0);
+		label:SetHeight('auto');
+		
+        local detail = Turbine.UI.Label();
+		detail:SetParent(row);
+        detail:SetSize(lwidth, 10);
+        detail:SetMultiline(false);
+        detail:SetText(det);
+        detail:SetBackColor(bgColor);
+        detail:SetFont(Turbine.UI.Lotro.Font.Verdana12);
+        detail:SetSelectable(true);     
+        detail:SetForeColor(self.trimColor);
+		detail:SetPosition(0, 26);
+		label.SizeChanged = function(s,a)
+			detail:SetPosition(0, label:GetHeight());
+		end        
+        
+        local iwidth = row:GetWidth() - lwidth;
+        
+        local top = 0;
+        local regular = Turbine.UI.Label();
+		regular:SetParent(row);
+        regular:SetSize(iwidth, 13);
+        regular:SetMultiline(false);
+        regular:SetText('Reg:' .. self:FormatItem(rec['r']));
+        regular:SetBackColor(bgColor);
+        regular:SetFont(Turbine.UI.Lotro.Font.Verdana13);
+        regular:SetSelectable(true);
+        if rec['r']['id'] ~= nil then
+	        regular.record = { name = rec['r']['n'], id = rec['r']['id'] };
+	        regular.MouseClick = self.ClickEvent;        
+        end               
+        regular:SetForeColor(self.white);
+		regular:SetPosition(label:GetWidth(),0);
+		top = regular:GetHeight();
+		
+		if rec['c'] ~= nil then
+	 		local crit = Turbine.UI.Label();
+	        crit:SetParent(row);
+	        crit:SetSize(iwidth, 13);
+	        crit:SetMultiline(false);
+	        crit:SetText('Crit:' .. self:FormatItem(rec['c']));
+	        crit:SetBackColor(bgColor);
+	        crit:SetFont(Turbine.UI.Lotro.Font.Verdana13);
+	        crit:SetSelectable(true);
+	        if rec['c']['id'] ~= nil then
+		        crit.record = { name = rec['c']['n'], id = rec['c']['id'] };
+		        crit.MouseClick = self.ClickEvent;
+	        end        
+	        crit:SetForeColor(self.white);
+	        crit:SetPosition(label:GetWidth(),top);
+	        top = top + crit:GetHeight();
+        end
+        
+        if rec['f'] ~= nil then
+        	local learn = Turbine.UI.Label();
+			learn:SetParent(row);
+	        learn:SetSize(iwidth, 13);
+	        learn:SetMultiline(false);
+	        learn:SetText('Learn:' .. self:FormatItem(rec['f']));
+	        learn:SetBackColor(bgColor);
+	        learn:SetFont(Turbine.UI.Lotro.Font.Verdana13);
+	        learn:SetSelectable(true);
+	        if rec['f']['id'] ~= nil then
+		        learn.record = { name = rec['f']['n'], id = rec['f']['id'] };
+		        learn.MouseClick = self.ClickEvent;
+		    end        
+	        learn:SetForeColor(self.white);
+			learn:SetPosition(label:GetWidth(), top);
+        end
+        self.craftContainer.CraftList:AddItem(row);
     end
     
 end
