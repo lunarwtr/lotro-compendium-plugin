@@ -16,6 +16,7 @@
 
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
+import "Compendium.Common.Utils";
 
 MiniAliasQuickslot = class( Turbine.UI.Control );
 

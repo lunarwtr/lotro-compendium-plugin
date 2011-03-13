@@ -18,20 +18,20 @@ import "Turbine.Gameplay";
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
 
-import "Compendium.Items.CompendiumItemsDB";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
-import "Compendium.Items.ItemCategoryMenu";
+import "Compendium.Crafts.CompendiumCraftsDB";
+import "Compendium.Crafts.CraftCategoryMenu";
 
-local rowHeight = 25;
+local rowHeight = 40;
 	
-CompendiumItemControl = class( Compendium.Common.UI.CompendiumControl );
-function CompendiumItemControl:Constructor()
+CompendiumCraftControl = class( Compendium.Common.UI.CompendiumControl );
+function CompendiumCraftControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 
 	self.searchDisabled = true;
 
-    self.menu = Compendium.Items.ItemCategoryMenu();
+    self.menu = Compendium.Crafts.CraftCategoryMenu();
     self.menu.ClickCategory = function(categories) 
 		self:AddFilters(categories);
 	end
@@ -120,34 +120,34 @@ function CompendiumItemControl:Constructor()
     filtersLabel:SetText("No filters set");	
 	self.filtersLabel = filtersLabel;
 
-    self.itemContainer=Turbine.UI.Control();
-    self.itemContainer:SetParent(self);
-    self.itemContainer:SetPosition(5, filtersLabel:GetTop() +  filtersLabel:GetHeight());
-    self.itemContainer:SetSize(self:GetWidth() - 7,self:GetHeight() - self.itemContainer:GetTop() - 70);
-    self.itemContainer:SetBackColor(Turbine.UI.Color(0,0,0)); -- this one has to stay fixed for grid to show
-    self.itemContainer.ItemList=Turbine.UI.ListBox();
-    self.itemContainer.ItemList:SetParent(self.itemContainer);
-    self.itemContainer.ItemList:SetPosition(2,1);
-    self.itemContainer.ItemList:SetSize(self.itemContainer:GetWidth()-4,self.itemContainer:GetHeight()-3);
-    self.itemContainer.ItemList:SetBackColor(self.backColor);
-    self.itemContainer.ItemList.VScrollBar=Turbine.UI.Lotro.ScrollBar();
-    self.itemContainer.ItemList.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
-    self.itemContainer.ItemList.VScrollBar:SetParent(self.itemContainer.ItemList);
-    self.itemContainer.ItemList.VScrollBar:SetBackColor(self.backColor);
-    self.itemContainer.ItemList.VScrollBar:SetPosition(self.itemContainer:GetWidth()-16,0)
-    self.itemContainer.ItemList.VScrollBar:SetWidth(12);
-    self.itemContainer.ItemList.VScrollBar:SetHeight(self.itemContainer:GetHeight()-2);
-    self.itemContainer.ItemList:SetVerticalScrollBar(self.itemContainer.ItemList.VScrollBar);
+    self.craftContainer=Turbine.UI.Control();
+    self.craftContainer:SetParent(self);
+    self.craftContainer:SetPosition(5, filtersLabel:GetTop() +  filtersLabel:GetHeight());
+    self.craftContainer:SetSize(self:GetWidth() - 7,self:GetHeight() - self.craftContainer:GetTop() - 70);
+    self.craftContainer:SetBackColor(Turbine.UI.Color(0,0,0)); -- this one has to stay fixed for grid to show
+    self.craftContainer.CraftList=Turbine.UI.ListBox();
+    self.craftContainer.CraftList:SetParent(self.craftContainer);
+    self.craftContainer.CraftList:SetPosition(2,1);
+    self.craftContainer.CraftList:SetSize(self.craftContainer:GetWidth()-4,self.craftContainer:GetHeight()-3);
+    self.craftContainer.CraftList:SetBackColor(self.backColor);
+    self.craftContainer.CraftList.VScrollBar=Turbine.UI.Lotro.ScrollBar();
+    self.craftContainer.CraftList.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
+    self.craftContainer.CraftList.VScrollBar:SetParent(self.craftContainer.CraftList);
+    self.craftContainer.CraftList.VScrollBar:SetBackColor(self.backColor);
+    self.craftContainer.CraftList.VScrollBar:SetPosition(self.craftContainer:GetWidth()-16,0)
+    self.craftContainer.CraftList.VScrollBar:SetWidth(12);
+    self.craftContainer.CraftList.VScrollBar:SetHeight(self.craftContainer:GetHeight()-2);
+    self.craftContainer.CraftList:SetVerticalScrollBar(self.craftContainer.CraftList.VScrollBar);
 	
     local aliasMenu = Compendium.Common.UI.ItemAliasMenu();
-    aliasMenu:SetParent(self.itemContainer.ItemList);
+    aliasMenu:SetParent(self.craftContainer.CraftList);
     self.aliasMenu = aliasMenu;
     
     self.ClickEvent = function( item, args )
     	if args.Button == Turbine.UI.MouseButton.Right then
     		-- right mouse button
     		self.aliasMenu:ShowAliasMenu(item.record);
-    		local lh = self.itemContainer.ItemList:GetHeight();
+    		local lh = self.craftContainer.CraftList:GetHeight();
     		local mh = self.aliasMenu:GetHeight();
     		local left = item:GetLeft() + args.X - 3;
     		local top = item:GetTop() + args.Y - 3;
@@ -162,8 +162,8 @@ function CompendiumItemControl:Constructor()
     
     local pagination = Turbine.UI.Label();
     pagination:SetParent(self);
-    pagination:SetSize(self.itemContainer:GetWidth(),20);
-    pagination:SetPosition(5,self.itemContainer:GetTop() + self.itemContainer:GetHeight());
+    pagination:SetSize(self.craftContainer:GetWidth(),20);
+    pagination:SetPosition(5,self.craftContainer:GetTop() + self.craftContainer:GetHeight());
    	pagination:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
     pagination:SetFont(self.fontFace);
     pagination:SetForeColor(self.fontColor);
@@ -228,11 +228,11 @@ function CompendiumItemControl:Constructor()
  	self.SetHeight = function(sender,height)
         if height<80 then height=80 end;
         Turbine.UI.Control.SetHeight(self,height);
-        local icheight = height - self.itemContainer:GetTop() - pagination:GetHeight();
-        self.itemContainer:SetHeight(icheight);
-        self.itemContainer.ItemList:SetHeight(icheight - 3);
-        self.itemContainer.ItemList.VScrollBar:SetHeight(icheight - 2);
-        pagination:SetTop(self.itemContainer:GetTop() + self.itemContainer:GetHeight());
+        local icheight = height - self.craftContainer:GetTop() - pagination:GetHeight();
+        self.craftContainer:SetHeight(icheight);
+        self.craftContainer.CraftList:SetHeight(icheight - 3);
+        self.craftContainer.CraftList.VScrollBar:SetHeight(icheight - 2);
+        pagination:SetTop(self.craftContainer:GetTop() + self.craftContainer:GetHeight());
 
 		-- recalculate # of rows we can show on screen per page
         self:CalcPageSize();
@@ -254,11 +254,11 @@ function CompendiumItemControl:Constructor()
 	    reset:SetLeft( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 1 );
 	
         local icwidth = width - 7;
-        self.itemContainer:SetWidth(icwidth);
-        self.itemContainer.ItemList:SetWidth(icwidth - 4);
-		self.itemContainer.ItemList.VScrollBar:SetLeft(icwidth-16,0)        
-		for index=1,self.itemContainer.ItemList:GetItemCount() do
-			local label = self.itemContainer.ItemList:GetItem(index);
+        self.craftContainer:SetWidth(icwidth);
+        self.craftContainer.CraftList:SetWidth(icwidth - 4);
+		self.craftContainer.CraftList.VScrollBar:SetLeft(icwidth-16,0)        
+		for index=1,self.craftContainer.CraftList:GetItemCount() do
+			local label = self.craftContainer.CraftList:GetItem(index);
 			label:SetWidth(icwidth - 13);
 		end
 		pagination:SetWidth(icwidth);
@@ -269,18 +269,18 @@ function CompendiumItemControl:Constructor()
 		self:SetWidth(width);
 		self:SetHeight(height);
 	end	
-	
+
 end
 
-function CompendiumItemControl:ClearItems()
-    self.itemContainer.ItemList:ClearItems();
+function CompendiumCraftControl:ClearItems()
+    self.craftContainer.CraftList:ClearItems();
     self.prevIdx = nil;
 	self.prevBtn:SetEnabled(false);
 	self.nextBtn:SetEnabled(false);
 	self.pagination:SetText('');
 end
 
-function CompendiumItemControl:BuildCursor()
+function CompendiumCraftControl:BuildCursor()
 	if self.searchDisabled then
 		return;
 	end
@@ -290,8 +290,8 @@ function CompendiumItemControl:BuildCursor()
 	-- filter results using our category indexes
 	local ids = nil;
 	for i,cat in pairs(self.currentFilters) do
-		if itemindexes[cat] ~= nil then
-			ids = self:JoinIndex(ids,itemindexes[cat]);
+		if craftindexes[cat] ~= nil then
+			ids = self:JoinIndex(ids,craftindexes[cat]);
 		end 
 	end
 	-- determine if a text search was used
@@ -304,7 +304,7 @@ function CompendiumItemControl:BuildCursor()
     else
     	-- if no search and no indexes use default cursor
     	if ids == nil then
-			self.cursor = Compendium.Common.Utils.DataCursor(itemstable, self.pagesize);
+			self.cursor = Compendium.Common.Utils.DataCursor(crafttable, self.pagesize);
 			self:LoadItems(self.cursor:CurPage());
 			self:UpdatePagination();   
 			return;
@@ -312,7 +312,7 @@ function CompendiumItemControl:BuildCursor()
     end
 
 	-- build data set	
-	local data = itemstable;
+	local data = crafttable;
 	if ids ~= nil then
 		data = ids 
 	end;
@@ -323,7 +323,7 @@ function CompendiumItemControl:BuildCursor()
 		if ids ~= nil then id = b end;
 
 		--Turbine.Shell.WriteLine('a:' .. a .. ' b:' .. b .. ' id:' .. id);		
-		local rec = itemstable[id];
+		local rec = crafttable[id];
         local include = true;
         if not ise then
             if string.find(string.lower(rec["n"]),escapedSearch) ~= 1 then
@@ -345,7 +345,7 @@ function CompendiumItemControl:BuildCursor()
 	
 end
 
-function CompendiumItemControl:UpdatePagination()
+function CompendiumCraftControl:UpdatePagination()
 	self.prevBtn:SetEnabled(false);
 	self.nextBtn:SetEnabled(false);
 	self.pagination:SetText('');
@@ -356,12 +356,12 @@ function CompendiumItemControl:UpdatePagination()
 	end
 end
 
-function CompendiumItemControl:AddFilters(categories)
+function CompendiumCraftControl:AddFilters(categories)
 	
 	local distinctCats = {};
 	for i,cat in pairs(self.currentFilters) do distinctCats[cat] = i end;
 	for i,cat in pairs(categories) do
-		if itemindexes[cat] ~= nil then distinctCats[cat] = i end; 
+		if craftindexes[cat] ~= nil then distinctCats[cat] = i end; 
 	end
 	self.currentFilters = {};
 	local count = 0;
@@ -377,7 +377,7 @@ function CompendiumItemControl:AddFilters(categories)
 	self:BuildCursor();
 end
 
-function CompendiumItemControl:JoinIndex(a, b)
+function CompendiumCraftControl:JoinIndex(a, b)
 	if a == nil then return b; end
 	
     local set = {};
@@ -391,41 +391,61 @@ function CompendiumItemControl:JoinIndex(a, b)
     return data;
 end
 
-function CompendiumItemControl:LoadItems(records)
+function CompendiumCraftControl:LoadItems(records)
 
-    local bgColor = self.itemContainer.ItemList:GetBackColor();
-    local width = self.itemContainer.ItemList:GetWidth();
+    local bgColor = self.craftContainer.CraftList:GetBackColor();
+    local width = self.craftContainer.CraftList:GetWidth();
     local playerLevel = Turbine.Gameplay.LocalPlayer.GetInstance():GetLevel();
+
+	--[[
+	{
+		["r"] = {["n"] = "Ancient Silver Flint Rune-stone", ["id"] = 1879112496}, 
+		["c"] = {["n"] = "Splendid Ancient Silver Flint Rune-stone", ["id"] = 1879112489}, 
+		["u"] = "Unlimited", 
+		["tr"] = 5, 
+		["n"] = "Ancient Silver Flint Rune-stone Recipe", 
+		["ing"] = {
+			{["n"] = "Ancient Silver Ingot", ["id"] = 1879055415, ["nu"] = "x2"}, 
+			{["n"] = "Chunk of Blue Rock-salt", ["id"] = 1879157857, ["nu"] = "x1 (optional)"}
+		}, 
+		["t"] = "Jeweller",
+		["f"] = {["n"] = "Heavy Cotton Robe Recipe", ["id"] = 1879087416}
+	}
+	]]
+
 
     for i,rec in pairs(records) do
         local level = rec["l"];
-        local cat = table.concat(rec['c'],', ');
-        local name = self:FormatItem(rec) .. ' lvl' .. level .. ' | ' .. rec['q'] .. ' | ' .. cat;
-        
-        if rec['lg'] ~= nil then name = name .. ' | Legendary' end;
-        if rec['ib'] ~= nil then name = name .. ' | ' .. rec['ib'] end;
+        --Turbine.Shell.WriteLine(rec['n']);
+        local name = rec['n'] .. ' : Regular ' .. self:FormatItem(rec['r']);
+        if rec['c'] ~= nil then
+        	name = name .. ', Crit: ' .. self:FormatItem(rec['c']);
+        end 
+        name = name .. ' | ' .. rec['t'];
+        if rec['tr'] ~= '' then
+        	name = name .. ' Tier ' .. rec['tr'];
+        end
+        name = name .. ' | Usage: ' .. rec['u'];
+        if rec['f'] ~= nil then
+        	name = name .. ' | Learned from ' .. self:FormatItem(rec['f']);
+        end
         
         local label = Turbine.UI.Label();
         label:SetSize(width - 13, rowHeight);
+        
         label:SetText(name);
         label:SetBackColor(bgColor);
-        label:SetFont(self.fontFaceSmall);
+        label:SetFont(Turbine.UI.Lotro.Font.Verdana13);
         label:SetSelectable(true);
-        label.record = { id = rec['id'], name = rec['n'] };
+        label.record = { name = rec['n'] };
         label.MouseClick = self.ClickEvent;        
-        
-        local color = self.fontColor;
-        if level ~= nil and level ~= '' then
-            color = self:GetLevelColor(playerLevel, tonumber(level));
-        end
-        label:SetForeColor(color);
-        self.itemContainer.ItemList:AddItem(label);
-
+        label:SetForeColor(self.white);
+        self.craftContainer.CraftList:AddItem(label);
     end
     
 end
 
-function CompendiumItemControl:Reset() 
+function CompendiumCraftControl:Reset() 
 	self.searchDisabled = true;
 	self:ClearItems();	
 	self.SearchText:SetText('');
@@ -436,26 +456,23 @@ function CompendiumItemControl:Reset()
 	self:BuildCursor();	
 end
 
-function CompendiumItemControl:FormatItem(record)
+function CompendiumCraftControl:FormatItem(record)
 	local item = '';
 	if record['id'] ~= nil then
 		local name = record['n'];
-		--[[
-		if #name > 30 then
-			name = string.sub(name, 1, 30)  .. "...";
-		end
-		]]
 		item = string.format(self.itemExampleTpl,record['id'],name);
 	else
-		--Turbine.Shell.WriteLine(record['id']);
 		item = '['..record['n']..']';
+	end
+	if record['nu'] ~= nil then
+		item = item .. ' ' .. record['nu'];
 	end
 	return item; 
 end
 
-function CompendiumItemControl:CalcPageSize() 
+function CompendiumCraftControl:CalcPageSize() 
 
-	local listHeight = self.itemContainer.ItemList:GetHeight();
+	local listHeight = self.craftContainer.CraftList:GetHeight();
 
 	self.pagesize = math.floor(listHeight / rowHeight);
 

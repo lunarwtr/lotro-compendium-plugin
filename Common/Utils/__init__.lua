@@ -13,23 +13,5 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ]]
-import "Compendium.Launcher.CompendiumLauncherWindow";
-
-local clw = CompendiumLauncherWindow();
-CompendiumWindowCommand = Turbine.ShellCommand();
-
-function CompendiumWindowCommand:Execute( command, arguments )
-    clw:SetVisible( true );
-end
-
-function CompendiumWindowCommand:GetHelp()
-    return "Shows the Compendium window.";
-end
-
-function CompendiumWindowCommand:GetShortHelp()
-    return "Shows Compendium.";
-end
-
-Turbine.Shell.AddCommand( "Comp;Compendium", CompendiumWindowCommand );
-
-listCommandsCommand = Turbine.ShellCommand();
+import "Compendium.Common.Utils.Class";
+import "Compendium.Common.Utils.DataCursor";

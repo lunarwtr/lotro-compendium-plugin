@@ -18,7 +18,7 @@ import "Turbine";
 import "Turbine.Gameplay";
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
-import "Compendium.Common";
+import "Compendium.Common.Utils";
 
 --[[
 	A base window class with reusable constants	and functions defined.

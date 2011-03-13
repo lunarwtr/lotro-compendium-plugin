@@ -17,7 +17,7 @@ import "Turbine";
 import "Turbine.Gameplay";
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
-import "Compendium.Common.Class";
+import "Compendium.Common.Utils";
 import "Compendium.Common.UI.CompendiumWindow";
 
 CompendiumAboutWindow = class( Compendium.Common.UI.CompendiumWindow );
@@ -47,7 +47,7 @@ function CompendiumAboutWindow:Constructor()
 	version:SetParent(self.MainPanel);
 	version:SetSize(70,30);
 	version:SetPosition(3,102);
-	version:SetText('version\n1.2-beta');
+	version:SetText('version\n1.3-beta');
     version:SetFont(self.fontFace);
     version:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
     

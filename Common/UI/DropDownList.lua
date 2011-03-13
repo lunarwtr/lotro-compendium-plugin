@@ -24,6 +24,8 @@
 
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
+import "Compendium.Common.Utils";
+
 DropDownList = class( Turbine.UI.Control );
 
 function DropDownList:Constructor()
