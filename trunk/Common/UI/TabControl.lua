@@ -14,11 +14,10 @@
    limitations under the License.
 
 ]]
-import "Turbine";
-import "Turbine.Gameplay";
+
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
-import "Compendium.Common";
+import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 
 TabControl = class( Compendium.Common.UI.CompendiumControl );
@@ -35,12 +34,15 @@ function TabControl:Constructor()
 			self:OnActiveTabChange(self:GetActiveIndex());
 	    end,
 		MouseEnter = function( sender, args )
-		   	sender:SetBackground( "Compendium/Common/Resources/images/compendium-tab-selected.tga" );
+		   	sender:SetActive(true);
 		end,
 		MouseLeave = function( sender, args )
 			if sender.id ~= self.activeTab then
-				sender:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );
+				sender:SetActive(false);
 			end
+		end,
+		SizeChanged = function(sender, args)
+			self:RefreshUI();
 		end
 	};
 
@@ -86,20 +88,12 @@ end
 
 function TabControl:AddTab(title, control)
 	-- build label
-    local tab = Turbine.UI.Label();
+    local tab = Compendium.Common.UI.Tab(title);
 	tab:SetVisible(false);
     tab:SetParent( self );
-    tab:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
-    tab:SetText( title );
-    tab:SetFont(self.fontFace);
-    tab:SetForeColor(self.fontColor);
-    tab:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    tab:SetFontStyle(Turbine.UI.FontStyle.Outline);    
-    tab:SetPosition( 30, 0 );
-    tab:SetSize( 111, 23 );
-   	tab:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );    
+	tab:SetHeight(23);
     tab:SetZOrder(101);
-    tab:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);
+    --tab:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);
 	
 	-- apply events to tab
 	for name, func in pairs(self.events) do
@@ -131,10 +125,10 @@ function TabControl:RefreshUI()
 		tab:SetPosition(left,0);
 		tab:SetVisible(true);
 		if index == self.activeTab then 
-			tab:SetBackground( "Compendium/Common/Resources/images/compendium-tab-selected.tga" );
+			tab:SetActive(true);
 			rec.control:SetVisible(true);
 		else
-			tab:SetBackground( "Compendium/Common/Resources/images/compendium-tab-nonselected.tga" );
+			tab:SetActive(false);
 			rec.control:SetVisible(false);
 		end
 		left = left + tab:GetWidth() + 4;

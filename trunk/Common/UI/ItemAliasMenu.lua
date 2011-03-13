@@ -16,8 +16,9 @@
 
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
+import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
-import "Compendium.Items.MiniAliasQuickslot";
+import "Compendium.Common.UI.MiniAliasQuickslot";
 
 ItemAliasMenu = class( Compendium.Common.UI.LabelMenu );
 
@@ -59,7 +60,7 @@ function ItemAliasMenu:Constructor()
 	    listitem:SetFont(fontFace);
 	    listitem:SetForeColor(fontColor); 	
 	
-		local quickslot = Compendium.Items.MiniAliasQuickslot();
+		local quickslot = Compendium.Common.UI.MiniAliasQuickslot();
 	    quickslot:SetParent( listitem );
 	    quickslot:SetPosition( listitem:GetWidth(), 1 );
 	    quickslot.QuickslotClick = function() self:HideMenu() end;

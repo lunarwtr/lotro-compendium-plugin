@@ -18,10 +18,12 @@ import "Turbine.Gameplay";
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
 
-import "Compendium.Common";
+import "Compendium.Common.Utils";
+import "Compendium.Common.UI";
 import "Compendium.Common.UI";
 import "Compendium.Items";
 import "Compendium.Quests";
+import "Compendium.Crafts";
 import "Compendium.Launcher.CompendiumShortcut";
 
 CompendiumLauncherWindow = class( Compendium.Common.UI.CompendiumWindow );
@@ -91,6 +93,7 @@ function CompendiumLauncherWindow:Constructor()
 	tabs:SetPosition(9,30);
 	tabs:AddTab("Quests",  Compendium.Quests.CompendiumQuestControl());
 	tabs:AddTab("Items",  Compendium.Items.CompendiumItemControl());
+	tabs:AddTab("Crafting",  Compendium.Crafts.CompendiumCraftControl());
 	tabs:SetActiveIndex(self.Settings.ActiveTabIndex);
 
 	tabs.OnActiveTabChange = function (sender,index) 

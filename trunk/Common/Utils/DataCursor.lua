@@ -1,5 +1,5 @@
 
-import "Compendium.Common.Class";
+import "Compendium.Common.Utils";
 
 DataCursor = class();
 

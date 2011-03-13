@@ -19,7 +19,7 @@ import "Turbine.UI";
 import "Turbine.UI.Lotro";
 
 import "Compendium.Quests.CompendiumQuestsDB";
-import "Compendium.Common";
+import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 
 CompendiumQuestControl= class( Compendium.Common.UI.CompendiumControl );
