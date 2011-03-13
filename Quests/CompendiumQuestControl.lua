@@ -314,7 +314,15 @@ function CompendiumQuestControl:Constructor()
 end
 
 function CompendiumQuestControl:ClearQuests()
-    self.qlContainer.QuestList:ClearItems();
+	for index=1,self.qlContainer.QuestList:GetItemCount() do
+		local item = self.qlContainer.QuestList:GetItem(index);
+		self:strip(item, 1);
+	end	
+	self.qlContainer.QuestList:ClearItems();
+	for index=1,self.qdContainer.QuestDetails:GetItemCount() do
+		local item = self.qdContainer.QuestDetails:GetItem(index);
+		self:strip(item, 1);
+	end		
     self.qdContainer.QuestDetails:ClearItems();
     self.QuestComments:SetText("");
     self:AddQuestDetail("No quest selected");

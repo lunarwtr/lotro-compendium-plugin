@@ -106,3 +106,44 @@ function CompendiumControl:tostring(set)
   end
   return s .. "}"
 end
+
+function CompendiumControl:destroy()
+	self:strip(self);
+end
+
+local stripVars = { 'record', 'MouseEnter', 'MouseLeave', 'Click', 'MouseClick', 'MouseHover', 'SizeChanged', 'VisibleChanged', 'Update' };
+function CompendiumControl:strip( control, depth )
+	if depth == nil then depth = 1 end;
+	if depth > 5 then return end;
+	--Turbine.Shell.WriteLine('Cleaning item at depth ' .. depth);
+	
+	if control.GetControls ~= nil then
+		local conts = control:GetControls(); 
+		for i = 1,conts:GetCount() do
+			local child = conts:Get(i);
+			if child.destroy ~= nil then
+				child:destroy();
+			else
+				self:strip( child, depth + 1 );
+			end
+		end
+		conts:Clear();
+	end
+
+	if control.GetItemCount ~= nil and control.Getitem ~= nil then
+		for index=1,control:GetItemCount() do
+			local item = control:GetItem(index);
+			if item.destroy ~= nil then
+				item:destroy();
+			else
+				self:strip( item, depth + 1);
+			end			
+		end
+	end
+	
+	for i,var in pairs(stripVars) do
+		if control[var] ~= nil then 
+			control[var] = nil 
+		end;
+	end
+end

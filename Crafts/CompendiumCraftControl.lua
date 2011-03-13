@@ -139,26 +139,55 @@ function CompendiumCraftControl:Constructor()
     self.craftContainer.CraftList.VScrollBar:SetHeight(self.craftContainer:GetHeight()-2);
     self.craftContainer.CraftList:SetVerticalScrollBar(self.craftContainer.CraftList.VScrollBar);
 	
+	-- item linking menu
     local aliasMenu = Compendium.Common.UI.ItemAliasMenu();
     aliasMenu:SetParent(self.craftContainer.CraftList);
     self.aliasMenu = aliasMenu;
     
-    self.ClickEvent = function( item, args )
-    	if args.Button == Turbine.UI.MouseButton.Right then
-    		-- right mouse button
-    		self.aliasMenu:ShowAliasMenu(item.record);
+    -- ingrediants menu
+	self.ingMenu = Compendium.Common.UI.LabelMenu();
+	self.ingMenu:SetParent(self.craftContainer.CraftList);
+    self.ingMenu:SetRowHighlight(false);
+    
+    self.itemEvents = {
+    	ItemClickEvent = function( item, args )
+	    	if args.Button == Turbine.UI.MouseButton.Right then
+	    		-- right mouse button
+	    		self.aliasMenu:ShowAliasMenu(item.record);
+	    		local lh = self.craftContainer.CraftList:GetHeight();
+	    		local mh = self.aliasMenu:GetHeight();
+	    		local left = item:GetParent():GetLeft() + item:GetLeft() + args.X - 3;
+	    		local top = item:GetParent():GetTop() + item:GetTop() + args.Y - 3;
+	    		
+	    		if (top + mh) > lh then
+	    			top = lh - mh;
+	    		end 
+	    		
+	    		self.aliasMenu:SetPosition(left, top);
+	    	end
+	    end,
+	    RecipeClickEvent = function( recipe, args, record )
+    		self:LoadIngrediants(record);
+			self.ingMenu:ShowMenu();
     		local lh = self.craftContainer.CraftList:GetHeight();
-    		local mh = self.aliasMenu:GetHeight();
-    		local left = item:GetParent():GetLeft() + item:GetLeft() + args.X - 3;
-    		local top = item:GetParent():GetTop() + item:GetTop() + args.Y - 3;
-    		
+    		local mh = self.ingMenu:GetHeight();
+    		local left = recipe:GetParent():GetLeft() + recipe:GetLeft() + args.X - 3;
+    		local top = recipe:GetParent():GetTop() + recipe:GetTop() + args.Y - 3;
     		if (top + mh) > lh then
     			top = lh - mh;
     		end 
-    		
-    		self.aliasMenu:SetPosition(left, top);
-    	end
-    end 
+    		self.ingMenu:SetPosition(left, top);
+	    end,
+		LabelEnter = function(sender,a) 
+			sender:SetOutlineColor(self.fontColor);
+		    sender:SetFontStyle(Turbine.UI.FontStyle.Outline);
+		end,
+		LabelLeave = function(sender,a) 
+			sender:SetOutlineColor(Turbine.UI.Color(0,0,0));
+		    sender:SetFontStyle(nil);
+		end	    
+	     
+    };
     
     local pagination = Turbine.UI.Label();
     pagination:SetParent(self);
@@ -273,6 +302,10 @@ function CompendiumCraftControl:Constructor()
 end
 
 function CompendiumCraftControl:ClearItems()
+	for index=1,self.craftContainer.CraftList:GetItemCount() do
+		local item = self.craftContainer.CraftList:GetItem(index);
+		self:strip(item, 1);
+	end	
     self.craftContainer.CraftList:ClearItems();
     self.prevIdx = nil;
 	self.prevBtn:SetEnabled(false);
@@ -437,6 +470,11 @@ function CompendiumCraftControl:LoadItems(records)
         label:SetForeColor(self.fontColor);
         label:SetPosition(0,0);
 		label:SetHeight('auto');
+		label.MouseClick = function(s,a) 
+			self.itemEvents.RecipeClickEvent(s,a,rec);
+		end
+		label.MouseEnter = self.itemEvents.LabelEnter;
+		label.MouseLeave = self.itemEvents.LabelLeave;
 		
         local detail = Turbine.UI.Label();
 		detail:SetParent(row);
@@ -465,8 +503,8 @@ function CompendiumCraftControl:LoadItems(records)
         regular:SetSelectable(true);
         if rec['r']['id'] ~= nil then
 	        regular.record = { name = rec['r']['n'], id = rec['r']['id'] };
-	        regular.MouseClick = self.ClickEvent;        
-        end               
+	        regular.MouseClick = self.itemEvents.ItemClickEvent;        
+        end
         regular:SetForeColor(self.white);
 		regular:SetPosition(label:GetWidth(),0);
 		top = regular:GetHeight();
@@ -482,7 +520,7 @@ function CompendiumCraftControl:LoadItems(records)
 	        crit:SetSelectable(true);
 	        if rec['c']['id'] ~= nil then
 		        crit.record = { name = rec['c']['n'], id = rec['c']['id'] };
-		        crit.MouseClick = self.ClickEvent;
+		        crit.MouseClick = self.itemEvents.ItemClickEvent;
 	        end        
 	        crit:SetForeColor(self.white);
 	        crit:SetPosition(label:GetWidth(),top);
@@ -500,7 +538,7 @@ function CompendiumCraftControl:LoadItems(records)
 	        learn:SetSelectable(true);
 	        if rec['f']['id'] ~= nil then
 		        learn.record = { name = rec['f']['n'], id = rec['f']['id'] };
-		        learn.MouseClick = self.ClickEvent;
+		        learn.MouseClick = self.itemEvents.ItemClickEvent;
 		    end        
 	        learn:SetForeColor(self.white);
 			learn:SetPosition(label:GetWidth(), top);
@@ -510,9 +548,53 @@ function CompendiumCraftControl:LoadItems(records)
     
 end
 
+function CompendiumCraftControl:LoadIngrediants( rec )
+
+	local menu = self.ingMenu;
+	
+	-- if that item is currently loaded, return
+	if menu.loadedItem == rec['n'] then return end;
+	
+	menu:ClearMenu();
+	
+	local label = Turbine.UI.Label();
+    label:SetParent( menu );
+    label:SetText('Ingrediants');
+    label:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
+    label:SetSize( 250, 18 );
+    label:SetFont(self.fontFace);
+    label:SetForeColor(self.fontColor);	
+	menu:AddItem(label);
+	
+	if rec['ing'] ~= nil and #rec['ing'] > 0 then
+		for i, r in pairs(rec['ing']) do
+			label = Turbine.UI.Label();
+		    label:SetParent( menu );
+		    label:SetMultiline(false);
+		    label:SetText(self:FormatItem(r));
+		    label:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
+		    label:SetSize( 250, 18 );
+		    label:SetFont(self.fontFace);
+		    label:SetForeColor(self.fontColor);		
+			menu:AddItem(label);
+		end
+	else
+		label = Turbine.UI.Label();
+	    label:SetParent( menu );
+	    label:SetText( '  (unknown)' );
+	    label:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
+	    label:SetSize( 250, 18 );
+	    label:SetFont(self.fontFace);
+	    label:SetForeColor(self.fontColor);			
+		menu:AddItem(label);
+	end
+	
+end
+
 function CompendiumCraftControl:Reset() 
 	self.searchDisabled = true;
-	self:ClearItems();	
+	self.ingMenu:ClearMenu();	
+	self:ClearItems();
 	self.SearchText:SetText('');
 	self.currentFilters = {};
 	self.filtersLabel:SetText('No filters set');

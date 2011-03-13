@@ -108,6 +108,16 @@ function LabelMenu:RecalcSize()
 
 end
 
+function LabelMenu:ClearMenu()
+	for index=1,self.list:GetItemCount() do
+		local item = self.list:GetItem(index);
+		item.MouseEnter = nil;
+		item.MouseLeave = nil;
+	end
+	self.list:ClearItems();
+	self:RecalcSize();
+end
+
 function LabelMenu:ShowMenu()
 	self.hideTime = nil;
 	self:SetVisible(true);
@@ -122,4 +132,10 @@ end
 
 function LabelMenu:SetRowHighlight(val)
 	self.rowHighlight = val;
+end
+
+function LabelMenu:destroy()
+	self:ClearMenu();
+	self.list:SetWantsUpdates(false);	
+	self.list.Update = nil;
 end

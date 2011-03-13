@@ -83,3 +83,9 @@ function AutoSizingLabel:SetHeight(h)
 	end
 end
 
+function AutoSizingLabel:destroy()
+	self.bars.vert.VisibleChanged = nil;
+	self.bars.hor.VisibleChanged = nil;
+	self.bars = nil;
+	self:GetControls():Clear();
+end

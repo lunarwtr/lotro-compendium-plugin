@@ -16,6 +16,7 @@
 import "Compendium.Launcher.CompendiumLauncherWindow";
 
 local clw = CompendiumLauncherWindow();
+
 CompendiumWindowCommand = Turbine.ShellCommand();
 
 function CompendiumWindowCommand:Execute( command, arguments )
