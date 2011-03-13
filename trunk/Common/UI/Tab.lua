@@ -103,3 +103,12 @@ function Tab:SetActive( active )
 	self.pieces[3]:SetBackground(image('r',status));
 	
 end
+
+function Tab:destroy() 
+	for i, item in pairs(self.pieces) do
+		item.MouseClick = nil;
+		item.MouseEnter = nil;
+		item.MouseLeave = nil;
+	end
+	self:GetControls():Clear();	
+end

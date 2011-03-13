@@ -100,7 +100,8 @@ function CompendiumLauncherWindow:Constructor()
 		self.Settings.ActiveTabIndex = index;
 		self:SaveSettings();
 	end
-
+	self.tabs = tabs;
+	
  	self.SetHeight = function(sender,height)
         if height<150 then height=150 end;
         Turbine.UI.Lotro.Window.SetHeight(self,height);
@@ -209,6 +210,11 @@ function CompendiumLauncherWindow:Constructor()
     end
     
 	self:SetSize(self.Settings.WindowSize.width, self.Settings.WindowSize.height);
+	if Plugins.Compendium.Unload == nil then
+		Plugins.Compendium.Unload = function() 
+			self:destroy();
+		end
+	end
 	
 end
 
@@ -245,4 +251,14 @@ end
 
 function CompendiumLauncherWindow:SaveSettings()
 	Turbine.PluginData.Save( Turbine.DataScope.Account, "CompendiumSettings", self.Settings );
+end
+
+function CompendiumLauncherWindow:destroy()
+	Turbine.Shell.WriteLine('Unloading Compendium..');
+	self.MouseDown = nil;
+	self.MouseMove = nil;
+	self.MouseUp = nil;
+	self.PositionChanged = nil;
+	self.VisibleChanged = nil;	
+	self.tabs:destroy();
 end

@@ -153,3 +153,23 @@ function TabControl:GetActiveIndex()
 	end
 	return -1;
 end
+
+function TabControl:destroy()
+	for index, rec in pairs(self.tabs) do
+		if rec.tab.destroy ~= nil then
+			rec.tab:destroy();
+		else
+			self:strip(rec.tab);
+		end;
+		if rec.control.destroy ~= nil then
+			rec.control:destroy();
+		else
+			self:strip(rec.control);
+		end;
+		rec.tab = nil;
+		rec.control = nil;
+	end
+	self.tabs = nil;
+	self.events = nil;
+	Compendium.Common.UI.CompendiumControl.destroy(self);
+end

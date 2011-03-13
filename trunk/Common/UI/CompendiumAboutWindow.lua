@@ -47,7 +47,7 @@ function CompendiumAboutWindow:Constructor()
 	version:SetParent(self.MainPanel);
 	version:SetSize(70,30);
 	version:SetPosition(3,102);
-	version:SetText('version\n1.3-beta');
+	version:SetText('version\n' .. Plugins.Compendium:GetVersion());
     version:SetFont(self.fontFace);
     version:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
     

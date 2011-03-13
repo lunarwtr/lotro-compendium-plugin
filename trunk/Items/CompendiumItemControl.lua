@@ -273,6 +273,10 @@ function CompendiumItemControl:Constructor()
 end
 
 function CompendiumItemControl:ClearItems()
+	for index=1,self.itemContainer.ItemList:GetItemCount() do
+		local item = self.itemContainer.ItemList:GetItem(index);
+		self:strip(item, 1);
+	end	
     self.itemContainer.ItemList:ClearItems();
     self.prevIdx = nil;
 	self.prevBtn:SetEnabled(false);
