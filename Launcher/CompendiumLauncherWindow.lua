@@ -55,7 +55,16 @@ function CompendiumLauncherWindow:Constructor()
 		self:SaveSettings();
 	end
 
-    self:SetText( "Compendium" );
+    self:SetText( "Compendium " );
+ 
+ 	local version = Turbine.UI.Label();
+ 	version:SetParent(self);
+ 	version:SetSize(100,15);
+ 	version:SetText('(' .. Plugins.Compendium:GetVersion() .. ')');
+ 	version:SetPosition((self:GetWidth() / 2) + 65,10);
+ 	version:SetFont(Turbine.UI.Lotro.Font.TrajanPro13);
+    version:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
+ 	version:SetForeColor(self.fontColor);
  
     self.footer=Turbine.UI.Control();
     self.footer:SetSize(self:GetWidth() - 50, 20);
@@ -113,6 +122,7 @@ function CompendiumLauncherWindow:Constructor()
         Turbine.UI.Lotro.Window.SetWidth(self,width);
         tabs:SetWidth(width - 18);
 		self.footer:SetWidth(self:GetWidth() - 50);
+		version:SetLeft((width / 2) + 35);		
     end
 	self.SetSize = function(sender,width, height) 
 		self:SetWidth(width);

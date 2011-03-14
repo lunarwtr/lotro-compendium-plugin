@@ -21,17 +21,15 @@ import "Compendium.Common.Utils";
 AutoSizingLabel = class( Turbine.UI.Label );
 function AutoSizingLabel:Constructor()
     Turbine.UI.Label.Constructor( self );
-    
-    Turbine.UI.Label.SetSize(self,1,1);
-    
+
     local vert =Turbine.UI.Lotro.ScrollBar();
     vert:SetOrientation(Turbine.UI.Orientation.Vertical);
     vert:SetBackColor(Turbine.UI.Color(0,0,0));
     vert:SetPosition(0,0);
-    vert:SetWidth(1,1);
+    vert:SetSize(1,1);
     vert:SetParent(self);
     vert.VisibleChanged = function(s,a)
-		self:SetHeight('auto');
+		if s:IsVisible() then self:SetHeight('auto') end
 	end 
     
     local hor =Turbine.UI.Lotro.ScrollBar();
@@ -41,44 +39,85 @@ function AutoSizingLabel:Constructor()
     hor:SetSize(1,1);
     hor:SetParent(self);
 	hor.VisibleChanged = function(s,a)
-		self:SetWidth('auto');
+		if s:IsVisible() then self:SetWidth('auto') end
 	end   
-
+	
 	self.bars = { vert = vert, hor = hor };
-	self:SetSize('auto','auto');
+	self:SetSize(2,2);
+	self:SetWantsUpdates(false);
+	self.Update = function()
+		if self.bars ~= nil and not self.issizing then 
+			self:SetSize(self.width, self.height);
+		end
+	end
+	--self:SetSize('auto','auto');
+	self.issizing = false;
 	
 end
+
+function AutoSizingLabel:SetText( text )
+	Turbine.UI.Label.SetText(self, text);
+	self:SetSize(self.width, self.height);
+end
+
 function AutoSizingLabel:SetSize(w,h)
+	self:SetWantsUpdates(false);
+	self.issizing = true;
 	self:SetWidth(w);
 	self:SetHeight(h);
+	self.issizing = false;
 end
 
 function AutoSizingLabel:SetWidth(w)
+	self:SetWantsUpdates(false);
+	self:SetHorizontalScrollBar(nil);
+	self.width = w;
 	if w == 'auto' then
+		if self.bars == nil then
+			for a,b in getmetatable(pairs(self)) do
+				Turbine.Shell.WriteLine(a);
+			end
+		end 
+	
 		self:SetHorizontalScrollBar(self.bars.hor);
-		local count = 1;
-		--Turbine.UI.Label.SetWidth(self,1);
-		while self.bars.hor:IsVisible() do
-			Turbine.UI.Label.SetWidth(self,self:GetWidth() + 2);
-			count = count + 1;
+		if  self.bars.hor:IsVisible() then
+			local count = 1; 
+			while self.bars.hor:IsVisible() do
+				Turbine.UI.Label.SetWidth(self,self:GetWidth() + 2);
+				count = count + 1;
+			end
+		else
+			self:SetWantsUpdates(true);
 		end			
 	else
-		self:SetHorizontalScrollBar(nil);
 	 	Turbine.UI.Label.SetWidth(self,w);
 	end
 end
 
 function AutoSizingLabel:SetHeight(h)
+	self:SetWantsUpdates(false);
+	self:SetVerticalScrollBar(nil);
+	self.height = h;
 	if h == 'auto' then
+	
+		if self.bars == nil then
+			for a,b in pairs(self) do
+				Turbine.Shell.WriteLine(a);
+			end
+		end 
+		
 		self:SetVerticalScrollBar(self.bars.vert);
-		local count = 1;
-		--Turbine.UI.Label.SetHeight(self,1);
-		while self.bars.vert:IsVisible() and count < 100 do
-			Turbine.UI.Label.SetHeight(self,self:GetHeight() + 2);
-			count = count + 1;
+		if self.bars.vert:IsVisible() then 
+			local count = 1;
+			--Turbine.UI.Label.SetHeight(self,1);
+			while self.bars.vert:IsVisible() and count < 100 do
+				Turbine.UI.Label.SetHeight(self,self:GetHeight() + 2);
+				count = count + 1;
+			end
+		else
+			self:SetWantsUpdates(true);
 		end
 	else
-		self:SetVerticalScrollBar(nil);
 	 	Turbine.UI.Label.SetHeight(self,h);
 	end
 end
