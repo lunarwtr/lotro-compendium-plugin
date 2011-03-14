@@ -287,8 +287,8 @@ function CompendiumCraftControl:Constructor()
         self.craftContainer.CraftList:SetWidth(icwidth - 4);
 		self.craftContainer.CraftList.VScrollBar:SetLeft(icwidth-16,0)        
 		for index=1,self.craftContainer.CraftList:GetItemCount() do
-			local label = self.craftContainer.CraftList:GetItem(index);
-			label:SetWidth(icwidth - 13);
+			local row = self.craftContainer.CraftList:GetItem(index);
+			row:SetWidth(icwidth - 13);
 		end
 		pagination:SetWidth(icwidth);
 		nextBtn:SetLeft(icwidth - nextBtn:GetWidth());
@@ -509,8 +509,9 @@ function CompendiumCraftControl:LoadItems(records)
 		regular:SetPosition(label:GetWidth(),0);
 		top = regular:GetHeight();
 		
+		local crit = nil;
 		if rec['c'] ~= nil then
-	 		local crit = Turbine.UI.Label();
+	 		crit = Turbine.UI.Label();
 	        crit:SetParent(row);
 	        crit:SetSize(iwidth, 13);
 	        crit:SetMultiline(false);
@@ -527,8 +528,9 @@ function CompendiumCraftControl:LoadItems(records)
 	        top = top + crit:GetHeight();
         end
         
+        local learn = nil;
         if rec['f'] ~= nil then
-        	local learn = Turbine.UI.Label();
+        	learn = Turbine.UI.Label();
 			learn:SetParent(row);
 	        learn:SetSize(iwidth, 13);
 	        learn:SetMultiline(false);
@@ -543,6 +545,17 @@ function CompendiumCraftControl:LoadItems(records)
 	        learn:SetForeColor(self.white);
 			learn:SetPosition(label:GetWidth(), top);
         end
+        
+        row.SetWidth = function(sender,width)
+	        Turbine.UI.Control.SetWidth(row,width);
+	        local lwidth = (row:GetWidth() / 2) - 80;
+	        label:SetSize(lwidth, 'auto');
+	        detail:SetSize(lwidth, 10);
+	        regular:SetLeft(lwidth,0);
+	        if crit ~= nil then crit:SetLeft(lwidth,0) end;
+	        if learn ~= nil then learn:SetLeft(lwidth,0) end;
+	    end
+        
         self.craftContainer.CraftList:AddItem(row);
     end
     
