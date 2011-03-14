@@ -61,6 +61,7 @@ function AutoSizingLabel:SetText( text )
 end
 
 function AutoSizingLabel:SetSize(w,h)
+	Turbine.UI.Label.SetSize(self,2,2);
 	self:SetWantsUpdates(false);
 	self.issizing = true;
 	self:SetWidth(w);
