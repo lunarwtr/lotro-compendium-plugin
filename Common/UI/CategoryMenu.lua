@@ -19,7 +19,7 @@ import "Turbine.UI.Lotro";
 
 
 CategoryMenu = class( Turbine.UI.ContextMenu );
-function CategoryMenu:Constructor(categories)
+function CategoryMenu:Constructor(categories, index)
     Turbine.UI.ContextMenu.Constructor( self );
 
 	self.ClickCategory = function(categories) 
@@ -27,11 +27,11 @@ function CategoryMenu:Constructor(categories)
 	end
 
 	-- build menu structure
-	self:BuildMenu(categories, self:GetItems(), {});
+	self:BuildMenu(categories, self:GetItems(), {}, index);
 		    
 end
 
-function CategoryMenu:BuildMenu(treenode, menulist, categories) 
+function CategoryMenu:BuildMenu(treenode, menulist, categories, index) 
 	
 	-- sort each level of keys in menu
 	local sortedKeys = {}
@@ -64,7 +64,11 @@ function CategoryMenu:BuildMenu(treenode, menulist, categories)
     	-- if this category has child nodes, then process those
     	if rec ~= 0 then
     		--Turbine.Shell.WriteLine(cat);
-    		self:BuildMenu(rec, item:GetItems(), catcopy);
+    		self:BuildMenu(rec, item:GetItems(), catcopy, index);
+    	else
+    		if index ~= nil and index[cat] == nil and cat ~= 'All' then
+    			Turbine.Shell.WriteLine('Remove ' .. cat);	
+    		end
     	end
     	
     end
