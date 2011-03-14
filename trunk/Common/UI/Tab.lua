@@ -49,10 +49,8 @@ function Tab:Constructor( text )
 	
 	local label = Compendium.Common.UI.AutoSizingLabel();
 	label:SetPosition(10,0);
-	label:SetHeight(23);
 	label:SetBackground(image('c','i'));
     label:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);	
-	label:SetText(text);
     label:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );	
 	label:SetMultiline(false);
     label:SetFont(fontFace);
@@ -60,6 +58,9 @@ function Tab:Constructor( text )
     label:SetOutlineColor(Turbine.UI.Color(0,0,0));
     label:SetFontStyle(Turbine.UI.FontStyle.Outline);
 	label:SetParent(self);
+	label:SetText(text);
+	label:SetSize('auto',23);
+	--label:SetWidth('auto');
 	label.SizeChanged = function(sender, args)
 		local width = sender:GetWidth();
 		self:SetWidth(10 + width + 10);

@@ -461,7 +461,7 @@ function CompendiumCraftControl:LoadItems(records)
 
 		local lwidth = (row:GetWidth() / 2) - 80; 
         local label = Compendium.Common.UI.AutoSizingLabel(); --Turbine.UI.Label();
-        label:SetSize(lwidth, 13);
+        
         label:SetText(rec['n']);
         label:SetBackColor(bgColor);
         label:SetFont(Turbine.UI.Lotro.Font.Verdana14);
@@ -469,7 +469,7 @@ function CompendiumCraftControl:LoadItems(records)
         label:SetParent(row);
         label:SetForeColor(self.fontColor);
         label:SetPosition(0,0);
-		label:SetHeight('auto');
+		label:SetSize(lwidth, 'auto');
 		label.MouseClick = function(s,a) 
 			self.itemEvents.RecipeClickEvent(s,a,rec);
 		end
