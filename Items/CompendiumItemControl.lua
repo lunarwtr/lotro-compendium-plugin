@@ -403,7 +403,16 @@ function CompendiumItemControl:LoadItems(records)
 
     for i,rec in pairs(records) do
         local level = rec["l"];
-        local cat = table.concat(rec['c'],', ');
+        local cats = {};
+        for i,c in pairs(rec['c']) do
+        	if c == 'Quest Reward' then
+        		c = c .. ' (' .. rec['qu'] .. ')';
+        	elseif c == 'Craftable' then
+        		c = c .. ' (' .. rec['lb'] .. ')';
+        	end
+        	table.insert(cats,c);
+        end
+        local cat = table.concat(cats,', ');
         local name = self:FormatItem(rec) .. ' lvl' .. level .. ' | ' .. rec['q'] .. ' | ' .. cat;
         
         if rec['lg'] ~= nil then name = name .. ' | Legendary' end;

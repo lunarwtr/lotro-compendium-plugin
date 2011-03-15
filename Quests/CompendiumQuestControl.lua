@@ -460,6 +460,9 @@ function CompendiumQuestControl:LoadQuests(records)
     for i,rec in pairs(records) do
         local level = rec["level"];
         local name = rec["name"] .. ' (' .. level .. ')';
+        if rec["faction"] == 'Mon' then
+        	name = name .. ' (M)';
+        end
         local label = Turbine.UI.Label();
         label:SetSize(width - 10, 15);
         label:SetText(name);
@@ -563,7 +566,7 @@ function CompendiumQuestControl:LoadQuestDetails(record)
     if record['arcs'] ~= nil then
         self:AddQuestDetail("");
         sep = true;
-        self:AddQuestDetail("Arc:");
+        self:AddQuestDetail("Quest Chain:");
         self:AddQuestDetail("  " .. record['arcs'], true).MouseClick = function(sender, args)
         	self:Reset();
         	self.ArcList:SelectIndexByValue(record['arcs']);
