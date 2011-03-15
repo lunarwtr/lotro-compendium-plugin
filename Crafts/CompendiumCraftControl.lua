@@ -167,7 +167,7 @@ function CompendiumCraftControl:Constructor()
 	    	end
 	    end,
 	    RecipeClickEvent = function( recipe, args, record )
-    		self:LoadIngrediants(record);
+    		self:LoadIngredients(record);
 			self.ingMenu:ShowMenu();
     		local lh = self.craftContainer.CraftList:GetHeight();
     		local mh = self.ingMenu:GetHeight();
@@ -561,7 +561,7 @@ function CompendiumCraftControl:LoadItems(records)
     
 end
 
-function CompendiumCraftControl:LoadIngrediants( rec )
+function CompendiumCraftControl:LoadIngredients( rec )
 
 	local menu = self.ingMenu;
 	
@@ -572,7 +572,7 @@ function CompendiumCraftControl:LoadIngrediants( rec )
 	
 	local label = Turbine.UI.Label();
     label:SetParent( menu );
-    label:SetText('Ingrediants');
+    label:SetText('Ingredients');
     label:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
     label:SetSize( 250, 18 );
     label:SetFont(self.fontFace);
