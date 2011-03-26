@@ -157,6 +157,7 @@ function ItemCategoryMenu:Constructor()
 				["Weapon Oils"] = 0		
 			}
 		},
+		["Legendary"] = 0,
 		["Source"] = {
 			["Craftable"] = 0,
 			["Quest Reward"] = 0

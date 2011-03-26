@@ -29,11 +29,10 @@ import "Compendium.Common.Utils";
 DropDownList = class( Turbine.UI.Control );
 
 function DropDownList:Constructor()
-	Turbine.UI.Label.Constructor( self );
+	Turbine.UI.Control.Constructor( self );
 -- we use a Label as the default container for this control so that we can get a border
 -- there will be a single label field in the first row with a dropdown button
 -- the second and further rows will normally be hidden, only being displayed when the first row is clicked or the button or F4 is pressed
-	self.IndexOffset=0;
 	self.CurrentValue=Turbine.UI.Label();
 	self.CurrentValue:SetParent(self);
 	self.CurrentValue:SetPosition(1,1);
@@ -71,11 +70,6 @@ function DropDownList:Constructor()
 		end
 	end
 
-	if self.ListData:GetSelectedIndex()~=1 then
-		-- bug is still in effect
-		self.IndexOffset=-1;
-	end
-
 	Turbine.UI.Label.SetBackColor(self,Turbine.UI.Color(.5,.5,.1));
 	self.ListData.VScrollBar=Turbine.UI.Lotro.ScrollBar();
 	self.ListData.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
@@ -85,10 +79,11 @@ function DropDownList:Constructor()
 	self.ListData.VScrollBar:SetHeight(0);
 	self.DropRows=5;
 
+--[[
 	self.ListData.FocusLost = function(sender,args)
 		self:GetParent():HideList();
 	end
-
+]]
 	self.CurrentValue.MouseClick = function(sender,args)
 		if (self.ListData:GetHeight()>0) then
 			self:HideList();
@@ -168,7 +163,7 @@ function DropDownList:AddItem(text, datavalue)
 		self.CurrentValue:SetText(listItem:GetText());
 		self.CurrentValue.DataValue=listItem.DataValue;
 		self:HideList();
-		self.ListData:SetSelectedIndex(listItem.Index+self.IndexOffset); -- we have to subtract one since there is a bug that makes SetSelectedIndex add 1 to it's value :(
+		self.ListData:SetSelectedIndex(listItem.Index); 
 		self:SelectedIndexChanged();
 	end
 	listItem.GetValue = function (sender)
@@ -178,45 +173,17 @@ function DropDownList:AddItem(text, datavalue)
 	if (self.ListData:GetItemCount()==1) then
 		-- autoselect the newly added item
 		self.CurrentValue:SetText(text);
-		self.ListData:SetSelectedIndex(listItem.Index+self.IndexOffset);
+		self.ListData:SetSelectedIndex(listItem.Index);
 	end
 end
 
-function DropDownList:RemoveItemAt(index)
-	index=tonumber(index)
-	local nextIndex;
-	if index>0 and index<=self.ListData:GetItemCount() then
-		for nextIndex=index+1,self.ListData:GetItemCount() do
-			self.ListData:GetItem(nextIndex).Index=self.ListData:GetItem(nextIndex).Index-1;
-		end
-		nextIndex=self.ListData:GetSelectedIndex();
-		-- need to eliminate the old event handler
-		self.ListData:GetItem(index).MouseClick = nil;
-		self.ListData:RemoveItemAt(index);
-		if self.ListData:GetItemCount()>0 then
-			if nextIndex>self.ListData:GetItemCount() then
-				self.CurrentValue:SetText(self.ListData:GetItem(self.ListData:GetItemCount()):GetText());
-				self.ListData:SetSelectedIndex(self.ListData:GetItemCount()+self.IndexOffset);
-				self:SelectedIndexChanged();
-			elseif nextIndex>index then
-				self.CurrentValue:SetText(self.ListData:GetItem(nextIndex-1):GetText());
-				self.ListData:SetSelectedIndex(nextIndex+self.IndexOffset-1);
-				self:SelectedIndexChanged();
-			else
-				self.CurrentValue:SetText(self.ListData:GetItem(nextIndex):GetText());
-				self.ListData:SetSelectedIndex(nextIndex+self.IndexOffset);
-				self:SelectedIndexChanged();
-			end
-		else
-			self.CurrentValue:SetText("")
-		end
-	end
-end
 
 function DropDownList:GetValue()
 	local dataValue=nil;
 	if self.ListData:GetItemCount()>0 then
-		dataValue=self.ListData:GetItem(self.ListData:GetSelectedIndex()).DataValue;
+		local sel = self.ListData:GetSelectedIndex();
+		--Turbine.Shell.WriteLine(sel);
+		dataValue=self.ListData:GetItem(sel).DataValue;
 	end
 	return (dataValue);
 end
@@ -230,7 +197,7 @@ function DropDownList:SetCurrentBackColor( color )
 end
 
 function DropDownList:SetBackColor( color )
-local index;
+	local index;
 	self.ListData:SetBackColor(color);
 	if (self.ListData:GetItemCount()>0) then
 		for index = 1,self.ListData:GetItemCount() do
@@ -240,29 +207,9 @@ local index;
 	self.ListData.VScrollBar:SetBackColor(color);
 end
 
-function DropDownList:HideEntry(index)
-	if index>0 and index<=self.ListData:GetItemCount() then
-		self.ListData:GetItem(index).isVisible=false;
-		self.ListData:GetItem(index):SetHeight(0);
-		if self:GetHeight()>20 then
-			self:ShowList()
-		end
-	end
-end
-
-function DropDownList:ShowEntry(index)
-	if index>0 and index<=self.ListData:GetItemCount() then
-		self.ListData:GetItem(index).isVisible=true;
-		self.ListData:GetItem(index):SetHeight(self.RowHeight);
-		if self:GetHeight()>20 then
-			self:ShowList()
-		end
-	end
-end
-
 function DropDownList:SetSelectedIndex(index)
 	if index>0 and index<=self.ListData:GetItemCount() then
-		self.ListData:SetSelectedIndex(index+self.IndexOffset);
+		self.ListData:SetSelectedIndex(index);
 	end
 end
 

@@ -37,8 +37,19 @@ function DataCursor:CurPage()
 	return pd;
 end
 
+function DataCursor:SetPage(page)
+	if page < 1 then page = 1 end
+	local offset = ((page - 1) * self.pagesize) + 1;
+	if offset > self.total then
+		self.offset = self.total;
+	else
+		self.offset = offset;
+	end
+	return self:CurPage();
+end
+
 function DataCursor:HasNext()
-	return self.offset < ( self.total - self.pagesize);
+	return (self.offset - 1) < ( self.total - self.pagesize);
 end
 
 function DataCursor:HasPrev()
@@ -55,13 +66,14 @@ function DataCursor:CurPageNum()
 end
 
 function DataCursor:SetPageSize( pagesize )
-	self.pagesize = pagesize;
+	self.pagesize = math.max(pagesize,1);
+	self.offset = math.floor(self.offset / self.pagesize) * self.pagesize + 1;
 end
 
 function DataCursor:tostring()
-	if self.total > 1 then
-		return "Page " .. self:CurPageNum() .. "/" .. self:PageCount() .. " | " .. self.total .. " Results";
+	if self.total >= 1 then
+		return "Page " .. self:CurPageNum() .. "/" .. self:PageCount() .. " | " .. self.total;
 	else 
-		return "0 Results";
+		return "0";
 	end
 end

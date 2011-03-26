@@ -26,6 +26,25 @@ import "Compendium.Quests";
 import "Compendium.Crafts";
 import "Compendium.Launcher.CompendiumShortcut";
 
+split = function (t,p)
+local pat,n,count,L = "(.-)"..p, 1,0,#t
+	local f = function (s,v)
+          local i,j,x = s:find(pat,n)
+          if i then
+            count = count + 1
+            n = j + 1
+            return count,x
+          elseif n < L then
+            count = count + 1
+            x = s:sub(n,-1)
+            n = L + 1
+            return count,x
+          end -- if
+    end -- function
+	return f,t,n
+end
+
+
 CompendiumLauncherWindow = class( Compendium.Common.UI.CompendiumWindow );
 function CompendiumLauncherWindow:Constructor()
     Compendium.Common.UI.CompendiumWindow.Constructor( self );
@@ -98,11 +117,38 @@ function CompendiumLauncherWindow:Constructor()
 
 	local tabs = Compendium.Common.UI.TabControl();
 	tabs:SetParent(self);
-	tabs:SetSize(self:GetWidth() - 18, self:GetHeight() - 50);
+	tabs:SetSize(self:GetWidth() - 18, self:GetHeight() - 55);
 	tabs:SetPosition(9,30);
-	tabs:AddTab("Quests",  Compendium.Quests.CompendiumQuestControl());
+	
+	self.questcontrol = Compendium.Quests.CompendiumQuestControl();
+	tabs:AddTab("Quests",  self.questcontrol);
 	tabs:AddTab("Items",  Compendium.Items.CompendiumItemControl());
 	tabs:AddTab("Crafting",  Compendium.Crafts.CompendiumCraftControl());
+	
+	
+	
+	local plugs = Turbine.PluginManager.GetAvailablePlugins();
+	local loaded = Turbine.PluginManager.GetLoadedPlugins();
+	local loadedhash = {};
+	for i,a in pairs(loaded) do
+		loadedhash[a.Name] = a;
+	end
+	
+	for i,a in pairs(plugs) do
+		if string.find(a.Name, "CompendiumExtension") ~= nil then
+			if loadedhash[a.Name] == nil then
+				Turbine.Shell.WriteLine('Loading ' .. a.Name);
+				Turbine.PluginManager.LoadPlugin(a.Name);
+			end
+			local cls = _G;
+			for j, b in split(a.Package, '%.') do
+				cls = cls[b];
+			end	
+
+			local ext = cls();
+			tabs:AddTab(ext:GetExtensionName(), ext);
+		end
+	end
 	tabs:SetActiveIndex(self.Settings.ActiveTabIndex);
 
 	tabs.OnActiveTabChange = function (sender,index) 
@@ -114,7 +160,7 @@ function CompendiumLauncherWindow:Constructor()
  	self.SetHeight = function(sender,height)
         if height<150 then height=150 end;
         Turbine.UI.Lotro.Window.SetHeight(self,height);
-        tabs:SetHeight(height - 35);
+        tabs:SetHeight(height - 55);
 		self.footer:SetTop(height - 25);        
     end
  	self.SetWidth = function(sender,width)
@@ -222,6 +268,7 @@ function CompendiumLauncherWindow:Constructor()
 	self:SetSize(self.Settings.WindowSize.width, self.Settings.WindowSize.height);
 	if Plugins.Compendium.Unload == nil then
 		Plugins.Compendium.Unload = function() 
+			self:persist();
 			self:destroy();
 		end
 	end
@@ -271,4 +318,22 @@ function CompendiumLauncherWindow:destroy()
 	self.PositionChanged = nil;
 	self.VisibleChanged = nil;	
 	self.tabs:destroy();
+end
+
+function CompendiumLauncherWindow:persist()
+	Turbine.PluginData.Save( Turbine.DataScope.Account, "CompendiumSettings", self.Settings );
+	self.tabs:persist();
+end
+
+function CompendiumLauncherWindow:ProcessCommandArguments(args)
+	
+	local cmd, loc, target = args:match "^%s*(addcoord)%s*%[([^%|]+)%|([^%]]+)%]"; --%[[^:]+:%\s*([^:]+):\s*([^%|]+)%|([^%]]+)%s*%]$";
+	if cmd == 'addcoord' then
+		 local area, coord = loc:match "%s*([^:]+):%s*([^:]+)$";
+		 local coordrec = { area = area, coord = coord, target = target };
+		 if self.questcontrol ~= nil then
+		 	self.questcontrol:AddCoordinate(coordrec);
+		 end
+	end
+
 end

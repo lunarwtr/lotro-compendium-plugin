@@ -49,7 +49,7 @@ function TabControl:Constructor()
     local tabBorder = Turbine.UI.Control();
     tabBorder:SetParent(self);
     tabBorder:SetPosition(0,22);
-    tabBorder:SetSize(self:GetWidth(),self:GetHeight() - 43);
+    tabBorder:SetSize(self:GetWidth(),self:GetHeight() - 23); -- 43
     tabBorder:SetBackColor(Turbine.UI.Color(0.18,0.19,0.29)); 
     tabBorder:SetZOrder(99);
 	local tabContainer = Turbine.UI.Control();
@@ -62,7 +62,7 @@ function TabControl:Constructor()
  	self.SetHeight = function(sender,height)
         if height<100 then height=100 end;
         Turbine.UI.Control.SetHeight(self,height);
-        tabBorder:SetHeight(height-43);
+        tabBorder:SetHeight(height-23);
         local contHeight = tabBorder:GetHeight()-2;
         tabContainer:SetHeight(contHeight);
        	for index, rec in pairs(self.tabs) do
@@ -79,7 +79,10 @@ function TabControl:Constructor()
 			rec.control:SetWidth(contWidth-4);
 		end
     end
-     
+    self.SetSize = function(s,w,h)
+    	s:SetWidth(w);
+    	s:SetHeight(h);
+    end
 end
 
 function TabControl:OnActiveTabChange(index)
@@ -172,4 +175,14 @@ function TabControl:destroy()
 	self.tabs = nil;
 	self.events = nil;
 	Compendium.Common.UI.CompendiumControl.destroy(self);
+end
+
+function CompendiumControl:persist()
+	if self.tabs ~= nil then
+		for index, rec in pairs(self.tabs) do
+			if rec.control.persist ~= nil then
+				rec.control:persist();
+			end;
+		end	
+	end
 end

@@ -160,60 +160,14 @@ function CompendiumItemControl:Constructor()
     	end
     end 
     
-    local pagination = Turbine.UI.Label();
+    local pagination = Compendium.Common.UI.PaginationControl();
     pagination:SetParent(self);
     pagination:SetSize(self.itemContainer:GetWidth(),20);
     pagination:SetPosition(5,self.itemContainer:GetTop() + self.itemContainer:GetHeight());
-   	pagination:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
-    pagination:SetFont(self.fontFace);
-    pagination:SetForeColor(self.fontColor);
-    pagination:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    pagination:SetFontStyle(Turbine.UI.FontStyle.Outline);
-
-   	local prev = function(sender,args)
+	pagination.PageChanged = function(sender,direction,records)
    		self:ClearItems();
-		self:LoadItems(self.cursor:PrevPage());
-		self:UpdatePagination();   	
+		self:LoadItems(records);
    	end
-	local next = function(sender,args)
-   		self:ClearItems();
-		self:LoadItems(self.cursor:NextPage());
-		self:UpdatePagination();   	
-   	end   	
-    
-    local prevBtn = Turbine.UI.Lotro.Button();
-    prevBtn:SetParent(pagination);
-    prevBtn:SetText('  Prev');
-    prevBtn:SetEnabled(false);
-   	prevBtn:SetSize(55,20);
-   	prevBtn:SetPosition(0,0);
-   	prevBtn.Click = prev;
- 	local prevIcon = Turbine.UI.Control();
-    prevIcon:SetParent( prevBtn );
-    prevIcon:SetBackground(0x41007e0e);
-    prevIcon:SetBlendMode(Turbine.UI.BlendMode.Overlay);
-    prevIcon:SetPosition( 3, 3 );
-    prevIcon:SetSize( 16, 16 );
-   	prevIcon.MouseClick = prev;
-   	
-    local nextBtn = Turbine.UI.Lotro.Button();
-    nextBtn:SetParent(pagination);
-    nextBtn:SetText(' Next');
-    nextBtn:SetEnabled(false);
-   	nextBtn:SetSize(55,20);
-   	nextBtn:SetPosition(pagination:GetWidth() - nextBtn:GetWidth(),0);   
-   	nextBtn:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
-   	nextBtn.Click = next;
- 	local nextIcon = Turbine.UI.Control();
-    nextIcon:SetParent( nextBtn );
-    nextIcon:SetBackground(0x41007e11);
-    nextIcon:SetBlendMode(Turbine.UI.BlendMode.Overlay);
-    nextIcon:SetPosition(nextBtn:GetWidth() - 20, 3 );
-    nextIcon:SetSize( 16, 16 );   	
-   	nextIcon.MouseClick = next;
-
-	self.prevBtn = prevBtn;
-	self.nextBtn = nextBtn;
     self.pagination = pagination;
 
     self:ClearItems();
@@ -240,12 +194,12 @@ function CompendiumItemControl:Constructor()
         	self.cursor:SetPageSize(self.pagesize);
 	   		self:ClearItems();
 			self:LoadItems(self.cursor:CurPage());
-			self:UpdatePagination();  
-		end       
+			self.pagination:UpdatePagination();
+		end
     end
     
  	self.SetWidth = function(sender,width)
- 		--Turbine.Shell.WriteLine(width);	
+ 		--Turbine.Shell.WriteLine(width);
         if width<100 then width=100 end;
         Turbine.UI.Control.SetWidth(self,width);
 		local swidth = width - (searchLabel:GetWidth()+searchLabel:GetLeft())-55;
@@ -262,7 +216,6 @@ function CompendiumItemControl:Constructor()
 			label:SetWidth(icwidth - 13);
 		end
 		pagination:SetWidth(icwidth);
-		nextBtn:SetLeft(icwidth - nextBtn:GetWidth());
     end
 	
 	self.SetSize = function(sender,width, height) 
@@ -279,16 +232,13 @@ function CompendiumItemControl:ClearItems()
 	end	
     self.itemContainer.ItemList:ClearItems();
     self.prevIdx = nil;
-	self.prevBtn:SetEnabled(false);
-	self.nextBtn:SetEnabled(false);
-	self.pagination:SetText('');
 end
 
 function CompendiumItemControl:BuildCursor()
 	if self.searchDisabled then
 		return;
 	end
-	
+	self.pagination:SetCursor(nil);
 	self:ClearItems();
 	
 	-- filter results using our category indexes
@@ -310,7 +260,7 @@ function CompendiumItemControl:BuildCursor()
     	if ids == nil then
 			self.cursor = Compendium.Common.Utils.DataCursor(itemstable, self.pagesize);
 			self:LoadItems(self.cursor:CurPage());
-			self:UpdatePagination();   
+			self.pagination:SetCursor(self.cursor);   
 			return;
 		end 	
     end
@@ -345,19 +295,8 @@ function CompendiumItemControl:BuildCursor()
 	
 	-- load current page
 	self:LoadItems(self.cursor:CurPage());
-	self:UpdatePagination();
+	self.pagination:SetCursor(self.cursor); 
 	
-end
-
-function CompendiumItemControl:UpdatePagination()
-	self.prevBtn:SetEnabled(false);
-	self.nextBtn:SetEnabled(false);
-	self.pagination:SetText('');
-	if self.cursor ~= nil then
-		self.pagination:SetText(self.cursor:tostring());
-		if self.cursor:HasPrev() then self.prevBtn:SetEnabled(true) end;
-		if self.cursor:HasNext() then self.nextBtn:SetEnabled(true) end;
-	end
 end
 
 function CompendiumItemControl:AddFilters(categories)
