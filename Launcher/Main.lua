@@ -14,13 +14,15 @@
    limitations under the License.
 ]]
 import "Compendium.Launcher.CompendiumLauncherWindow";
-
 local clw = CompendiumLauncherWindow();
 
 CompendiumWindowCommand = Turbine.ShellCommand();
 
 function CompendiumWindowCommand:Execute( command, arguments )
-    clw:SetVisible( true );
+	if not clw:IsVisible() then
+    	clw:SetVisible( true );
+    end
+    clw:ProcessCommandArguments(arguments);
 end
 
 function CompendiumWindowCommand:GetHelp()
@@ -31,6 +33,6 @@ function CompendiumWindowCommand:GetShortHelp()
     return "Shows Compendium.";
 end
 
-Turbine.Shell.AddCommand( "Comp;Compendium", CompendiumWindowCommand );
+Turbine.Shell.AddCommand( "Comp;Compendium;comp addcoord", CompendiumWindowCommand );
 
 listCommandsCommand = Turbine.ShellCommand();

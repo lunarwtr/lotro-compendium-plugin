@@ -19,72 +19,93 @@ import "Turbine.UI";
 import "Turbine.UI.Lotro";
 
 import "Compendium.Quests.CompendiumQuestsDB";
+import "Compendium.Quests.QuestCommentsControl";
+import "Compendium.Quests.QuestCategoryMenu";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
+
+local pagesize = 200;
+local rewardLabels = { 
+    reputation = "Rep", 
+    destinypoints = "Dest Pts", 
+    money = "Money", 
+    receive = "Receive", 
+    virtues = "Virtues", 
+    titles = "Titles", 
+    selectoneof = "Select One Of", 
+    traits = "Traits" 
+};
 
 CompendiumQuestControl= class( Compendium.Common.UI.CompendiumControl );
 function CompendiumQuestControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 
+	self.localquestdatamodified = false;
+	self.localquestdata = {};
+    self.currentFilters = {};
 	self.searchDisabled = true;
-        
+	self:LoadLocalQuests();
+	
+	--[[
+	local ctime = Turbine.Engine:GetLocalTime() 
+	for i,q in pairs(questtable) do
+		self.localquestdata[q['name'] ] = { c = {{ val = q['o'], modifiable = true, time = ctime }}  };
+	end
+	]]
+	
+    self.menu = Compendium.Quests.QuestCategoryMenu();
+    self.menu.ClickCategory = function(categories) 
+		self:AddFilters(categories);
+	end        
+    local filterButton = Turbine.UI.Lotro.Button();
+    filterButton:SetParent(self);
+    filterButton:SetPosition(9,3);
+    filterButton:SetSize(85,20);
+    filterButton:SetText(" Filter By");
+ 	filterButton:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
+	filterButton.Click = function( sender, args ) 
+    	self.menu:ShowMenu();
+    end
+    
+    local filterIcon = Turbine.UI.Control();
+    filterIcon:SetParent( filterButton );
+    filterIcon:SetBackground(0x41007e19);
+    filterIcon:SetBlendMode(Turbine.UI.BlendMode.Overlay);
+    filterIcon:SetPosition( filterButton:GetWidth() - 20, 1 );
+    filterIcon:SetSize( 16, 16 );
+    filterIcon.MouseClick = function( sender, args ) 
+    	self.menu:ShowMenu();
+    end
+      
+      --[[ 
 	self.logo = Turbine.UI.Control();
 	self.logo:SetBlendMode(Turbine.UI.BlendMode.Screen);
 	self.logo:SetBackground( "Compendium/Common/Resources/images/CompendiumLogoSmall.tga" );
 	self.logo:SetPosition(self:GetWidth() - 80 ,0);
 	self.logo:SetSize(75,100);
 	self.logo:SetParent( self );    
-    
-    self.ZoneCaption=Turbine.UI.Label();
-    self.ZoneCaption:SetParent(self);
-    self.ZoneCaption:SetPosition(9,6);
-    self.ZoneCaption:SetSize(110,20);
-    self.ZoneCaption:SetFont(self.fontFace);
-    self.ZoneCaption:SetForeColor(self.fontColor);
-    self.ZoneCaption:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    self.ZoneCaption:SetFontStyle(Turbine.UI.FontStyle.Outline);
-    self.ZoneCaption:SetText("Filter By Zone:");
+     ]]
+     
+    local searchLabel = Turbine.UI.Label();
+    searchLabel:SetParent(self);
+    searchLabel:SetPosition(97,5);
+    searchLabel:SetSize(55,20);
+    searchLabel:SetFont(self.fontFace);
+    searchLabel:SetForeColor(self.fontColor);
+    searchLabel:SetOutlineColor(Turbine.UI.Color(0,0,0));
+    searchLabel:SetFontStyle(Turbine.UI.FontStyle.Outline);
+    searchLabel:SetText("Search:");
 
-    self.LevelCaption=Turbine.UI.Label();
-    self.LevelCaption:SetParent(self);
-    self.LevelCaption:SetPosition(9,31);
-    self.LevelCaption:SetSize(110,20);
-    self.LevelCaption:SetFont(self.fontFace);
-    self.LevelCaption:SetForeColor(self.fontColor);
-    self.LevelCaption:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    self.LevelCaption:SetFontStyle(Turbine.UI.FontStyle.Outline);
-    self.LevelCaption:SetText("Filter By Level:");
-
-    self.ArcCaption=Turbine.UI.Label();
-    self.ArcCaption:SetParent(self);
-    self.ArcCaption:SetPosition(9,56);
-    self.ArcCaption:SetSize(110,20);
-    self.ArcCaption:SetFont(self.fontFace);
-    self.ArcCaption:SetForeColor(self.fontColor);
-    self.ArcCaption:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    self.ArcCaption:SetFontStyle(Turbine.UI.FontStyle.Outline);
-    self.ArcCaption:SetText("Filter By Chain:");
-    
-    self.SearchCaption=Turbine.UI.Label();
-    self.SearchCaption:SetParent(self);
-    self.SearchCaption:SetPosition(9,81);
-    self.SearchCaption:SetSize(70,20);
-    self.SearchCaption:SetFont(self.fontFace);
-    self.SearchCaption:SetForeColor(self.fontColor);
-    self.SearchCaption:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    self.SearchCaption:SetFontStyle(Turbine.UI.FontStyle.Outline);
-    self.SearchCaption:SetText("Search:");
-
-    local searchWidth = self:GetWidth()-(self.SearchCaption:GetWidth()+self.SearchCaption:GetLeft())-140;
+    local searchWidth = self:GetWidth()-(searchLabel:GetWidth()+searchLabel:GetLeft())-55;
     self.SearchBorder=Turbine.UI.Control();
     self.SearchBorder:SetParent(self);
-    self.SearchBorder:SetPosition(self.SearchCaption:GetLeft()+self.SearchCaption:GetWidth()+2,self.SearchCaption:GetTop()-5);
+    self.SearchBorder:SetPosition(searchLabel:GetLeft()+searchLabel:GetWidth()+2,searchLabel:GetTop()-3);
     self.SearchBorder:SetSize(searchWidth,20);
     self.SearchBorder:SetBackColor(Turbine.UI.Color(.15,.25,.45))
 
     self.SearchText=Turbine.UI.Lotro.TextBox();
     self.SearchText:SetParent(self);
-    self.SearchText:SetPosition(self.SearchCaption:GetLeft()+self.SearchCaption:GetWidth()+3,self.SearchCaption:GetTop()-4);
+    self.SearchText:SetPosition(searchLabel:GetLeft()+searchLabel:GetWidth()+3,searchLabel:GetTop()-2);
     self.SearchText:SetSize(searchWidth,18);
     self.SearchText:SetBackColor(Turbine.UI.Color(.25,.35,.55));
     self.SearchText:SetTextAlignment(Turbine.UI.ContentAlignment.MiddleLeft);
@@ -101,12 +122,30 @@ function CompendiumQuestControl:Constructor()
             self.SearchText:SetWantsUpdates(false);
     end
     self.SearchText.Update=function()
+    	local text = self.SearchText:GetText();
+        if self.SearchText.Text ~= text then
+        	self.SearchText.Text = text;
+        	self:BuildCursor();
+        end
+    end
+    --[[
+    self.SearchText.Update=function()
         if self.SearchText.Text~=self.SearchText:GetText() then
                 self.SearchText.Text=self.SearchText:GetText()
                 self:SearchAndLoadQuests(self.SearchText:GetText(), self.ZoneList:GetValue(), self.LevelList:GetValue());
         end
     end
-
+	--]]
+	
+    local filtersLabel = Turbine.UI.Label();
+    filtersLabel:SetParent(self);
+    filtersLabel:SetPosition(5,filterButton:GetTop() +  filterButton:GetHeight());
+    filtersLabel:SetSize(self:GetWidth() - 7,20);
+    filtersLabel:SetFont(self.fontFace);
+    filtersLabel:SetForeColor(self.trimColor);
+    filtersLabel:SetText("No filters set");	
+	self.filtersLabel = filtersLabel;	
+	
     -- add a search reset button
     local reset = Turbine.UI.Lotro.Button();
     reset:SetParent( self );
@@ -119,7 +158,7 @@ function CompendiumQuestControl:Constructor()
 
     self.qlContainer=Turbine.UI.Control();
     self.qlContainer:SetParent(self);
-    self.qlContainer:SetPosition(5,106);
+    self.qlContainer:SetPosition(5,filtersLabel:GetTop() + filtersLabel:GetHeight() + 1);
     self.qlContainer:SetSize((self:GetWidth()/2) - 7, self:GetHeight()-270);
     self.qlContainer:SetBackColor(Turbine.UI.Color(0,0,0)); -- this one has to stay fixed for grid to show
     self.qlContainer.QuestList=Turbine.UI.ListBox();
@@ -152,6 +191,30 @@ function CompendiumQuestControl:Constructor()
         end
 
     end
+
+    local pagination = Compendium.Common.UI.PaginationControl();
+    pagination:SetParent(self.qlContainer);
+    pagination:SetVisible(false);
+    pagination:SetSize(self.qlContainer:GetWidth(),20);
+    pagination:SetPosition(0,self.qlContainer:GetHeight() - 22);
+	pagination.PageChanged = function(sender,direction,records)
+   		self:ClearQuests();
+		self:LoadQuests(records);
+   	end
+   	pagination.VisibleChanged = function(s,a) 
+   		local ql = self.qlContainer.QuestList;
+   		local sb = ql.VScrollBar;
+   		local ch = self.qlContainer:GetHeight();
+   		if pagination:IsVisible() then
+   			ql:SetHeight(ch - 23);
+   			sb:SetHeight(ch - 22);
+   		else
+   			ql:SetHeight(ch - 3);
+   			sb:SetHeight(ch - 2);
+   		end
+   	end
+   	
+    self.pagination = pagination;
     
     self.qdContainer=Turbine.UI.Control();
     self.qdContainer:SetParent(self);
@@ -172,82 +235,69 @@ function CompendiumQuestControl:Constructor()
     self.qdContainer.QuestDetails.VScrollBar:SetHeight(self.qdContainer:GetHeight()-2);
     self.qdContainer.QuestDetails:SetVerticalScrollBar(self.qdContainer.QuestDetails.VScrollBar);    
 
-    local bottom = self.qdContainer:GetTop() + self.qdContainer:GetHeight() + 5;
-    self.commentsCtr=Turbine.UI.Control();
-    self.commentsCtr:SetParent(self);
-    self.commentsCtr:SetPosition(5,bottom);
-    self.commentsCtr:SetSize(self:GetWidth()-7, self:GetHeight() - bottom - 50);
-    self.commentsCtr:SetBackColor(Turbine.UI.Color(0,0,0)); 
-    self.QuestComments=Turbine.UI.Label();
-    self.QuestComments:SetParent(self.commentsCtr);
-    self.QuestComments:SetPosition(2,1);
-    self.QuestComments:SetSize(self.commentsCtr:GetWidth()-4,self.commentsCtr:GetHeight()-3);
-    self.QuestComments:SetFont(self.fontFace);
-    self.QuestComments:SetForeColor(self.fontColor);
-    self.QuestComments:SetBackColor(self.backColor)
-    self.QuestComments:SetSelectable(true);
-    self.QuestComments.VScrollBar=Turbine.UI.Lotro.ScrollBar();
-    self.QuestComments.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
-    self.QuestComments.VScrollBar:SetParent(self.QuestComments);
-    self.QuestComments.VScrollBar:SetBackColor(self.backColor);
-    self.QuestComments.VScrollBar:SetPosition(self.commentsCtr:GetWidth()-16,0)
-    self.QuestComments.VScrollBar:SetWidth(12);
-    self.QuestComments.VScrollBar:SetHeight(self.commentsCtr:GetHeight()-2);
-    self.QuestComments:SetVerticalScrollBar(self.QuestComments.VScrollBar);
---    Turbine.Shell.WriteLine("Top: " .. self.qdContainer:GetTop() .. " Height: " .. self.qdContainer:GetHeight());
-
-    
-    self.ArcList=Compendium.Common.UI.DropDownList();
-    self.ArcList:SetParent(self);
-    self.ArcList:SetPosition(self.ArcCaption:GetLeft()+self.ArcCaption:GetWidth()+3,self.ArcCaption:GetTop()-3);
-    self.ArcList:SetSize(self:GetWidth()-(self.ArcCaption:GetWidth()+self.ArcCaption:GetLeft())-95,20);
-    self.ArcList:SetBorderColor(self.trimColor);
-    self.ArcList:SetCurrentBackColor(self.colorDarkGrey);
-    self.ArcList:SetBackColor(self.backColor);
-    self.ArcList:SetCurrentBackColor(self.backColor);
-    self.ArcList:SetDropRows(6);
-    self.ArcList:AddItem( '(Choose a Quest Chain)', '');
-    self.ArcList.DropDownUpdate=function(levelText)
-        self:SearchAndLoadQuests(self.SearchText:GetText(), self.ZoneList:GetValue(), self.LevelList:GetValue(), self.ArcList:GetValue());
+    local bottom = self.qdContainer:GetTop() + self.qdContainer:GetHeight() + 2;
+	local detailTabs = Compendium.Common.UI.TabControl();
+	detailTabs:SetParent(self);
+	detailTabs:SetPosition(7,bottom);
+	    
+    self.questDesc=Turbine.UI.Label();
+    self.questDesc:SetPosition(0,0);
+    self.questDesc:SetFont(self.fontFace);
+    self.questDesc:SetForeColor(self.fontColor);
+    self.questDesc:SetSelectable(true);
+    self.questDesc.VScrollBar=Turbine.UI.Lotro.ScrollBar();
+    self.questDesc.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
+    self.questDesc.VScrollBar:SetParent(self.questDesc);
+    self.questDesc.VScrollBar:SetBackColor(self.backColor);
+    self.questDesc.VScrollBar:SetPosition(self.questDesc:GetWidth()-12,0)
+    self.questDesc.VScrollBar:SetWidth(12);
+    self.questDesc.VScrollBar:SetHeight(self.questDesc:GetHeight()-2);
+    self.questDesc:SetVerticalScrollBar(self.questDesc.VScrollBar);
+    self.questDesc.SizeChanged = function(s,a) 
+    	local width = s:GetWidth();
+		local height = s:GetHeight();
+	    self.questDesc.VScrollBar:SetPosition(width-12,0);
+	    self.questDesc.VScrollBar:SetHeight(height - 2);
     end
-    for i = 1, #self.arcs do
-        self.ArcList:AddItem( self.arcs[i], self.arcs[i] );
-    end    
 
-    self.LevelList=Compendium.Common.UI.DropDownList();
-    self.LevelList:SetParent(self);
-    self.LevelList:SetPosition(self.LevelCaption:GetLeft()+self.LevelCaption:GetWidth()+3,self.LevelCaption:GetTop()-3);
-    self.LevelList:SetSize(self:GetWidth()-(self.LevelCaption:GetWidth()+self.LevelCaption:GetLeft())-95,20);
-    self.LevelList:SetBorderColor(self.trimColor);
-    self.LevelList:SetCurrentBackColor(self.colorDarkGrey);
-    self.LevelList:SetBackColor(self.backColor);
-    self.LevelList:SetCurrentBackColor(self.backColor);
-    self.LevelList:SetDropRows(6);
-    self.LevelList:AddItem( '(Choose a Level Range)', '');
-    self.LevelList.DropDownUpdate=function(levelText)
-        self:SearchAndLoadQuests(self.SearchText:GetText(), self.ZoneList:GetValue(), self.LevelList:GetValue(), self.ArcList:GetValue());
-    end
-    for i = 1, #self.levels do
-        self.LevelList:AddItem( self.levels[i], self.levels[i] );
+    self.questObj=Turbine.UI.Label();
+    self.questObj:SetPosition(0,0);
+    self.questObj:SetFont(self.fontFace);
+    self.questObj:SetForeColor(self.fontColor);
+    self.questObj:SetSelectable(true);
+    self.questObj.VScrollBar=Turbine.UI.Lotro.ScrollBar();
+    self.questObj.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
+    self.questObj.VScrollBar:SetParent(self.questObj);
+    self.questObj.VScrollBar:SetBackColor(self.backColor);
+    self.questObj.VScrollBar:SetPosition(self.questObj:GetWidth()-12,0)
+    self.questObj.VScrollBar:SetWidth(12);
+    self.questObj.VScrollBar:SetHeight(self.questObj:GetHeight()-2);
+    self.questObj:SetVerticalScrollBar(self.questObj.VScrollBar);
+    self.questObj.SizeChanged = function(s,a) 
+    	local width = s:GetWidth();
+		local height = s:GetHeight();
+	    self.questObj.VScrollBar:SetPosition(width-12,0);
+	    self.questObj.VScrollBar:SetHeight(height - 2);
     end
 
     
-    self.ZoneList=Compendium.Common.UI.DropDownList();
-    self.ZoneList:SetParent(self);
-    self.ZoneList:SetPosition(self.ZoneCaption:GetLeft()+self.ZoneCaption:GetWidth()+3,self.ZoneCaption:GetTop()-3);
-    self.ZoneList:SetSize(self:GetWidth()-(self.ZoneCaption:GetWidth()+self.ZoneCaption:GetLeft())-95,20);
-    self.ZoneList:SetBorderColor(self.trimColor);
-    self.ZoneList:SetCurrentBackColor(self.colorDarkGrey);
-    self.ZoneList:SetBackColor(self.backColor);
-    self.ZoneList:SetCurrentBackColor(self.backColor);
-    self.ZoneList:SetDropRows(6);
-    self.ZoneList:AddItem( '(Choose a Zone)', '');
-    self.ZoneList.DropDownUpdate=function(zoneText)
-        self:SearchAndLoadQuests(self.SearchText:GetText(), self.ZoneList:GetValue(), self.LevelList:GetValue(), self.ArcList:GetValue());
+    local comments= Compendium.Quests.QuestCommentsControl();
+    comments.CommentAdded = function(s, value) 
+    	if self.currentRecord ~= nil then
+    		self:UpdateLocalRecord(self.currentRecord,'addcomment', { val = value , modifiable = true, time = Turbine.Engine:GetLocalTime() } );
+    	end
     end
-    for i = 1, #self.zones do
-        self.ZoneList:AddItem( self.zones[i], self.zones[i] );
+    comments.CommentDeleted  = function(s, value) 
+    	if self.currentRecord ~= nil then
+    		self:UpdateLocalRecord(self.currentRecord,'delcomment', value );
+    	end
     end
+	self.comments = comments;
+
+	detailTabs:AddTab("Objectives",  self.questObj);
+	detailTabs:AddTab("Description",  self.questDesc);
+	detailTabs:AddTab("Comments",  comments);
+	detailTabs:SetSize(self:GetWidth()-10, 150);
     
     self:ClearQuests();
 	self.searchDisabled = false;
@@ -257,8 +307,6 @@ function CompendiumQuestControl:Constructor()
         if width<100 then width=100 end;
         Turbine.UI.Control.SetWidth(self,width);
         
-        self.logo:SetLeft(width - 80);
-        
         local qlwidth = (width/2) - 7;
         self.qlContainer:SetWidth(qlwidth);
         self.qdContainer:SetLeft(self.qlContainer:GetLeft() + qlwidth + 5);
@@ -267,21 +315,14 @@ function CompendiumQuestControl:Constructor()
         self.qdContainer.QuestDetails:SetWidth(qlwidth - 4);
         self.qlContainer.QuestList.VScrollBar:SetLeft(qlwidth-16);
         self.qdContainer.QuestDetails.VScrollBar:SetLeft(qlwidth-16);
+        pagination:SetWidth(qlwidth - 4);
         
-        local ddwidth = width-(self.ZoneCaption:GetWidth()+self.ZoneCaption:GetLeft())-92;
-    	self.ZoneList:SetSize(ddwidth,20);    
-        self.LevelList:SetSize(ddwidth,20);     
-        self.ArcList:SetSize(ddwidth,20);     
-        
-		local swidth = width - (self.SearchCaption:GetWidth()+self.SearchCaption:GetLeft())-137;
+		local swidth = width - (searchLabel:GetWidth()+searchLabel:GetLeft())-55;
     	self.SearchBorder:SetWidth(swidth);
     	self.SearchText:SetWidth(swidth);
-	    reset:SetLeft( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 2 );
+	    reset:SetLeft( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 1 );
 		
-	    self.QuestComments.VScrollBar:SetLeft(width - 23);
-		self.QuestComments:SetWidth(width - 11);
-		self.commentsCtr:SetWidth(width - 7);
-		
+		detailTabs:SetWidth(width - 10);
 		for index=1,self.qlContainer.QuestList:GetItemCount() do
 			local label = self.qlContainer.QuestList:GetItem(index);
 			label:SetWidth(qlwidth - 14);
@@ -295,21 +336,33 @@ function CompendiumQuestControl:Constructor()
 		
  	self.SetHeight = function(sender,height)
         if height<300 then height=300 end;
-        local lheight = height - self.commentsCtr:GetHeight() - self.qlContainer:GetTop() - 5;
+        local lheight = height - self.qlContainer:GetTop() - detailTabs:GetHeight() - 5;
+        
         Turbine.UI.Control.SetHeight(self,height);
 		self.qlContainer:SetHeight(lheight);
-		self.qlContainer.QuestList:SetHeight(lheight - 3);
-		self.qlContainer.QuestList.VScrollBar:SetHeight(lheight - 2);
+		local ql = self.qlContainer.QuestList;
+   		local sb = ql.VScrollBar;
+   		if pagination:IsVisible() then
+   			ql:SetHeight(lheight - 23);
+   			sb:SetHeight(lheight - 22);
+   		else
+   			ql:SetHeight(lheight - 3);
+   			sb:SetHeight(lheight - 2);
+   		end
+		pagination:SetTop(lheight - 22);
+		
 		self.qdContainer:SetHeight(lheight);
 		self.qdContainer.QuestDetails:SetHeight(lheight - 3);
 		self.qdContainer.QuestDetails.VScrollBar:SetHeight(lheight - 2);
-	    self.commentsCtr:SetTop(self.qdContainer:GetTop() + lheight + 5);	
+		detailTabs:SetTop(self.qdContainer:GetTop() + lheight + 2);   	
     end	
 	
 	self.SetSize = function(sender,width, height) 
 		self:SetWidth(width);
 		self:SetHeight(height);
 	end	
+	
+	self:BuildCursor();
 		    
 end
 
@@ -324,18 +377,22 @@ function CompendiumQuestControl:ClearQuests()
 		self:strip(item, 1);
 	end		
     self.qdContainer.QuestDetails:ClearItems();
-    self.QuestComments:SetText("");
+    self.questDesc:SetText("");
+    self.questObj:SetText("");
+	self.comments:ClearComments();
     self:AddQuestDetail("No quest selected");
     self.prevIdx = nil;
+	self.currentRecord = nil;    
 end
 
 function CompendiumQuestControl:AddQuestDetail(text, hyperlink)
     local label = Turbine.UI.Label();
-    label:SetSize(self.qdContainer.QuestDetails:GetWidth() - 10, 15);
+    label:SetSize(self.qdContainer.QuestDetails:GetWidth() - 10, 13);
     label:SetText(text);
     label:SetBackColor(self.backColor);
     label:SetFont(self.fontFaceSmall);
-
+    label:SetSelectable(true);
+	label:SetMultiline(false);
     if hyperlink == true then
         label:SetFontStyle( Turbine.UI.FontStyle.Outline );
         label:SetForeColor(self.yellow);
@@ -348,97 +405,6 @@ function CompendiumQuestControl:AddQuestDetail(text, hyperlink)
     return label;
 end
 
-function CompendiumQuestControl:SearchAndLoadQuests(searchText, zoneText, levelText, arcText)
-	if self.searchDisabled then
-		return;
-	end
-	
-    self:ClearQuests();
-
-    local ize = (zoneText == nil or zoneText == '');
-    local ise = (searchText == nil or searchText == '');
-    local ile = (levelText == nil or levelText == '');
-    local iae = (arcText == nil or arcText == '');
-
-    if ise and ize and ile and iae then
-        -- no point in searching
-        return;
-    end
-
-    
-    local escapedSearch = '';
-    if not ise then
-        -- some symbols need escaped in regex patterns
-        escapedSearch = string.lower(string.gsub(searchText,'[%-%.%+%[%]%(%)%^%%%?%*]','%%%1'));
-    end
-    
-    local count = 0;
-    
-    --[[
-	local msg = "Searching";
-    if not ise then
-       msg = msg .. ' ' .. searchText;
-    end
-    msg = msg .. ' in ' .. zoneText;
-    Turbine.Shell.WriteLine(msg);
-    ]]
-    
-    local type = 'all';
-    local data = nil;
-    
-    if ize and ile and iae then
-    	-- full text search w/o filters
-    	data = questtable;
-    else
-    	if not ize then data = self:JoinIndex(data, zoneindex[zoneText]); end
-    	if not ile then data = self:JoinIndex(data, levelindex[levelText]); end
-    	if not iae then data = self:JoinIndex(data, arcindex[arcText]); end
-    	type = 'ids';
-    end
-
-	--Turbine.Shell.WriteLine('Data: ' .. self:tostring(data));
-
-    local records = {};
-    for a,b in pairs(data) do
-        local quest = nil;
-        local id = nil;
-        if type == 'all' then
-            id = a;
-            quest = b;
-        else
-            id = b;
-            quest = questtable[tonumber(id)];
-            --if count < 10 then Turbine.Shell.WriteLine(id) end
-        end
-        
-        if quest ~= nil then
-            local name = quest["name"];
-            local include = true;
-            if not ise then
-                if string.find(string.lower(name),escapedSearch) ~= 1 then
-                    include = false;
-                end
-            end
-            --if count < 10 then Turbine.Shell.WriteLine(name) end
-            if include then
-                count = count + 1;
-                records[#records + 1] = quest;
-            end
-        end
-    end
-    
-    -- if full text search then it has to be sorted
-    if type == 'all' then
-        table.sort(records, function(a,b)
-            return a["name"] < b["name"];
-        end);
-    end
-    self:LoadQuests(records);
-    
-    --Turbine.Shell.WriteLine("Found " .. count .. " quests.");
-
-end
-
 function CompendiumQuestControl:JoinIndex(a, b)
 	if a == nil then return b; end
 	
@@ -446,7 +412,9 @@ function CompendiumQuestControl:JoinIndex(a, b)
     local data = {};
     for i,k in pairs(a) do set[tostring(k)] = true; end
     for i,k in pairs(b) do
-        if set[tostring(k)] then data[#data + 1] = k; end
+        if set[tostring(k)] then 
+        	table.insert(data, k); 
+        end
     end
     return data;
 end
@@ -464,7 +432,9 @@ function CompendiumQuestControl:LoadQuests(records)
         	name = name .. ' (M)';
         end
         local label = Turbine.UI.Label();
+        label:SetMultiline(false);
         label:SetSize(width - 10, 15);
+        label:SetSelectable(true);
         label:SetText(name);
         label:SetBackColor(bgColor);
         label:SetFont(self.fontFaceSmall);
@@ -483,11 +453,13 @@ end
 
 function CompendiumQuestControl:Reset() 
 	self.searchDisabled = true;
-	self.ZoneList:SetSelectedIndex(1);
-	self.LevelList:SetSelectedIndex(1);
-	self.ArcList:SetSelectedIndex(1);
 	self.SearchText:SetText('');
+    self:ClearQuests();	
+	self.currentFilters = {};
+	self.filtersLabel:SetText('No filters set');
+	self.cursor = nil;
 	self.searchDisabled = false;
+	self:BuildCursor();
 end
 
 function CompendiumQuestControl:FormatItem(record)
@@ -507,6 +479,7 @@ end
 
 function CompendiumQuestControl:LoadQuestDetails(record)
     
+    local localrecord = self.localquestdata[record['name']];
     --[[{
     	["next"] = {1276, 2025}, 
     	["reputation"] = {"+700 with Malledhrim"}, 
@@ -521,7 +494,7 @@ function CompendiumQuestControl:LoadQuestDetails(record)
     	["prev"] = {862, 1620}, 
     	["name"] = "The Narrow Way", 
     	["arcs"] = "Forts of Taur Morvith", 
-    	["description"] = "The Elven scout Ianudirel was sent ahead to explore the far side of the river from Krul Lugu, but she has not yet returned.", 
+    	["d"] = "The Elven scout Ianudirel was sent ahead to explore the far side of the river from Krul Lugu, but she has not yet returned.", 
     	["minlevel"] = 59, 
     	["repeatable"] = "No", 
     	["faction"] = "FrP", 
@@ -529,48 +502,61 @@ function CompendiumQuestControl:LoadQuestDetails(record)
     },]]
     
     self.qdContainer.QuestDetails:ClearItems();
+	self.comments:ClearComments();
+    self.currentRecord = record;
+    
     self:AddQuestDetail("Name:");
     self:AddQuestDetail("  " .. record['name']);
-    self:AddQuestDetail("Level: " .. record['level'] .. " / Min Level: " .. record['minlevel']);
-    self:AddQuestDetail("Repeatable: " .. record['repeatable'] .. " / Instanced: " .. record['instanced']);
+    local levelinfo = "Level: " .. record['level'];
+    if record['minlevel'] ~= nil then levelinfo = levelinfo  .. " / Min Level: " .. record['minlevel'] end;
+    self:AddQuestDetail(levelinfo);
+    if record['t'] ~= nil then self:AddQuestDetail("Type: " .. record['t']); end
+    local repinst = "Repeatable: " .. record['repeatable'];
+    if record['instanced'] ~= nil then repinst = repinst .. " / Instanced: " .. record['instanced'] end;
+    self:AddQuestDetail(repinst);
 
     if record['zone'] ~= nil then self:AddQuestDetail("Zone: " .. record['zone']); end
     if record['area'] ~= nil then self:AddQuestDetail("Area: " .. record['area']); end
     if record['faction'] ~= nil then self:AddQuestDetail("Faction: " .. record['faction']); end
-    if record['money'] ~= nil then self:AddQuestDetail("Money: " .. record['money'][1]['val']); end
-    if record['reputation'] ~= nil then 
-    	if #record['reputation'] > 1 then
-    		for i,rep in pairs(record['reputation']) do
-    			local prefix = "     ";
-    			if i == 1 then prefix = "Rep: "; end
-    			self:AddQuestDetail(prefix .. rep['val'])
-    		end
-    	else
-    		self:AddQuestDetail("Rep: " .. record['reputation'][1]['val']);
+    if record['b'] ~= nil then self:AddQuestDetail("Bestower: " .. record['b']); end
+    
+    for reward, display in pairs(rewardLabels) do
+    	if record[reward] ~= nil then
+    		local vals = record[reward];
+	    	if #vals > 1 then
+	    		for i,item in pairs(vals) do
+	    			local prefix = "     ";
+	    			if i == 1 then prefix = display .. ": "; end
+	    			
+	    			local dispval = item['val']
+	    			if reward == 'receive' or reward == 'selectoneof' then
+	    				dispval = self:FormatItem(item);
+	    			end
+	    			
+	    			self:AddQuestDetail(prefix .. dispval)
+	    		end
+	    	else
+    			local dispval = vals[1]['val']
+    			if reward == 'receive' or reward == 'selectoneof' then
+    				dispval = self:FormatItem(vals[1]);
+    			end	    	
+	    		self:AddQuestDetail(display .. ": " .. dispval);
+	    	end
     	end
     end
-    if record['receive'] ~= nil then 
-    	if #record['receive'] > 1 then
-    		for i,item in pairs(record['receive']) do
-    			local prefix = "     ";
-    			if i == 1 then prefix = "Recieve: "; end
-    			
-    			self:AddQuestDetail(prefix .. self:FormatItem(item))
-    		end
-    	else
-    		self:AddQuestDetail("Recieve: " .. self:FormatItem(record['receive'][1]));
-    	end
-    end     
         		
     local sep = false;
     if record['arcs'] ~= nil then
         self:AddQuestDetail("");
         sep = true;
         self:AddQuestDetail("Quest Chain:");
-        self:AddQuestDetail("  " .. record['arcs'], true).MouseClick = function(sender, args)
-        	self:Reset();
-        	self.ArcList:SelectIndexByValue(record['arcs']);
-        end;
+        local arclabel = self:AddQuestDetail("  " .. record['arcs'], true);
+        if questindexes[record['arcs']] ~= nil then
+	        arclabel.MouseClick = function(sender, args)
+	        	self:Reset();
+	        	self:AddFilters({ record['arcs'] });
+	        end;
+	    end
     end
     if record['prev'] ~= nil then
         if sep == false then self:AddQuestDetail(""); end
@@ -599,7 +585,7 @@ function CompendiumQuestControl:LoadQuestDetails(record)
     if record['mobs'] ~= nil and #record['mobs'] > 0 then
         if sep == false then self:AddQuestDetail(""); end
         sep = true
-        self:AddQuestDetail("Mobs of Interest:");
+        self:AddQuestDetail("Mobs/NPCs of Interest:");
         for i,mob in pairs(record['mobs']) do
             local name = "  " .. mob['name'];
             if mob['locations'] ~= nil then
@@ -640,7 +626,191 @@ function CompendiumQuestControl:LoadQuestDetails(record)
         end
     end
     
-    self.QuestComments:SetText(record['description']);
+    -- description
+    self.questDesc:SetVerticalScrollBar(nil);
+    self.questDesc:SetText(record['d']);
+    self.questDesc:SetVerticalScrollBar(self.questDesc.VScrollBar);
+	-- objective
+    self.questObj:SetVerticalScrollBar(nil);
+    self.questObj:SetText(record['o']);
+    self.questObj:SetVerticalScrollBar(self.questObj.VScrollBar);
 
+	
+
+    
+    if record['c'] ~= nil then
+    	local comrecs = {};
+    	for i, value in pairs(record['c']) do
+    		table.insert(comrecs,  { val = value , modifiable = false, time = 0 } );
+    	end
+    	self.comments:AddCommentRecords(comrecs, false);
+    else
+    	self.comments:AddCommentRecords({}, false);
+    end
+    -- add any custom added comments user may have added
+	if localrecord ~= nil and localrecord['c'] ~= nil then
+		for i, lcr in pairs(localrecord['c']) do
+			self.comments:AddCommentRecord(lcr, true);
+		end
+	end
+
+end
+
+function CompendiumQuestControl:BuildCursor()
+
+	if self.searchDisabled then
+		return;
+	end
+    self:ClearQuests();
+	self.pagination:SetCursor(nil);
+	self.pagination:SetVisible(false);
+	
+	-- filter results using our category indexes
+	local ids = nil;
+	for i,cat in pairs(self.currentFilters) do
+		if questindexes[cat] ~= nil then
+			ids = self:JoinIndex(ids,questindexes[cat]);
+		end 
+	end
+	-- determine if a text search was used
+	local searchText = self.SearchText:GetText();
+    local ise = (searchText == nil or searchText == '');
+    local escapedSearch = '';
+    if not ise then
+        -- some symbols need escaped in regex patterns
+        escapedSearch = string.lower(string.gsub(searchText,'[%-%.%+%[%]%(%)%^%%%?%*]','%%%1'));
+    else
+    	-- if no search and no indexes use default cursor
+    	if ids == nil then
+			self.cursor = Compendium.Common.Utils.DataCursor(questtable, pagesize);
+			self.pagination:SetCursor(self.cursor);
+			if self.cursor:PageCount() > 1 then
+				self.pagination:SetVisible(true);
+			end
+			self:LoadQuests(self.cursor:CurPage());
+			return;
+		end 	
+    end
+
+	-- build data set	
+	local data = questtable;
+	if ids ~= nil then
+		data = ids 
+	end;
+	local recs = {};
+    local count = 0;
+	for a, b in pairs(data) do
+		local id = a;
+		if ids ~= nil then id = b end;
+
+		--Turbine.Shell.WriteLine('a:' .. a .. ' b:' .. b .. ' id:' .. id);		
+		local rec = questtable[id];
+        local include = true;
+        if not ise then
+            if string.find(string.lower(rec["name"]),escapedSearch) ~= 1 then
+                include = false;
+            end
+        end
+        if include then
+            count = count + 1;
+            table.insert(recs,rec);
+        end
+	end;
+	
+	-- create pagination cursor for results
+	self.cursor = Compendium.Common.Utils.DataCursor(recs, pagesize);
+	self.pagination:SetCursor(self.cursor);
+	if self.cursor:PageCount() > 1 then
+		self.pagination:SetVisible(true);
+	end
+	
+	-- load current page
+	self:LoadQuests(self.cursor:CurPage());
+
+end
+
+function CompendiumQuestControl:AddFilters(categories)
+	
+	local distinctCats = {};
+	for i,cat in pairs(self.currentFilters) do distinctCats[cat] = i end;
+	for i,cat in pairs(categories) do
+		if questindexes[cat] ~= nil then distinctCats[cat] = i end; 
+	end
+	self.currentFilters = {};
+	local count = 0;
+	local filterText = 'Filters: ';
+	for cat,v in pairs(distinctCats) do
+		if count > 0 then filterText = filterText .. ', ' end;
+		filterText = filterText .. cat;
+		table.insert(self.currentFilters, cat) 
+		count = count + 1;
+	end;
+	
+	self.filtersLabel:SetText(filterText);
+	self:BuildCursor();
+end
+
+function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
+
+	local quest = questrecord['name'];
+	if self.localquestdata[quest] == nil then 
+		self.localquestdata[quest] = {};
+	end
+	
+	if type == 'addcomment' then
+		if self.localquestdata[quest]['c'] == nil then
+			self.localquestdata[quest]['c'] = { data }
+		else
+			table.insert(self.localquestdata[quest]['c'],data);
+		end
+		self.comments:AddCommentRecord(data, true);
+		self.localquestdatamodified = true;
+	elseif type == 'delcomment' then
+		if self.localquestdata[quest]['c'] == nil then
+			-- nothing to do
+		else
+			local comments = {};
+			for i,c in pairs(self.localquestdata[quest]['c']) do 
+				if c['time'] ~= data['time'] then
+					table.insert(comments,c);
+				end
+			end
+			self.localquestdata[quest]['c'] = comments;
+			self.localquestdatamodified = true;
+		end			
+	else
+		-- unknown update type
+	end
+			
+end
+
+function CompendiumQuestControl:persist()
+	if self.localquestdatamodified then
+		Turbine.Shell.WriteLine('Saving quests...');
+		Turbine.PluginData.Save( Turbine.DataScope.Account, "LocalQuestData", self.localquestdata );
+		self.localquestdatamodified = false;
+		Turbine.Shell.WriteLine('Saving complete.');
+	end
+end
+
+function CompendiumQuestControl:LoadLocalQuests()
+	self.localquestdata = Turbine.PluginData.Load( Turbine.DataScope.Account , "LocalQuestData")
+	if self.localquestdata == nil then
+		self.localquestdata = {};
+	end
+end
+
+function CompendiumQuestControl:AddCoordinate( record )
+	if record == nil then return end;
+	
+	local coord = '';
+	if record.target ~= ';target' then
+		coord = record.target .. ' in ';
+	else
+		coord = 'In ';
+	end
+	coord = coord .. record.area .. ' @ ' .. record.coord;  
+	self.comments:AddToComment(coord);
+	
 end
 
