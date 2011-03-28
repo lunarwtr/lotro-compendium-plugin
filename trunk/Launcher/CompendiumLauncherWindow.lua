@@ -173,11 +173,11 @@ function CompendiumLauncherWindow:Constructor()
 	    checkbox:SetParent( settingControl );
 	    checkbox:SetMultiline( true );
 	    checkbox:SetPosition( 20, cbtop );
-	    checkbox:SetSize( 250, 20 );
+	    checkbox:SetSize( 350, 20 );
 	    checkbox:SetFont(self.fontFace);
 	    checkbox:SetForeColor(self.fontColor);    
 	    checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
-	    checkbox:SetText( "  Load " .. db .. " (requires reload)." );
+	    checkbox:SetText( "  Load " .. db .. " Compendium (requires reload)." );
 	    checkbox:SetChecked(self.Settings.Components[db]);
 		checkbox.CheckedChanged = function(s,a)
 			if s:IsChecked() then
@@ -185,6 +185,7 @@ function CompendiumLauncherWindow:Constructor()
 			else
 				self.Settings.Components[db] = false;
 			end
+			self.Settings.ActiveTabIndex = 1;
 			self:SaveSettings();
 		end	
 		cbtop = cbtop + 20;
@@ -193,12 +194,6 @@ function CompendiumLauncherWindow:Constructor()
 			tabs:AddTab(rec.title, rec.init());
 		end
 	end
-	--[[
-	tabs:AddTab("Quests", Compendium.Quests.CompendiumQuestControl());
-	tabs:AddTab("Deeds", Compendium.Deeds.CompendiumDeedControl());
-	tabs:AddTab("Items", Compendium.Items.CompendiumItemControl());
-	tabs:AddTab("Crafting", Compendium.Crafts.CompendiumCraftControl());
-	]]
 	
 	local plugs = Turbine.PluginManager.GetAvailablePlugins();
 	local loaded = Turbine.PluginManager.GetLoadedPlugins();
