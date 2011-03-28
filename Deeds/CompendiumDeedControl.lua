@@ -18,9 +18,9 @@ import "Turbine.Gameplay";
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
 
-import "Compendium.Quests.CompendiumQuestsDB";
-import "Compendium.Quests.QuestCommentsControl";
-import "Compendium.Quests.QuestCategoryMenu";
+import "Compendium.Deeds.CompendiumDeedsDB";
+import "Compendium.Deeds.DeedCommentsControl";
+import "Compendium.Deeds.DeedCategoryMenu";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 
@@ -36,24 +36,24 @@ local rewardLabels = {
     traits = "Traits" 
 };
 
-CompendiumQuestControl= class( Compendium.Common.UI.CompendiumControl );
-function CompendiumQuestControl:Constructor()
+CompendiumDeedControl= class( Compendium.Common.UI.CompendiumControl );
+function CompendiumDeedControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 
-	self.localquestdatamodified = false;
-	self.localquestdata = {};
+	self.localdeeddatamodified = false;
+	self.localdeeddata = {};
     self.currentFilters = {};
 	self.searchDisabled = true;
-	self:LoadLocalQuests();
+	self:LoadLocalDeeds();
 	
 	--[[
 	local ctime = Turbine.Engine:GetLocalTime() 
-	for i,q in pairs(questtable) do
-		self.localquestdata[q['name'] ] = { c = {{ val = q['o'], modifiable = true, time = ctime }}  };
+	for i,q in pairs(deedtable) do
+		self.localdeeddata[q['name'] ] = { c = {{ val = q['o'], modifiable = true, time = ctime }}  };
 	end
 	]]
 	
-    self.menu = Compendium.Quests.QuestCategoryMenu();
+    self.menu = Compendium.Deeds.DeedCategoryMenu();
     self.menu.ClickCategory = function(categories) 
 		self:AddFilters(categories);
 	end        
@@ -132,7 +132,7 @@ function CompendiumQuestControl:Constructor()
     self.SearchText.Update=function()
         if self.SearchText.Text~=self.SearchText:GetText() then
                 self.SearchText.Text=self.SearchText:GetText()
-                self:SearchAndLoadQuests(self.SearchText:GetText(), self.ZoneList:GetValue(), self.LevelList:GetValue());
+                self:SearchAndLoadDeeds(self.SearchText:GetText(), self.ZoneList:GetValue(), self.LevelList:GetValue());
         end
     end
 	--]]
@@ -161,33 +161,33 @@ function CompendiumQuestControl:Constructor()
     self.qlContainer:SetPosition(5,filtersLabel:GetTop() + filtersLabel:GetHeight() + 1);
     self.qlContainer:SetSize((self:GetWidth()/2) - 7, self:GetHeight()-270);
     self.qlContainer:SetBackColor(Turbine.UI.Color(0,0,0)); -- this one has to stay fixed for grid to show
-    self.qlContainer.QuestList=Turbine.UI.ListBox();
-    self.qlContainer.QuestList:SetParent(self.qlContainer);
-    self.qlContainer.QuestList:SetPosition(2,1);
-    self.qlContainer.QuestList:SetSize(self.qlContainer:GetWidth()-4,self.qlContainer:GetHeight()-3);
-    self.qlContainer.QuestList:SetBackColor(self.backColor);
-    self.qlContainer.QuestList.VScrollBar=Turbine.UI.Lotro.ScrollBar();
-    self.qlContainer.QuestList.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
-    self.qlContainer.QuestList.VScrollBar:SetParent(self.qlContainer.QuestList);
-    self.qlContainer.QuestList.VScrollBar:SetBackColor(self.backColor);
-    self.qlContainer.QuestList.VScrollBar:SetPosition(self.qlContainer:GetWidth()-16,0)
-    self.qlContainer.QuestList.VScrollBar:SetWidth(12);
-    self.qlContainer.QuestList.VScrollBar:SetHeight(self.qlContainer:GetHeight()-2);
-    self.qlContainer.QuestList:SetVerticalScrollBar(self.qlContainer.QuestList.VScrollBar);
-    self.qlContainer.QuestList.SelectedIndexChanged=function(sender, args)
-        local idx = self.qlContainer.QuestList:GetSelectedIndex();
+    self.qlContainer.DeedList=Turbine.UI.ListBox();
+    self.qlContainer.DeedList:SetParent(self.qlContainer);
+    self.qlContainer.DeedList:SetPosition(2,1);
+    self.qlContainer.DeedList:SetSize(self.qlContainer:GetWidth()-4,self.qlContainer:GetHeight()-3);
+    self.qlContainer.DeedList:SetBackColor(self.backColor);
+    self.qlContainer.DeedList.VScrollBar=Turbine.UI.Lotro.ScrollBar();
+    self.qlContainer.DeedList.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
+    self.qlContainer.DeedList.VScrollBar:SetParent(self.qlContainer.DeedList);
+    self.qlContainer.DeedList.VScrollBar:SetBackColor(self.backColor);
+    self.qlContainer.DeedList.VScrollBar:SetPosition(self.qlContainer:GetWidth()-16,0)
+    self.qlContainer.DeedList.VScrollBar:SetWidth(12);
+    self.qlContainer.DeedList.VScrollBar:SetHeight(self.qlContainer:GetHeight()-2);
+    self.qlContainer.DeedList:SetVerticalScrollBar(self.qlContainer.DeedList.VScrollBar);
+    self.qlContainer.DeedList.SelectedIndexChanged=function(sender, args)
+        local idx = self.qlContainer.DeedList:GetSelectedIndex();
         if self.prevIdx ~= nil then
-            local oldItem = self.qlContainer.QuestList:GetItem(self.prevIdx);
+            local oldItem = self.qlContainer.DeedList:GetItem(self.prevIdx);
             if oldItem ~= nil then
                 oldItem:SetBackColor(self.backColor);
             end
         end
         if idx ~= 0 then
             self.prevIdx = idx;
-            local item = self.qlContainer.QuestList:GetItem(idx);
+            local item = self.qlContainer.DeedList:GetItem(idx);
             item:SetBackColor(self.selBackColor);
-            -- Display Quest
-            self:LoadQuestDetails(questtable[item.QuestId]);
+            -- Display Deed
+            self:LoadDeedDetails(deedtable[item.DeedId]);
         end
 
     end
@@ -198,11 +198,11 @@ function CompendiumQuestControl:Constructor()
     pagination:SetSize(self.qlContainer:GetWidth(),20);
     pagination:SetPosition(0,self.qlContainer:GetHeight() - 22);
 	pagination.PageChanged = function(sender,direction,records)
-   		self:ClearQuests();
-		self:LoadQuests(records);
+   		self:ClearDeeds();
+		self:LoadDeeds(records);
    	end
    	pagination.VisibleChanged = function(s,a) 
-   		local ql = self.qlContainer.QuestList;
+   		local ql = self.qlContainer.DeedList;
    		local sb = ql.VScrollBar;
    		local ch = self.qlContainer:GetHeight();
    		if pagination:IsVisible() then
@@ -221,67 +221,67 @@ function CompendiumQuestControl:Constructor()
     self.qdContainer:SetPosition(self.qlContainer:GetLeft()+self.qlContainer:GetWidth()+5,self.qlContainer:GetTop());
     self.qdContainer:SetSize(self.qlContainer:GetWidth(),self.qlContainer:GetHeight());
     self.qdContainer:SetBackColor(Turbine.UI.Color(0,0,0)); -- this one has to stay fixed for grid to show
-    self.qdContainer.QuestDetails = Turbine.UI.ListBox();
-    self.qdContainer.QuestDetails:SetParent(self.qdContainer);
-    self.qdContainer.QuestDetails:SetPosition(2,1);
-    self.qdContainer.QuestDetails:SetSize(self.qdContainer:GetWidth()-4,self.qdContainer:GetHeight()-3);
-    self.qdContainer.QuestDetails:SetBackColor(self.backColor);
-    self.qdContainer.QuestDetails.VScrollBar=Turbine.UI.Lotro.ScrollBar();
-    self.qdContainer.QuestDetails.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
-    self.qdContainer.QuestDetails.VScrollBar:SetParent(self.qdContainer.QuestDetails);
-    self.qdContainer.QuestDetails.VScrollBar:SetBackColor(self.backColor);
-    self.qdContainer.QuestDetails.VScrollBar:SetPosition(self.qdContainer:GetWidth()-16,0)
-    self.qdContainer.QuestDetails.VScrollBar:SetWidth(12);
-    self.qdContainer.QuestDetails.VScrollBar:SetHeight(self.qdContainer:GetHeight()-2);
-    self.qdContainer.QuestDetails:SetVerticalScrollBar(self.qdContainer.QuestDetails.VScrollBar);    
+    self.qdContainer.DeedDetails = Turbine.UI.ListBox();
+    self.qdContainer.DeedDetails:SetParent(self.qdContainer);
+    self.qdContainer.DeedDetails:SetPosition(2,1);
+    self.qdContainer.DeedDetails:SetSize(self.qdContainer:GetWidth()-4,self.qdContainer:GetHeight()-3);
+    self.qdContainer.DeedDetails:SetBackColor(self.backColor);
+    self.qdContainer.DeedDetails.VScrollBar=Turbine.UI.Lotro.ScrollBar();
+    self.qdContainer.DeedDetails.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
+    self.qdContainer.DeedDetails.VScrollBar:SetParent(self.qdContainer.DeedDetails);
+    self.qdContainer.DeedDetails.VScrollBar:SetBackColor(self.backColor);
+    self.qdContainer.DeedDetails.VScrollBar:SetPosition(self.qdContainer:GetWidth()-16,0)
+    self.qdContainer.DeedDetails.VScrollBar:SetWidth(12);
+    self.qdContainer.DeedDetails.VScrollBar:SetHeight(self.qdContainer:GetHeight()-2);
+    self.qdContainer.DeedDetails:SetVerticalScrollBar(self.qdContainer.DeedDetails.VScrollBar);    
 
     local bottom = self.qdContainer:GetTop() + self.qdContainer:GetHeight() + 2;
 	local detailTabs = Compendium.Common.UI.TabControl();
 	detailTabs:SetParent(self);
 	detailTabs:SetPosition(7,bottom);
 	    
-    self.questDesc=Turbine.UI.Label();
-    self.questDesc:SetPosition(0,0);
-    self.questDesc:SetFont(self.fontFace);
-    self.questDesc:SetForeColor(self.fontColor);
-    self.questDesc:SetSelectable(true);
-    self.questDesc.VScrollBar=Turbine.UI.Lotro.ScrollBar();
-    self.questDesc.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
-    self.questDesc.VScrollBar:SetParent(self.questDesc);
-    self.questDesc.VScrollBar:SetBackColor(self.backColor);
-    self.questDesc.VScrollBar:SetPosition(self.questDesc:GetWidth()-12,0)
-    self.questDesc.VScrollBar:SetWidth(12);
-    self.questDesc.VScrollBar:SetHeight(self.questDesc:GetHeight()-2);
-    self.questDesc:SetVerticalScrollBar(self.questDesc.VScrollBar);
-    self.questDesc.SizeChanged = function(s,a) 
+    self.deedDesc=Turbine.UI.Label();
+    self.deedDesc:SetPosition(0,0);
+    self.deedDesc:SetFont(self.fontFace);
+    self.deedDesc:SetForeColor(self.fontColor);
+    self.deedDesc:SetSelectable(true);
+    self.deedDesc.VScrollBar=Turbine.UI.Lotro.ScrollBar();
+    self.deedDesc.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
+    self.deedDesc.VScrollBar:SetParent(self.deedDesc);
+    self.deedDesc.VScrollBar:SetBackColor(self.backColor);
+    self.deedDesc.VScrollBar:SetPosition(self.deedDesc:GetWidth()-12,0)
+    self.deedDesc.VScrollBar:SetWidth(12);
+    self.deedDesc.VScrollBar:SetHeight(self.deedDesc:GetHeight()-2);
+    self.deedDesc:SetVerticalScrollBar(self.deedDesc.VScrollBar);
+    self.deedDesc.SizeChanged = function(s,a) 
     	local width = s:GetWidth();
 		local height = s:GetHeight();
-	    self.questDesc.VScrollBar:SetPosition(width-12,0);
-	    self.questDesc.VScrollBar:SetHeight(height - 2);
+	    self.deedDesc.VScrollBar:SetPosition(width-12,0);
+	    self.deedDesc.VScrollBar:SetHeight(height - 2);
     end
 
-    self.questObj=Turbine.UI.Label();
-    self.questObj:SetPosition(0,0);
-    self.questObj:SetFont(self.fontFace);
-    self.questObj:SetForeColor(self.fontColor);
-    self.questObj:SetSelectable(true);
-    self.questObj.VScrollBar=Turbine.UI.Lotro.ScrollBar();
-    self.questObj.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
-    self.questObj.VScrollBar:SetParent(self.questObj);
-    self.questObj.VScrollBar:SetBackColor(self.backColor);
-    self.questObj.VScrollBar:SetPosition(self.questObj:GetWidth()-12,0)
-    self.questObj.VScrollBar:SetWidth(12);
-    self.questObj.VScrollBar:SetHeight(self.questObj:GetHeight()-2);
-    self.questObj:SetVerticalScrollBar(self.questObj.VScrollBar);
-    self.questObj.SizeChanged = function(s,a) 
+    self.deedObj=Turbine.UI.Label();
+    self.deedObj:SetPosition(0,0);
+    self.deedObj:SetFont(self.fontFace);
+    self.deedObj:SetForeColor(self.fontColor);
+    self.deedObj:SetSelectable(true);
+    self.deedObj.VScrollBar=Turbine.UI.Lotro.ScrollBar();
+    self.deedObj.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
+    self.deedObj.VScrollBar:SetParent(self.deedObj);
+    self.deedObj.VScrollBar:SetBackColor(self.backColor);
+    self.deedObj.VScrollBar:SetPosition(self.deedObj:GetWidth()-12,0)
+    self.deedObj.VScrollBar:SetWidth(12);
+    self.deedObj.VScrollBar:SetHeight(self.deedObj:GetHeight()-2);
+    self.deedObj:SetVerticalScrollBar(self.deedObj.VScrollBar);
+    self.deedObj.SizeChanged = function(s,a) 
     	local width = s:GetWidth();
 		local height = s:GetHeight();
-	    self.questObj.VScrollBar:SetPosition(width-12,0);
-	    self.questObj.VScrollBar:SetHeight(height - 2);
+	    self.deedObj.VScrollBar:SetPosition(width-12,0);
+	    self.deedObj.VScrollBar:SetHeight(height - 2);
     end
 
     
-    local comments= Compendium.Quests.QuestCommentsControl();
+    local comments= Compendium.Deeds.DeedCommentsControl();
     comments.CommentAdded = function(s, value) 
     	if self.currentRecord ~= nil then
     		self:UpdateLocalRecord(self.currentRecord,'addcomment', { val = value , modifiable = true, time = Turbine.Engine:GetLocalTime() } );
@@ -294,12 +294,12 @@ function CompendiumQuestControl:Constructor()
     end
 	self.comments = comments;
 
-	detailTabs:AddTab("Objectives",  self.questObj);
-	detailTabs:AddTab("Description",  self.questDesc);
+	detailTabs:AddTab("Objectives",  self.deedObj);
+	detailTabs:AddTab("Description",  self.deedDesc);
 	detailTabs:AddTab("Comments",  comments);
 	detailTabs:SetSize(self:GetWidth()-10, 150);
     
-    self:ClearQuests();
+    self:ClearDeeds();
 	self.searchDisabled = false;
 
     
@@ -311,10 +311,10 @@ function CompendiumQuestControl:Constructor()
         self.qlContainer:SetWidth(qlwidth);
         self.qdContainer:SetLeft(self.qlContainer:GetLeft() + qlwidth + 5);
         self.qdContainer:SetWidth(qlwidth);
-        self.qlContainer.QuestList:SetWidth(qlwidth - 4);
-        self.qdContainer.QuestDetails:SetWidth(qlwidth - 4);
-        self.qlContainer.QuestList.VScrollBar:SetLeft(qlwidth-16);
-        self.qdContainer.QuestDetails.VScrollBar:SetLeft(qlwidth-16);
+        self.qlContainer.DeedList:SetWidth(qlwidth - 4);
+        self.qdContainer.DeedDetails:SetWidth(qlwidth - 4);
+        self.qlContainer.DeedList.VScrollBar:SetLeft(qlwidth-16);
+        self.qdContainer.DeedDetails.VScrollBar:SetLeft(qlwidth-16);
         pagination:SetWidth(qlwidth - 4);
         
 		local swidth = width - (searchLabel:GetWidth()+searchLabel:GetLeft())-55;
@@ -323,12 +323,12 @@ function CompendiumQuestControl:Constructor()
 	    reset:SetLeft( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 1 );
 		
 		detailTabs:SetWidth(width - 10);
-		for index=1,self.qlContainer.QuestList:GetItemCount() do
-			local label = self.qlContainer.QuestList:GetItem(index);
+		for index=1,self.qlContainer.DeedList:GetItemCount() do
+			local label = self.qlContainer.DeedList:GetItem(index);
 			label:SetWidth(qlwidth - 14);
 		end
-		for index=1,self.qdContainer.QuestDetails:GetItemCount() do
-			local label = self.qdContainer.QuestDetails:GetItem(index);
+		for index=1,self.qdContainer.DeedDetails:GetItemCount() do
+			local label = self.qdContainer.DeedDetails:GetItem(index);
 			label:SetWidth(qlwidth - 14);
 		end
 
@@ -340,7 +340,7 @@ function CompendiumQuestControl:Constructor()
         
         Turbine.UI.Control.SetHeight(self,height);
 		self.qlContainer:SetHeight(lheight);
-		local ql = self.qlContainer.QuestList;
+		local ql = self.qlContainer.DeedList;
    		local sb = ql.VScrollBar;
    		if pagination:IsVisible() then
    			ql:SetHeight(lheight - 23);
@@ -352,8 +352,8 @@ function CompendiumQuestControl:Constructor()
 		pagination:SetTop(lheight - 22);
 		
 		self.qdContainer:SetHeight(lheight);
-		self.qdContainer.QuestDetails:SetHeight(lheight - 3);
-		self.qdContainer.QuestDetails.VScrollBar:SetHeight(lheight - 2);
+		self.qdContainer.DeedDetails:SetHeight(lheight - 3);
+		self.qdContainer.DeedDetails.VScrollBar:SetHeight(lheight - 2);
 		detailTabs:SetTop(self.qdContainer:GetTop() + lheight + 2);   	
     end	
 	
@@ -366,28 +366,28 @@ function CompendiumQuestControl:Constructor()
 		    
 end
 
-function CompendiumQuestControl:ClearQuests()
-	for index=1,self.qlContainer.QuestList:GetItemCount() do
-		local item = self.qlContainer.QuestList:GetItem(index);
+function CompendiumDeedControl:ClearDeeds()
+	for index=1,self.qlContainer.DeedList:GetItemCount() do
+		local item = self.qlContainer.DeedList:GetItem(index);
 		self:strip(item, 1);
 	end	
-	self.qlContainer.QuestList:ClearItems();
-	for index=1,self.qdContainer.QuestDetails:GetItemCount() do
-		local item = self.qdContainer.QuestDetails:GetItem(index);
+	self.qlContainer.DeedList:ClearItems();
+	for index=1,self.qdContainer.DeedDetails:GetItemCount() do
+		local item = self.qdContainer.DeedDetails:GetItem(index);
 		self:strip(item, 1);
 	end		
-    self.qdContainer.QuestDetails:ClearItems();
-    self.questDesc:SetText("");
-    self.questObj:SetText("");
+    self.qdContainer.DeedDetails:ClearItems();
+    self.deedDesc:SetText("");
+    self.deedObj:SetText("");
 	self.comments:ClearComments();
-    self:AddQuestDetail("No quest selected");
+    self:AddDeedDetail("No deed selected");
     self.prevIdx = nil;
 	self.currentRecord = nil;    
 end
 
-function CompendiumQuestControl:AddQuestDetail(text, hyperlink)
+function CompendiumDeedControl:AddDeedDetail(text, hyperlink)
     local label = Turbine.UI.Label();
-    label:SetSize(self.qdContainer.QuestDetails:GetWidth() - 10, 13);
+    label:SetSize(self.qdContainer.DeedDetails:GetWidth() - 10, 13);
     label:SetText(text);
     label:SetBackColor(self.backColor);
     label:SetFont(self.fontFaceSmall);
@@ -401,11 +401,11 @@ function CompendiumQuestControl:AddQuestDetail(text, hyperlink)
         label:SetForeColor(self.fontColor);
     end
 
-    self.qdContainer.QuestDetails:AddItem(label);
+    self.qdContainer.DeedDetails:AddItem(label);
     return label;
 end
 
-function CompendiumQuestControl:JoinIndex(a, b)
+function CompendiumDeedControl:JoinIndex(a, b)
 	if a == nil then return b; end
 	
     local set = {};
@@ -419,10 +419,10 @@ function CompendiumQuestControl:JoinIndex(a, b)
     return data;
 end
 
-function CompendiumQuestControl:LoadQuests(records)
+function CompendiumDeedControl:LoadDeeds(records)
 
-    local bgColor = self.qlContainer.QuestList:GetBackColor();
-    local width = self.qlContainer.QuestList:GetWidth();
+    local bgColor = self.qlContainer.DeedList:GetBackColor();
+    local width = self.qlContainer.DeedList:GetWidth();
     local playerLevel = Turbine.Gameplay.LocalPlayer.GetInstance():GetLevel();
 
     for i,rec in pairs(records) do
@@ -445,16 +445,16 @@ function CompendiumQuestControl:LoadQuests(records)
         end
         label:SetForeColor(color);
                 
-        label.QuestId = tonumber(rec["id"]);
-        self.qlContainer.QuestList:AddItem(label);
+        label.DeedId = tonumber(rec["id"]);
+        self.qlContainer.DeedList:AddItem(label);
     end
     
 end
 
-function CompendiumQuestControl:Reset() 
+function CompendiumDeedControl:Reset() 
 	self.searchDisabled = true;
 	self.SearchText:SetText('');
-    self:ClearQuests();	
+    self:ClearDeeds();	
 	self.currentFilters = {};
 	self.filtersLabel:SetText('No filters set');
 	self.cursor = nil;
@@ -462,7 +462,7 @@ function CompendiumQuestControl:Reset()
 	self:BuildCursor();
 end
 
-function CompendiumQuestControl:FormatItem(record)
+function CompendiumDeedControl:FormatItem(record)
 	local item = '';
 	if record['id'] ~= nil then
 		item = string.format(self.itemExampleTpl,record['id'],record['val']);
@@ -477,48 +477,19 @@ function CompendiumQuestControl:FormatItem(record)
 	return item; 
 end
 
-function CompendiumQuestControl:LoadQuestDetails(record)
+function CompendiumDeedControl:LoadDeedDetails(record)
     
-    local localrecord = self.localquestdata[record['name']];
-    --[[{
-    	["next"] = {1276, 2025}, 
-    	["reputation"] = {"+700 with Malledhrim"}, 
-    	["zone"] = "Mirkwood", 
-    	["area"] = "Taur Morvith", 
-    	["money"] = {"45s 36c"}, 
-		["receive"] = {"Malledhrim Bronze Feather (x4)"},
-    	["mobs"] = {{["locations"] = {"16.60S, 50.55W"}, ["name"] = "Iavassúl"}}, 
-    	["category"] = "Mirkwood", 
-    	["id"] = 2222, 
-    	["scope"] = "n/a", 
-    	["prev"] = {862, 1620}, 
-    	["name"] = "The Narrow Way", 
-    	["arcs"] = "Forts of Taur Morvith", 
-    	["d"] = "The Elven scout Ianudirel was sent ahead to explore the far side of the river from Krul Lugu, but she has not yet returned.", 
-    	["minlevel"] = 59, 
-    	["repeatable"] = "No", 
-    	["faction"] = "FrP", 
-    	["instanced"] = "No"
-    },]]
-    
-    self.qdContainer.QuestDetails:ClearItems();
+    local localrecord = self.localdeeddata[record['name']];
+
+    self.qdContainer.DeedDetails:ClearItems();
 	self.comments:ClearComments();
     self.currentRecord = record;
     
-    self:AddQuestDetail("Name:");
-    self:AddQuestDetail("  " .. record['name']);
-    local levelinfo = "Level: " .. record['level'];
-    if record['minlevel'] ~= nil then levelinfo = levelinfo  .. " / Min Level: " .. record['minlevel'] end;
-    self:AddQuestDetail(levelinfo);
-    if record['t'] ~= nil then self:AddQuestDetail("Type: " .. record['t']); end
-    local repinst = "Repeatable: " .. record['repeatable'];
-    if record['instanced'] ~= nil then repinst = repinst .. " / Instanced: " .. record['instanced'] end;
-    self:AddQuestDetail(repinst);
-
-    if record['zone'] ~= nil then self:AddQuestDetail("Zone: " .. record['zone']); end
-    if record['area'] ~= nil then self:AddQuestDetail("Area: " .. record['area']); end
-    if record['faction'] ~= nil then self:AddQuestDetail("Faction: " .. record['faction']); end
-    if record['b'] ~= nil then self:AddQuestDetail("Bestower: " .. record['b']); end
+    self:AddDeedDetail("Name:");
+    self:AddDeedDetail("  " .. record['name']);
+    self:AddDeedDetail("Level: " .. record['level']);
+    if record['t'] ~= nil then self:AddDeedDetail("Type: " .. record['t']); end
+    if record['zone'] ~= nil then self:AddDeedDetail("Zone: " .. record['zone']); end
     
     for reward, display in pairs(rewardLabels) do
     	if record[reward] ~= nil then
@@ -533,107 +504,95 @@ function CompendiumQuestControl:LoadQuestDetails(record)
 	    				dispval = self:FormatItem(item);
 	    			end
 	    			
-	    			self:AddQuestDetail(prefix .. dispval)
+	    			self:AddDeedDetail(prefix .. dispval)
 	    		end
 	    	else
     			local dispval = vals[1]['val']
     			if reward == 'receive' or reward == 'selectoneof' then
     				dispval = self:FormatItem(vals[1]);
     			end	    	
-	    		self:AddQuestDetail(display .. ": " .. dispval);
+	    		self:AddDeedDetail(display .. ": " .. dispval);
 	    	end
     	end
     end
-        		
+
     local sep = false;
-    if record['arcs'] ~= nil then
-        self:AddQuestDetail("");
-        sep = true;
-        self:AddQuestDetail("Quest Chain:");
-        local arclabel = self:AddQuestDetail("  " .. record['arcs'], true);
-        if questindexes[record['arcs']] ~= nil then
-	        arclabel.MouseClick = function(sender, args)
-	        	self:Reset();
-	        	self:AddFilters({ record['arcs'] });
-	        end;
-	    end
-    end
     if record['prev'] ~= nil then
-        if sep == false then self:AddQuestDetail(""); end
+        if sep == false then self:AddDeedDetail(""); end
         sep = true
-        self:AddQuestDetail("Prereq(s):");
+        self:AddDeedDetail("Prereq(s):");
         for i,previd in pairs(record['prev']) do     
-        	local name = questtable[previd]['name'];   
-	        self:AddQuestDetail("  " .. name, true).MouseClick = function(sender, args)
-	            self:LoadQuestDetails(questtable[previd]);
+        	local name = deedtable[previd]['name'];   
+	        self:AddDeedDetail("  " .. name, true).MouseClick = function(sender, args)
+	            self:LoadDeedDetails(deedtable[previd]);
 	        end;
         end
     end
     if record['next'] ~= nil then
-        if sep == false then self:AddQuestDetail(""); end
+        if sep == false then self:AddDeedDetail(""); end
         sep = true
-        self:AddQuestDetail("Next Quest(s):");
+        self:AddDeedDetail("Next Deed(s):");
         for i,nextid in pairs(record['next']) do     
-        	local name = questtable[nextid]['name'];   
-	        self:AddQuestDetail("  " .. name, true).MouseClick = function(sender, args)
-	            self:LoadQuestDetails(questtable[nextid]);
+        	local name = deedtable[nextid]['name'];   
+	        self:AddDeedDetail("  " .. name, true).MouseClick = function(sender, args)
+	            self:LoadDeedDetails(deedtable[nextid]);
 	        end;
         end
     end
     
     sep = false
     if record['mobs'] ~= nil and #record['mobs'] > 0 then
-        if sep == false then self:AddQuestDetail(""); end
+        if sep == false then self:AddDeedDetail(""); end
         sep = true
-        self:AddQuestDetail("Mobs/NPCs of Interest:");
+        self:AddDeedDetail("Mobs/NPCs of Interest:");
         for i,mob in pairs(record['mobs']) do
             local name = "  " .. mob['name'];
             if mob['locations'] ~= nil then
 	            if #mob['locations'] > 1 then
-	            	self:AddQuestDetail(name); 
+	            	self:AddDeedDetail(name); 
 	            	for i,loc in pairs(mob['locations']) do
-		            	self:AddQuestDetail('       ' .. loc);	            	
+		            	self:AddDeedDetail('       ' .. loc);	            	
 	            	end
 	            elseif #mob['locations'] == 1 then
 	            	name = name .. ' (' .. mob['locations'][1] .. ')';
-	            	self:AddQuestDetail(name);
+	            	self:AddDeedDetail(name);
 	            end
 	        else 
-	        	self:AddQuestDetail(name);
+	        	self:AddDeedDetail(name);
 	        end
         end
     end
 
     if record['pois'] ~= nil and #record['pois'] > 0 then
-        if sep == false then self:AddQuestDetail(""); end
+        if sep == false then self:AddDeedDetail(""); end
         sep = true
-        self:AddQuestDetail("Points of Interest:");
+        self:AddDeedDetail("Points of Interest:");
         for i,poi in pairs(record['pois']) do
             local name = "  " .. poi['name'];
             if poi['locations'] ~= nil then
 	            if #poi['locations'] > 1 then
-	            	self:AddQuestDetail(name); 
+	            	self:AddDeedDetail(name); 
 	            	for i,loc in pairs(poi['locations']) do
-		            	self:AddQuestDetail('       ' .. loc);	            	
+		            	self:AddDeedDetail('       ' .. loc);	            	
 	            	end
 	            elseif #poi['locations'] == 1 then
 	            	name = name .. ' (' .. poi['locations'][1] .. ')';
-	            	self:AddQuestDetail(name);
+	            	self:AddDeedDetail(name);
 	            end
 	        else 
-	        	self:AddQuestDetail(name);
+	        	self:AddDeedDetail(name);
 	        end
         end
     end
     
     -- description
-    self.questDesc:SetVerticalScrollBar(nil);
-    self.questDesc:SetText(record['d']);
-    self.questDesc:SetVerticalScrollBar(self.questDesc.VScrollBar);
+    self.deedDesc:SetVerticalScrollBar(nil);
+    self.deedDesc:SetText(record['d']);
+    self.deedDesc:SetVerticalScrollBar(self.deedDesc.VScrollBar);
 	-- objective
-    self.questObj:SetVerticalScrollBar(nil);
-    self.questObj:SetText(record['o']);
-    self.questObj:SetVerticalScrollBar(self.questObj.VScrollBar);
+    self.deedObj:SetVerticalScrollBar(nil);
+    self.deedObj:SetText(record['o']);
+    self.deedObj:SetVerticalScrollBar(self.deedObj.VScrollBar);
 
 	
 
@@ -643,31 +602,31 @@ function CompendiumQuestControl:LoadQuestDetails(record)
     	for i, value in pairs(record['c']) do
     		table.insert(comrecs,  { val = value , modifiable = false, time = 0 } );
     	end
-    	self.comments:AddCommentRecords(comrecs, false);
+    	self.comments:AddCommentRecords(comrecs);
     else
-    	self.comments:AddCommentRecords({}, false);
+    	self.comments:AddCommentRecords({});
     end
     -- add any custom added comments user may have added
 	if localrecord ~= nil and localrecord['c'] ~= nil then
-		self.comments:AddCommentRecords(localrecord['c']);
+    	self.comments:AddCommentRecords(localrecord['c']);
 	end
 
 end
 
-function CompendiumQuestControl:BuildCursor()
+function CompendiumDeedControl:BuildCursor()
 
 	if self.searchDisabled then
 		return;
 	end
-    self:ClearQuests();
+    self:ClearDeeds();
 	self.pagination:SetCursor(nil);
 	self.pagination:SetVisible(false);
 	
 	-- filter results using our category indexes
 	local ids = nil;
 	for i,cat in pairs(self.currentFilters) do
-		if questindexes[cat] ~= nil then
-			ids = self:JoinIndex(ids,questindexes[cat]);
+		if deedindexes[cat] ~= nil then
+			ids = self:JoinIndex(ids,deedindexes[cat]);
 		end 
 	end
 	-- determine if a text search was used
@@ -680,18 +639,18 @@ function CompendiumQuestControl:BuildCursor()
     else
     	-- if no search and no indexes use default cursor
     	if ids == nil then
-			self.cursor = Compendium.Common.Utils.DataCursor(questtable, pagesize);
+			self.cursor = Compendium.Common.Utils.DataCursor(deedtable, pagesize);
 			self.pagination:SetCursor(self.cursor);
 			if self.cursor:PageCount() > 1 then
 				self.pagination:SetVisible(true);
 			end
-			self:LoadQuests(self.cursor:CurPage());
+			self:LoadDeeds(self.cursor:CurPage());
 			return;
 		end 	
     end
 
 	-- build data set	
-	local data = questtable;
+	local data = deedtable;
 	if ids ~= nil then
 		data = ids 
 	end;
@@ -702,7 +661,7 @@ function CompendiumQuestControl:BuildCursor()
 		if ids ~= nil then id = b end;
 
 		--Turbine.Shell.WriteLine('a:' .. a .. ' b:' .. b .. ' id:' .. id);		
-		local rec = questtable[id];
+		local rec = deedtable[id];
         local include = true;
         if not ise then
             if string.find(string.lower(rec["name"]),escapedSearch) ~= 1 then
@@ -723,16 +682,16 @@ function CompendiumQuestControl:BuildCursor()
 	end
 	
 	-- load current page
-	self:LoadQuests(self.cursor:CurPage());
+	self:LoadDeeds(self.cursor:CurPage());
 
 end
 
-function CompendiumQuestControl:AddFilters(categories)
+function CompendiumDeedControl:AddFilters(categories)
 	
 	local distinctCats = {};
 	for i,cat in pairs(self.currentFilters) do distinctCats[cat] = i end;
 	for i,cat in pairs(categories) do
-		if questindexes[cat] ~= nil then distinctCats[cat] = i end; 
+		if deedindexes[cat] ~= nil then distinctCats[cat] = i end; 
 	end
 	self.currentFilters = {};
 	local count = 0;
@@ -748,33 +707,33 @@ function CompendiumQuestControl:AddFilters(categories)
 	self:BuildCursor();
 end
 
-function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
+function CompendiumDeedControl:UpdateLocalRecord(deedrecord, type, data)
 
-	local quest = questrecord['name'];
-	if self.localquestdata[quest] == nil then 
-		self.localquestdata[quest] = {};
+	local deed = deedrecord['name'];
+	if self.localdeeddata[deed] == nil then 
+		self.localdeeddata[deed] = {};
 	end
 	
 	if type == 'addcomment' then
-		if self.localquestdata[quest]['c'] == nil then
-			self.localquestdata[quest]['c'] = { data }
+		if self.localdeeddata[deed]['c'] == nil then
+			self.localdeeddata[deed]['c'] = { data }
 		else
-			table.insert(self.localquestdata[quest]['c'],data);
+			table.insert(self.localdeeddata[deed]['c'],data);
 		end
 		self.comments:AddCommentRecord(data, true);
-		self.localquestdatamodified = true;
+		self.localdeeddatamodified = true;
 	elseif type == 'delcomment' then
-		if self.localquestdata[quest]['c'] == nil then
+		if self.localdeeddata[deed]['c'] == nil then
 			-- nothing to do
 		else
 			local comments = {};
-			for i,c in pairs(self.localquestdata[quest]['c']) do 
+			for i,c in pairs(self.localdeeddata[deed]['c']) do 
 				if c['time'] ~= data['time'] then
 					table.insert(comments,c);
 				end
 			end
-			self.localquestdata[quest]['c'] = comments;
-			self.localquestdatamodified = true;
+			self.localdeeddata[deed]['c'] = comments;
+			self.localdeeddatamodified = true;
 		end			
 	else
 		-- unknown update type
@@ -782,23 +741,23 @@ function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
 			
 end
 
-function CompendiumQuestControl:persist()
-	if self.localquestdatamodified then
-		Turbine.Shell.WriteLine('Saving quests...');
-		Turbine.PluginData.Save( Turbine.DataScope.Account, "LocalQuestData", self.localquestdata );
-		self.localquestdatamodified = false;
+function CompendiumDeedControl:persist()
+	if self.localdeeddatamodified then
+		Turbine.Shell.WriteLine('Saving deeds...');
+		Turbine.PluginData.Save( Turbine.DataScope.Account, "LocalDeedData", self.localdeeddata );
+		self.localdeeddatamodified = false;
 		Turbine.Shell.WriteLine('Saving complete.');
 	end
 end
 
-function CompendiumQuestControl:LoadLocalQuests()
-	self.localquestdata = Turbine.PluginData.Load( Turbine.DataScope.Account , "LocalQuestData")
-	if self.localquestdata == nil then
-		self.localquestdata = {};
+function CompendiumDeedControl:LoadLocalDeeds()
+	self.localdeeddata = Turbine.PluginData.Load( Turbine.DataScope.Account , "LocalDeedData")
+	if self.localdeeddata == nil then
+		self.localdeeddata = {};
 	end
 end
 
-function CompendiumQuestControl:AddCoordinate( record )
+function CompendiumDeedControl:AddCoordinate( record )
 	if record == nil then return end;
 	
 	local coord = '';

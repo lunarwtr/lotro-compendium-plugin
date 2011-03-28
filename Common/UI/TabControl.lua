@@ -157,6 +157,13 @@ function TabControl:GetActiveIndex()
 	return -1;
 end
 
+function TabControl:GetActiveControl()
+	for index, rec in pairs(self.tabs) do
+		if index == self.activeTab then return rec.control end;
+	end
+	return nil;
+end
+
 function TabControl:destroy()
 	for index, rec in pairs(self.tabs) do
 		if rec.tab.destroy ~= nil then
