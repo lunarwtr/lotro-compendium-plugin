@@ -44,7 +44,7 @@ function PaginationControl:Constructor( cursor )
     local prevBtn = Turbine.UI.Lotro.Button();
     prevBtn:SetParent(self);
     prevBtn:SetText('  Prev');
-    prevBtn:SetEnabled(false);
+    prevBtn:SetVisible(false);
    	prevBtn:SetSize(55,20);
    	prevBtn:SetPosition(0,0);
    	prevBtn.Click = prev;
@@ -59,7 +59,7 @@ function PaginationControl:Constructor( cursor )
     local nextBtn = Turbine.UI.Lotro.Button();
     nextBtn:SetParent(self);
     nextBtn:SetText(' Next');
-    nextBtn:SetEnabled(false);
+    nextBtn:SetVisible(false);
    	nextBtn:SetSize(55,20);
    	nextBtn:SetPosition(self:GetWidth() - nextBtn:GetWidth(),0);   
    	nextBtn:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
@@ -116,12 +116,12 @@ end
 
 
 function PaginationControl:UpdatePagination()
-	self.prevBtn:SetEnabled(false);
-	self.nextBtn:SetEnabled(false);
+	self.prevBtn:SetVisible(false);
+	self.nextBtn:SetVisible(false);
 	self:SetText('');
 	if self.cursor ~= nil then
 		self:SetText(self.cursor:tostring() .. ' ' .. self.paginationText);
-		if self.cursor:HasPrev() then self.prevBtn:SetEnabled(true) end;
-		if self.cursor:HasNext() then self.nextBtn:SetEnabled(true) end;
+		if self.cursor:HasPrev() then self.prevBtn:SetVisible(true) end;
+		if self.cursor:HasNext() then self.nextBtn:SetVisible(true) end;
 	end
 end

@@ -23,6 +23,7 @@ import "Compendium.Common.UI";
 import "Compendium.Common.UI";
 import "Compendium.Items";
 import "Compendium.Quests";
+import "Compendium.Deeds";
 import "Compendium.Crafts";
 import "Compendium.Launcher.CompendiumShortcut";
 
@@ -44,6 +45,12 @@ local pat,n,count,L = "(.-)"..p, 1,0,#t
 	return f,t,n
 end
 
+local compendiumdbs = { 
+						{ title = "Quest", init = function() return Compendium.Quests.CompendiumQuestControl() end },
+						{ title = "Deeds", init = function() return Compendium.Deeds.CompendiumDeedControl() end },
+						{ title = "Items", init = function() return Compendium.Items.CompendiumItemControl() end },
+						{ title = "Crafting", init = function() return Compendium.Crafts.CompendiumCraftControl() end }
+					};
 
 CompendiumLauncherWindow = class( Compendium.Common.UI.CompendiumWindow );
 function CompendiumLauncherWindow:Constructor()
@@ -76,6 +83,22 @@ function CompendiumLauncherWindow:Constructor()
 
     self:SetText( "Compendium " );
  
+ 	self.allowFade = false;
+	self:SetOpacity( 1 );
+	self:SetFadeSpeed( 5 );
+    self.MouseEnter = function( sender, args )
+    	if self.Settings.FadeWindow then
+	    	self:SetFadeSpeed( .3 );
+	        sender:SetOpacity( 1 );
+        end
+    end
+    self.MouseLeave = function( sender, args )
+    	if self.Settings.FadeWindow and self.allowFade then
+	    	self:SetFadeSpeed( 5 );
+	        sender:SetOpacity( 0.5 );
+        end
+    end
+
  	local version = Turbine.UI.Label();
  	version:SetParent(self);
  	version:SetSize(100,15);
@@ -119,13 +142,63 @@ function CompendiumLauncherWindow:Constructor()
 	tabs:SetParent(self);
 	tabs:SetSize(self:GetWidth() - 18, self:GetHeight() - 55);
 	tabs:SetPosition(9,30);
+
+	local settingControl = Turbine.UI.Control();
+	settingControl:SetSize(200,200);
 	
-	self.questcontrol = Compendium.Quests.CompendiumQuestControl();
-	tabs:AddTab("Quests",  self.questcontrol);
-	tabs:AddTab("Items",  Compendium.Items.CompendiumItemControl());
-	tabs:AddTab("Crafting",  Compendium.Crafts.CompendiumCraftControl());
+	local checkbox = Turbine.UI.Lotro.CheckBox();
+    checkbox:SetParent( settingControl );
+    checkbox:SetMultiline( true );
+    checkbox:SetPosition( 20, 20 );
+    checkbox:SetSize( 250, 20 );
+    checkbox:SetFont(self.fontFace);
+    checkbox:SetForeColor(self.fontColor);    
+    checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
+    checkbox:SetText( "  Fade window when mouse leaves." );
+    checkbox:SetChecked(self.Settings.FadeWindow);
+	checkbox.CheckedChanged = function(s,a)
+		if s:IsChecked() then
+			self.Settings.FadeWindow = true;
+			self.allowFade = true;
+		else
+			self.Settings.FadeWindow = false;
+		end
+		self:SaveSettings();			
+	end
 	
-	
+	local cbtop = checkbox:GetTop() + 40;
+	for i, rec in pairs(compendiumdbs) do
+		local db = rec.title;
+		checkbox = Turbine.UI.Lotro.CheckBox();
+	    checkbox:SetParent( settingControl );
+	    checkbox:SetMultiline( true );
+	    checkbox:SetPosition( 20, cbtop );
+	    checkbox:SetSize( 250, 20 );
+	    checkbox:SetFont(self.fontFace);
+	    checkbox:SetForeColor(self.fontColor);    
+	    checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
+	    checkbox:SetText( "  Load " .. db .. " (requires reload)." );
+	    checkbox:SetChecked(self.Settings.Components[db]);
+		checkbox.CheckedChanged = function(s,a)
+			if s:IsChecked() then
+				self.Settings.Components[db] = true;
+			else
+				self.Settings.Components[db] = false;
+			end
+			self:SaveSettings();
+		end	
+		cbtop = cbtop + 20;
+		
+		if self.Settings.Components[db] == true then
+			tabs:AddTab(rec.title, rec.init());
+		end
+	end
+	--[[
+	tabs:AddTab("Quests", Compendium.Quests.CompendiumQuestControl());
+	tabs:AddTab("Deeds", Compendium.Deeds.CompendiumDeedControl());
+	tabs:AddTab("Items", Compendium.Items.CompendiumItemControl());
+	tabs:AddTab("Crafting", Compendium.Crafts.CompendiumCraftControl());
+	]]
 	
 	local plugs = Turbine.PluginManager.GetAvailablePlugins();
 	local loaded = Turbine.PluginManager.GetLoadedPlugins();
@@ -149,6 +222,7 @@ function CompendiumLauncherWindow:Constructor()
 			tabs:AddTab(ext:GetExtensionName(), ext);
 		end
 	end
+	tabs:AddTab("Settings",  settingControl);
 	tabs:SetActiveIndex(self.Settings.ActiveTabIndex);
 
 	tabs.OnActiveTabChange = function (sender,index) 
@@ -186,6 +260,7 @@ function CompendiumLauncherWindow:Constructor()
     self.MovingIcon:SetPosition(self:GetWidth()/2-15,self:GetHeight()-21);
     self.MovingIcon:SetVisible(false);
     self.MouseDown=function(sender,args)
+        self.allowFade = false;
         if (args.Y>self:GetHeight()-50) and (args.X>self:GetWidth()-50) then
             self.MoveX=args.X;
             self.MoveY=args.Y;
@@ -254,6 +329,7 @@ function CompendiumLauncherWindow:Constructor()
         end
     end
     self.MouseUp=function(sender,args)
+    	self.allowFade = true;
         self.MovingIcon:SetVisible(false);
         self.MoveX=-1;
         self.MoveY=-1;
@@ -273,6 +349,15 @@ function CompendiumLauncherWindow:Constructor()
 		end
 	end
 	
+    self:SetWantsKeyEvents( true );
+    self.KeyDown = function( sender, args )
+        if ( args.Action == Turbine.UI.Lotro.Action.Escape ) then
+            self:SetVisible( false );
+        end
+	end
+    	
+    self.allowFade = true;
+    
 end
 
 function CompendiumLauncherWindow:LoadSettings()
@@ -293,8 +378,14 @@ function CompendiumLauncherWindow:LoadSettings()
 				["left"] = tostring(Turbine.UI.Display.GetWidth()-55),
 				["top"] = "230";
 			},
-			ActiveTabIndex = 1
+			FadeWindow = true,
+			ActiveTabIndex = 1,
+			Components = {}
 		};
+		for i, rec in pairs(compendiumdbs) do
+			self.Settings.Components[rec.title] = true;
+		end
+		
 	else
 		-- for backwards compatibility
 		if self.Settings.WindowVisible == nil then
@@ -302,7 +393,19 @@ function CompendiumLauncherWindow:LoadSettings()
 		end
 		if self.Settings.ActiveTabIndex == nil then
 			self.Settings.ActiveTabIndex = 1;
+		end	
+		if self.Settings.FadeWindow == nil then
+			self.Settings.FadeWindow = true;
+		end
+		
+		if self.Settings.Components == nil then
+			self.Settings.Components = {}
 		end		
+		for i, rec in pairs(compendiumdbs) do
+			if self.Settings.Components[rec.title] == nil then
+				self.Settings.Components[rec.title] = true;
+			end
+		end
 	end
 end
 
@@ -330,10 +433,77 @@ function CompendiumLauncherWindow:ProcessCommandArguments(args)
 	local cmd, loc, target = args:match "^%s*(addcoord)%s*%[([^%|]+)%|([^%]]+)%]"; --%[[^:]+:%\s*([^:]+):\s*([^%|]+)%|([^%]]+)%s*%]$";
 	if cmd == 'addcoord' then
 		 local area, coord = loc:match "%s*([^:]+):%s*([^:]+)$";
-		 local coordrec = { area = area, coord = coord, target = target };
-		 if self.questcontrol ~= nil then
-		 	self.questcontrol:AddCoordinate(coordrec);
+		 
+		 local coordrec = nil
+		 if area ~= nil then
+		 	coordrec = { area = area, coord = coord, target = target };
+		 else
+		 	coordrec = { area = loc, target = target };
+		 end
+		 
+		 local control = self.tabs:GetActiveControl();
+		 if control.AddCoordinate ~= nil then
+		 	control:AddCoordinate(coordrec);
 		 end
 	end
 
+end
+
+function CompendiumLauncherWindow:SetFadeSpeed( value )
+    self.fadeSpeed = 1 / value;
+end
+
+function CompendiumLauncherWindow:SetVisible( value )
+
+	if ( value == true ) then
+		Compendium.Common.UI.CompendiumWindow.SetVisible(self, true);
+        self:SetOpacity( 1 );
+    else
+		Compendium.Common.UI.CompendiumWindow.SetVisible(self, false);
+    end
+end
+
+function CompendiumLauncherWindow:SetOpacity( value )
+    self.realOpacity = value;
+    self.currentTime = Turbine.Engine.GetGameTime();
+    self.currentOpacity = Turbine.UI.Lotro.GoldWindow.GetOpacity( self );
+    self.targetOpacity = value;
+
+    if ( self.targetOpacity ~= self.currentOpacity ) then
+        self:SetWantsUpdates( true );
+    end
+end
+
+function CompendiumLauncherWindow:Update( sender, args )
+    local newOpacity;
+
+    local now = Turbine.Engine.GetGameTime();
+    local delta = now - self.currentTime;
+    self.currentTime = now;
+
+    delta = delta * self.fadeSpeed;
+
+    if ( self.currentOpacity < self.targetOpacity ) then
+        newOpacity = self.currentOpacity + delta;
+
+        if ( newOpacity > self.targetOpacity ) then
+            self:SetWantsUpdates( false )
+            newOpacity = self.targetOpacity
+        end
+    else
+        newOpacity = self.currentOpacity - delta;
+
+        if ( newOpacity < self.targetOpacity ) then
+            self:SetWantsUpdates( false )
+            newOpacity = self.targetOpacity
+
+            if ( self.hideOnClose ) then
+                Turbine.UI.Lotro.GoldWindow.SetVisible( self, false );
+                self.hideOnClose = false
+            end
+        end
+    end
+
+    self.currentOpacity = newOpacity;
+    Turbine.UI.Lotro.GoldWindow.SetOpacity( self, newOpacity );
 end
