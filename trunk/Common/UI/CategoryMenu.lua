@@ -58,7 +58,7 @@ function CategoryMenu:BuildMenu(treenode, menulist, categories, index)
     	
     	-- register even handler for this category listing
     	item.Click = function(sender,args)
-			self.ClickCategory(catcopy);
+			self.ClickCategory(catcopy, args);
 		end
     	
     	-- if this category has child nodes, then process those

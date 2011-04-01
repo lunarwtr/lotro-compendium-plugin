@@ -42,20 +42,35 @@ function CompendiumDeedControl:Constructor()
 
 	self.localdeeddatamodified = false;
 	self.localdeeddata = {};
-    self.currentFilters = {};
+	self.currentIndexFilters = {};
+	self.currentManualFilters = {};
 	self.searchDisabled = true;
 	self:LoadLocalDeeds();
 	
-	--[[
-	local ctime = Turbine.Engine:GetLocalTime() 
-	for i,q in pairs(deedtable) do
-		self.localdeeddata[q['name'] ] = { c = {{ val = q['o'], modifiable = true, time = ctime }}  };
+	self.range = Compendium.Common.UI.LevelRangeControl();
+	self.range:SetParent(self);
+	self.range.RangeApplied = function( s, from, to )
+		local rec = {};
+		if from ~= nil then rec.from = tonumber(from) end;
+		if to ~= nil then rec.to = tonumber(to) end;
+		self:AddFilters({ manual = { level = rec } });
 	end
-	]]
 	
     self.menu = Compendium.Deeds.DeedCategoryMenu();
     self.menu.ClickCategory = function(categories) 
-		self:AddFilters(categories);
+    	local size = #categories;
+    	if size > 0 and categories[size] == 'Custom' then
+			local x, y = self:PointToClient(Turbine.UI.Display:GetMousePosition());
+			local mw, mh = self.range:GetSize();
+			local w, h = self:GetSize();
+			local left, top = x - (mw / 2), y - (mh / 2);
+			if (top + mh) > h then top = h - mh end;
+			if (left + mw) > w then left = w - mw end;
+			self.range:SetPosition(left,top);
+			self.range:ShowMenu(true);    		
+    	else
+			self:AddFilters({ indexes = categories });
+    	end
 	end        
     local filterButton = Turbine.UI.Lotro.Button();
     filterButton:SetParent(self);
@@ -455,7 +470,8 @@ function CompendiumDeedControl:Reset()
 	self.searchDisabled = true;
 	self.SearchText:SetText('');
     self:ClearDeeds();	
-	self.currentFilters = {};
+    self.currentIndexFilters = {};
+    self.currentManualFilters = {};
 	self.filtersLabel:SetText('No filters set');
 	self.cursor = nil;
 	self.searchDisabled = false;
@@ -624,7 +640,7 @@ function CompendiumDeedControl:BuildCursor()
 	
 	-- filter results using our category indexes
 	local ids = nil;
-	for i,cat in pairs(self.currentFilters) do
+	for i,cat in pairs(self.currentIndexFilters) do
 		if deedindexes[cat] ~= nil then
 			ids = self:JoinIndex(ids,deedindexes[cat]);
 		end 
@@ -636,6 +652,8 @@ function CompendiumDeedControl:BuildCursor()
     if not ise then
         -- some symbols need escaped in regex patterns
         escapedSearch = string.lower(string.gsub(searchText,'[%-%.%+%[%]%(%)%^%%%?%*]','%%%1'));
+    elseif #self.currentManualFilters > 0 then
+    	-- we'll take care of it below
     else
     	-- if no search and no indexes use default cursor
     	if ids == nil then
@@ -668,6 +686,21 @@ function CompendiumDeedControl:BuildCursor()
                 include = false;
             end
         end
+       -- only need to apply manual filters if passed text search
+        if include then
+			for i,filter in pairs(self.currentManualFilters) do
+				if filter.type == 'level' then
+					local from, to = filter.from, filter.to;
+					if from == nil then from = 0 end;
+					if to == nil then to = 1000 end;
+					if rec['level'] < from or rec['level'] > to then
+						include = false;
+						break; 
+					end			
+				end
+			end
+		end        
+
         if include then
             count = count + 1;
             table.insert(recs,rec);
@@ -686,26 +719,56 @@ function CompendiumDeedControl:BuildCursor()
 
 end
 
-function CompendiumDeedControl:AddFilters(categories)
+function CompendiumDeedControl:AddFilters(filters)
 	
-	local distinctCats = {};
-	for i,cat in pairs(self.currentFilters) do distinctCats[cat] = i end;
-	for i,cat in pairs(categories) do
-		if deedindexes[cat] ~= nil then distinctCats[cat] = i end; 
-	end
-	self.currentFilters = {};
 	local count = 0;
 	local filterText = 'Filters: ';
+
+	local distinctCats = {};
+	for i,cat in pairs(self.currentIndexFilters) do distinctCats[cat] = i end;
+	if filters.indexes ~= nil then
+		for i,cat in pairs(filters.indexes) do
+			if deedindexes[cat] ~= nil then distinctCats[cat] = i end; 
+		end
+	end
+	self.currentIndexFilters = {};
 	for cat,v in pairs(distinctCats) do
 		if count > 0 then filterText = filterText .. ', ' end;
 		filterText = filterText .. cat;
-		table.insert(self.currentFilters, cat) 
+		table.insert(self.currentIndexFilters, cat) 
 		count = count + 1;
-	end;
+	end
+
+	local manuals = {};
+	for i,filter in pairs(self.currentManualFilters) do table.insert(manuals,filter) end;
+	if filters.manual ~= nil then
+		for cat,rec in pairs(filters.manual) do 
+			rec.type = cat; 
+			table.insert(manuals,rec); 
+		end
+	end
+	self.currentManualFilters = {};
+	for i,rec in pairs(manuals) do
+		if count > 0 then filterText = filterText .. ', ' end;
+		if rec.type == 'level' then
+			if rec.from ~= nil and rec.to ~= nil then
+				filterText = filterText .. string.format('Levels %s-%s', rec.from, rec.to);
+				table.insert(self.currentManualFilters, rec); 
+			elseif rec.from ~= nil then
+				filterText = filterText .. string.format('Levels > %s',rec.from);
+				table.insert(self.currentManualFilters, rec); 
+			elseif rec.to ~= nil then
+				filterText = filterText .. string.format('Levels < %s',rec.to);
+				table.insert(self.currentManualFilters, rec);
+			end
+		end
+		count = count + 1;
+	end
 	
 	self.filtersLabel:SetText(filterText);
 	self:BuildCursor();
 end
+
 
 function CompendiumDeedControl:UpdateLocalRecord(deedrecord, type, data)
 

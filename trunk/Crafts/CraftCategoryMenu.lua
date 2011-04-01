@@ -112,7 +112,7 @@ function CraftCategoryMenu:Constructor()
 		 	["41-50"] = 0, 
 		 	["51-60"] = 0, 
 		 	["61-70"] = 0, 
-		 	["71-80"] = 0  
+		 	["71-80"] = 0
 		 },
 		["Other"] = {
 			["Barter"] = 0,

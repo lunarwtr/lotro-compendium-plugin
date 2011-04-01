@@ -37,7 +37,8 @@ function QuestCategoryMenu:Constructor()
 				["51-55"]=0,
 				["56-60"]=0,
 				["6-10"]=0,
-				["61-65"]=0
+				["61-65"]=0,
+				["Custom"]=0
 				},
 			["Quest Chains"]={
 				["A-I"]={
