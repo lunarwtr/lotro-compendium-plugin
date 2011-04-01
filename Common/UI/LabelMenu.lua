@@ -82,6 +82,7 @@ end
 function LabelMenu:AddItem( item )
 	self.list:AddItem(item);
 	item:SetParent(self.list);
+	item:SetZOrder(self.list:GetZOrder() + 1);
 	item:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
 	item.MouseEnter = self.ItemEnter;
 	item.MouseLeave = self.ItemLeave;
@@ -119,6 +120,10 @@ function LabelMenu:ClearMenu()
 end
 
 function LabelMenu:ShowMenu()
+	local parent = self:GetParent();
+	if parent ~= nil then
+		parent:SetZOrder(parent:GetZOrder() + 100);
+	end
 	self.hideTime = nil;
 	self:SetVisible(true);
 	self.list:SetWantsUpdates(true);

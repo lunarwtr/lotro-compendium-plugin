@@ -21,6 +21,7 @@ import "Compendium.Common.UI.MiniAliasQuickslot";
 import "Compendium.Common.UI.Tab";
 import "Compendium.Common.UI.TabControl";
 import "Compendium.Common.UI.PaginationControl";
+import "Compendium.Common.UI.LevelRangeControl";
 import "Compendium.Common.UI.AutoSizingLabel";
 import "Compendium.Common.UI.CategoryMenu";
 import "Compendium.Common.UI.CompendiumWindow";

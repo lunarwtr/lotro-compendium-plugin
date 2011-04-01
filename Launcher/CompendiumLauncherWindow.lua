@@ -461,7 +461,7 @@ end
 function CompendiumLauncherWindow:SetOpacity( value )
     self.realOpacity = value;
     self.currentTime = Turbine.Engine.GetGameTime();
-    self.currentOpacity = Turbine.UI.Lotro.GoldWindow.GetOpacity( self );
+    self.currentOpacity = Compendium.Common.UI.CompendiumWindow.GetOpacity( self );
     self.targetOpacity = value;
 
     if ( self.targetOpacity ~= self.currentOpacity ) then
@@ -493,12 +493,12 @@ function CompendiumLauncherWindow:Update( sender, args )
             newOpacity = self.targetOpacity
 
             if ( self.hideOnClose ) then
-                Turbine.UI.Lotro.GoldWindow.SetVisible( self, false );
+                Compendium.Common.UI.CompendiumWindow.SetVisible( self, false );
                 self.hideOnClose = false
             end
         end
     end
 
     self.currentOpacity = newOpacity;
-    Turbine.UI.Lotro.GoldWindow.SetOpacity( self, newOpacity );
+    Compendium.Common.UI.CompendiumWindow.SetOpacity( self, newOpacity );
 end
