@@ -78,7 +78,9 @@ function ItemAliasMenu:ShowAliasMenu( record )
 	-- add shortcuts
 	for i,cfg in pairs(channelConfig) do
 		local quickslot = self[cfg.label];
-		quickslot:SetShortcut( Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, string.format(cfg.shortcut,record['id'], record['name']) ));
+		local sc = Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '' );
+		sc:SetData(string.format(cfg.shortcut,record['id'], record['name']));		
+		quickslot:SetShortcut( Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, sc ));
 	end	
 	
 	-- display

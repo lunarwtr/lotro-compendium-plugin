@@ -91,7 +91,8 @@ function CompendiumQuestControl:Constructor()
     filterIcon.MouseClick = function( sender, args ) 
     	self.menu:ShowMenu();
     end
-      
+
+    
       --[[ 
 	self.logo = Turbine.UI.Control();
 	self.logo:SetBlendMode(Turbine.UI.BlendMode.Screen);
@@ -295,6 +296,8 @@ function CompendiumQuestControl:Constructor()
 	    self.questObj.VScrollBar:SetHeight(height - 2);
     end
 
+	self.coord = Compendium.Common.UI.CoordinateControl();
+	self.coord:SetParent(self);  	
     
     local comments= Compendium.Quests.QuestCommentsControl();
     comments.CommentAdded = function(s, value) 
@@ -306,6 +309,11 @@ function CompendiumQuestControl:Constructor()
     	if self.currentRecord ~= nil then
     		self:UpdateLocalRecord(self.currentRecord,'delcomment', value );
     	end
+    end
+    comments.CoordClicked = function( sender, y, ns, x, ew )
+    	if self.currentRecord ~= nil then
+    		self:CoordClicked( y, ns, x, ew, self.currentRecord['zone'], 'Misc Point of Interest', self.currentRecord['name']);
+    	end		
     end
 	self.comments = comments;
 
@@ -608,11 +616,21 @@ function CompendiumQuestControl:LoadQuestDetails(record)
 	            if #mob['locations'] > 1 then
 	            	self:AddQuestDetail(name); 
 	            	for i,loc in pairs(mob['locations']) do
-		            	self:AddQuestDetail('       ' .. loc);	            	
+		            	self:AddQuestDetail('       ' .. loc).MouseClick = function(s,a)
+		            		local tmp, tmp, tmp, y, ns, x, ew = string.find(loc, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWew]))");
+		            		if i ~= nil then
+		            			self:CoordClicked( y, ns, x, ew, mob['zone'], mob['name'], 'Quest - ' .. string.gsub(record['name'],':','-') .. ' / Mob - ' .. mob['name']);
+		            		end
+		            	end
 	            	end
 	            elseif #mob['locations'] == 1 then
 	            	name = name .. ' (' .. mob['locations'][1] .. ')';
-	            	self:AddQuestDetail(name);
+	            	self:AddQuestDetail(name).MouseClick = function(s,a)
+	            		local tmp, tmp, tmp, y, ns, x, ew = string.find(mob['locations'][1], "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWew]))");
+	            		if i ~= nil then
+	            			self:CoordClicked( y, ns, x, ew, mob['zone'], mob['name'], 'Quest - ' .. string.gsub(record['name'],':','-') .. ' / Mob - ' .. mob['name']);
+	            		end
+	            	end
 	            end
 	        else 
 	        	self:AddQuestDetail(name);
@@ -630,11 +648,21 @@ function CompendiumQuestControl:LoadQuestDetails(record)
 	            if #poi['locations'] > 1 then
 	            	self:AddQuestDetail(name); 
 	            	for i,loc in pairs(poi['locations']) do
-		            	self:AddQuestDetail('       ' .. loc);	            	
+		            	self:AddQuestDetail('       ' .. loc).MouseClick = function(s,a)
+		            		local tmp, tmp, tmp, y, ns, x, ew = string.find(loc, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWew]))");
+		            		if i ~= nil then
+		            			self:CoordClicked( y, ns, x, ew, poi['zone'], poi['name'], 'Quest - ' .. string.gsub(record['name'],':','-') .. ' / ' .. poi['name']);
+		            		end
+		            	end            	
 	            	end
 	            elseif #poi['locations'] == 1 then
 	            	name = name .. ' (' .. poi['locations'][1] .. ')';
-	            	self:AddQuestDetail(name);
+	            	self:AddQuestDetail(name).MouseClick = function(s,a)
+	            		local tmp, tmp, tmp, y, ns, x, ew = string.find(poi['locations'][1], "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWew]))");
+	            		if i ~= nil then
+	            			self:CoordClicked( y, ns, x, ew, poi['zone'], poi['name'], 'Quest - ' .. string.gsub(record['name'],':','-') .. ' / ' .. poi['name']);
+	            		end
+	            	end
 	            end
 	        else 
 	        	self:AddQuestDetail(name);
@@ -650,9 +678,6 @@ function CompendiumQuestControl:LoadQuestDetails(record)
     self.questObj:SetVerticalScrollBar(nil);
     self.questObj:SetText(record['o']);
     self.questObj:SetVerticalScrollBar(self.questObj.VScrollBar);
-
-	
-
     
     if record['c'] ~= nil then
     	local comrecs = {};
@@ -877,3 +902,9 @@ function CompendiumQuestControl:AddCoordinate( record )
 	
 end
 
+function CompendiumQuestControl:CoordClicked( y, ns, x, ew, zone, name, quest )
+	local mx, my = self:PointToClient(Turbine.UI.Display:GetMousePosition());
+	local left, top = mx - 3, my - 3;
+	self.coord:SetPosition(left, top);
+	self.coord:ShowMenu( y, ns, x, ew, zone, name, quest );
+end

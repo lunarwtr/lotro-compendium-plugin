@@ -91,7 +91,7 @@ end
 
 function LabelMenu:RecalcSize()
 	local height = 0;
-	local maxwidth = 100;
+	local maxwidth = 10;
 	for index=1,self.list:GetItemCount() do
 		local item = self.list:GetItem(index);
 		height = height + item:GetHeight();

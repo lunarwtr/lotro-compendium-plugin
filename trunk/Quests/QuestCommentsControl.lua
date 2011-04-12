@@ -41,6 +41,22 @@ function QuestCommentsControl:Constructor()
     comments:SetVerticalScrollBar(comments.VScrollBar); 
 	self.comments = comments;
 	
+	comments.MouseClick = function(s,args)
+		local text = comments:GetText();
+		if text ~= nil then
+			local s = math.max(comments:GetSelectionStart() - 13,1);
+			local e = math.min(string.len(text),s + 26);
+			local piece = string.sub(text,s,e);
+			local i, j, whole, y, ns, x, ew = string.find(piece, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWew]))");
+			if i ~= nil then
+				comments:SetSelection(nil,nil);
+				comments:SetSelection(s + (i - 1), string.len(whole));
+				self:CoordClicked(y, ns, x, ew);
+			end
+		end
+	end
+
+	
     local pagination = Compendium.Common.UI.PaginationControl();
     pagination:SetParent(self);
     pagination:SetPosition(3,0);
@@ -70,23 +86,22 @@ function QuestCommentsControl:Constructor()
 	local coord = Turbine.UI.Control();
     coord:SetVisible(false);
     coord:SetParent(self);
-    coord:SetSize( 32, 32 );
-    coord:SetPosition(5,5);	
-    coord:SetPosition(centry:GetWidth() + 8, centry:GetTop());
+    coord:SetSize( 30, 30 );
+    coord:SetPosition(centry:GetWidth() + 8, centry:GetTop() + 2);
 	    	
 	local quick = Turbine.UI.Lotro.Quickslot();
 	quick:SetParent(coord);
-    quick:SetSize( 10, 30 );
-    quick:SetPosition(10,0);
+    quick:SetSize( 30, 30 );
+    quick:SetPosition(0,0);
     quick:SetEnabled(true);
     quick:SetShortcut( Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '/comp addcoord [;loc|;target]' ) );
     quick:SetVisible(true);
 
 	local coordicon = Turbine.UI.Control();
-	coordicon:SetBackground( "Compendium/Common/Resources/images/pin-icon.tga" );
+	coordicon:SetBackground( "Compendium/Common/Resources/images/add-coords.tga" );
 	coordicon:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);    
 	coordicon:SetParent(coord);    
-    coordicon:SetSize( 32, 32 );
+    coordicon:SetSize( 30, 30 );
     coordicon:SetPosition(0,0);	
     coordicon:SetZOrder(quick:GetZOrder() + 1);
     coordicon:SetMouseVisible(false);
@@ -123,7 +138,7 @@ function QuestCommentsControl:Constructor()
 			end
 		end
     end
-	self.del = del;	
+	self.del = del;
 	
     self.SizeChanged = function(s,a) 
     	local width = s:GetWidth();
@@ -139,7 +154,7 @@ function QuestCommentsControl:Constructor()
 		local ceh = height - ch - 23;
 	    centry:SetTop(ch + pagination:GetHeight() + 2);
 		centry:SetSize(width- 90,ceh);
-	    coord:SetPosition(centry:GetWidth() + 8, centry:GetTop());
+	    coord:SetPosition(centry:GetWidth() + 8, centry:GetTop()+2);
 	    add:SetPosition(coord:GetLeft() + coord:GetWidth() + 2, centry:GetTop() + 5 );
 	    --coordbtn:SetPosition(add:GetLeft(), add:GetTop() + add:GetHeight());
  		del:SetPosition(width-28, 4);	    
@@ -236,4 +251,8 @@ function QuestCommentsControl:AddToComment( comment )
 		text = text .. ' ' .. comment;
 	end
 	self.centry:SetText(text);
+end
+
+function QuestCommentsControl:CoordClicked(y, ns, x, ew)
+	-- override 
 end
