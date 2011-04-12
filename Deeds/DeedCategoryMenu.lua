@@ -65,6 +65,7 @@ function DeedCategoryMenu:Constructor()
 			["Virtues"]=0
 			},
 		["Zone"]={
+			["All"]=0,
 			["Angmar"]=0,
 			["Bree-land"]=0,
 			["Enedwaith"]=0,
