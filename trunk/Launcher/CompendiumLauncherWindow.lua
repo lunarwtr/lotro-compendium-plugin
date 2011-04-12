@@ -201,7 +201,7 @@ function CompendiumLauncherWindow:Constructor()
 	for i,a in pairs(loaded) do
 		loadedhash[a.Name] = a;
 	end
-	
+	local moormap = false
 	for i,a in pairs(plugs) do
 		if string.find(a.Name, "CompendiumExtension") ~= nil then
 			if loadedhash[a.Name] == nil then
@@ -216,7 +216,47 @@ function CompendiumLauncherWindow:Constructor()
 			local ext = cls();
 			tabs:AddTab(ext:GetExtensionName(), ext);
 		end
+		if a.Name == 'MoorMap' then moormap = true end
 	end
+	
+	if moormap == false and self.Settings.MoorMapNotice ~= true then
+	
+		local notice = Compendium.Common.UI.CompendiumWindow()
+		notice:SetSize(300,290);
+		notice:SetText('Notice');
+		local noticeImg = Turbine.UI.Control();
+		noticeImg:SetSize(200,150);
+		noticeImg:SetBackground('Compendium/Common/Resources/images/moormaps.tga');
+	    noticeImg:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);
+	    noticeImg:SetParent(notice);
+	    noticeImg:SetPosition((notice:GetWidth() / 2) - (noticeImg:GetWidth() / 2), 45);
+	    local noticeMsg = Turbine.UI.Label()
+	    noticeMsg:SetSize(250, 40);
+	    noticeMsg:SetParent(notice);
+	 	noticeMsg:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
+	    noticeMsg:SetFont(self.fontFace);
+	    noticeMsg:SetForeColor(self.fontColor);
+	    noticeMsg:SetOutlineColor(Turbine.UI.Color(0,0,0));
+	    noticeMsg:SetFontStyle(Turbine.UI.FontStyle.Outline);   
+		noticeMsg:SetText('Download MoorMaps addon and Compendium can show you locations on Map!');
+		noticeMsg:SetPosition((notice:GetWidth() / 2) - (noticeMsg:GetWidth() / 2), noticeImg:GetTop() + noticeImg:GetHeight() + 5);
+		local ok = Turbine.UI.Lotro.Button();
+		ok:SetSize(50,20);
+	 	ok:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
+		ok:SetText('Ok');
+		ok:SetParent(notice);
+		ok:SetPosition((notice:GetWidth() / 2) - (ok:GetWidth() / 2), notice:GetHeight() - 40);
+		ok.Click = function(s,a)
+			self.Settings.MoorMapNotice = true;
+			self:SaveSettings();
+			notice:SetVisible(false);
+		end
+		notice:SetVisible(true);
+		notice:Activate();
+		self.notice = notice;
+		
+	end
+	
 	tabs:AddTab("Settings",  settingControl);
 	tabs:SetActiveIndex(self.Settings.ActiveTabIndex);
 
