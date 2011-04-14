@@ -80,7 +80,7 @@ function ItemAliasMenu:ShowAliasMenu( record )
 		local quickslot = self[cfg.label];
 		local sc = Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '' );
 		sc:SetData(string.format(cfg.shortcut,record['id'], record['name']));		
-		quickslot:SetShortcut( Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, sc ));
+		quickslot:SetShortcut( sc );
 	end	
 	
 	-- display
