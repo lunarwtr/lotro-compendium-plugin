@@ -396,7 +396,7 @@ function CompendiumLauncherWindow:Constructor()
 end
 
 function CompendiumLauncherWindow:LoadSettings()
-	self.Settings = Turbine.PluginData.Load( Turbine.DataScope.Account , "CompendiumSettings")
+	self.Settings = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Account , "CompendiumSettings")
 	
 	if self.Settings == nil then
 		self.Settings = { 
@@ -445,7 +445,7 @@ function CompendiumLauncherWindow:LoadSettings()
 end
 
 function CompendiumLauncherWindow:SaveSettings()
-	Turbine.PluginData.Save( Turbine.DataScope.Account, "CompendiumSettings", self.Settings );
+	Compendium.Common.Utils.PluginData.Save(Turbine.DataScope.Account, "CompendiumSettings", self.Settings );
 end
 
 function CompendiumLauncherWindow:destroy()
@@ -459,7 +459,7 @@ function CompendiumLauncherWindow:destroy()
 end
 
 function CompendiumLauncherWindow:persist()
-	Turbine.PluginData.Save( Turbine.DataScope.Account, "CompendiumSettings", self.Settings );
+	Compendium.Common.Utils.PluginData.Save( Turbine.DataScope.Account, "CompendiumSettings", self.Settings );
 	self.tabs:persist();
 end
 

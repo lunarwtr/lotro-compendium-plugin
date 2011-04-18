@@ -872,14 +872,14 @@ end
 function CompendiumQuestControl:persist()
 	if self.localquestdatamodified then
 		Turbine.Shell.WriteLine('Saving quests...');
-		Turbine.PluginData.Save( Turbine.DataScope.Account, "LocalQuestData", self.localquestdata );
+		Compendium.Common.Utils.PluginData.Save( Turbine.DataScope.Account, "LocalQuestData", self.localquestdata );
 		self.localquestdatamodified = false;
 		Turbine.Shell.WriteLine('Saving complete.');
 	end
 end
 
 function CompendiumQuestControl:LoadLocalQuests()
-	self.localquestdata = Turbine.PluginData.Load( Turbine.DataScope.Account , "LocalQuestData")
+	self.localquestdata = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Account , "LocalQuestData")
 	if self.localquestdata == nil then
 		self.localquestdata = {};
 	end
