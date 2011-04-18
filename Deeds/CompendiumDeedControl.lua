@@ -835,14 +835,14 @@ end
 function CompendiumDeedControl:persist()
 	if self.localdeeddatamodified then
 		Turbine.Shell.WriteLine('Saving deeds...');
-		Turbine.PluginData.Save( Turbine.DataScope.Account, "LocalDeedData", self.localdeeddata );
+		Compendium.Common.Utils.PluginData.Save( Turbine.DataScope.Account, "LocalDeedData", self.localdeeddata );
 		self.localdeeddatamodified = false;
 		Turbine.Shell.WriteLine('Saving complete.');
 	end
 end
 
 function CompendiumDeedControl:LoadLocalDeeds()
-	self.localdeeddata = Turbine.PluginData.Load( Turbine.DataScope.Account , "LocalDeedData")
+	self.localdeeddata = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Account , "LocalDeedData")
 	if self.localdeeddata == nil then
 		self.localdeeddata = {};
 	end
