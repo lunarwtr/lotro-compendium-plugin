@@ -74,12 +74,7 @@ function AutoSizingLabel:SetWidth(w)
 	self:SetHorizontalScrollBar(nil);
 	self.width = w;
 	if w == 'auto' then
-		if self.bars == nil then
-			for a,b in getmetatable(pairs(self)) do
-				Turbine.Shell.WriteLine(a);
-			end
-		end 
-	
+
 		self:SetHorizontalScrollBar(self.bars.hor);
 		if  self.bars.hor:IsVisible() then
 			local count = 1; 
@@ -100,13 +95,7 @@ function AutoSizingLabel:SetHeight(h)
 	self:SetVerticalScrollBar(nil);
 	self.height = h;
 	if h == 'auto' then
-	
-		if self.bars == nil then
-			for a,b in pairs(self) do
-				Turbine.Shell.WriteLine(a);
-			end
-		end 
-		
+
 		self:SetVerticalScrollBar(self.bars.vert);
 		if self.bars.vert:IsVisible() then 
 			local count = 1;

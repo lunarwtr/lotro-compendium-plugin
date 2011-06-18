@@ -22,26 +22,32 @@ import "Compendium.Common.UI.MiniAliasQuickslot";
 
 ItemAliasMenu = class( Compendium.Common.UI.LabelMenu );
 
-local channelConfig = {
-	{ label = 'Say', shortcut = '/say <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>(from compendium)</rgb>' },  
-	{ label = 'Kinship', shortcut = '/k <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>(from compendium)</rgb>' }, 
-	{ label = 'Fellowship', shortcut = '/f <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>(from compendium)</rgb>' }, 
-	{ label = 'Raid', shortcut = '/ra <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>(from compendium)</rgb>' }, 
-	{ label = 'Trade WTB', shortcut = '/trade WTB <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine>' }  
-};
+local channelConfig = {};
 
 function ItemAliasMenu:Constructor()
     Compendium.Common.UI.LabelMenu.Constructor( self );
+	rsrc = Compendium.Common.Resources.Bundle:GetResources();
+	channelConfig = {
+		{ label = rsrc['say'], shortcut = rsrc["saychat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' },  
+		{ label = rsrc['kinship'], shortcut = rsrc["kinchat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' }, 
+		{ label = rsrc['fellowship'], shortcut = rsrc["fellowchat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' }, 
+		{ label = rsrc['raid'], shortcut = rsrc["raidchat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' }, 
+		{ label = rsrc['tradewtb'], shortcut = rsrc["tradechat"]..' WTB <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine>' },  
+		{ label = rsrc['user1'], shortcut = rsrc["userchat1"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' },  
+		{ label = rsrc['user2'], shortcut = rsrc["userchat2"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' },  
+		{ label = rsrc['user3'], shortcut = rsrc["userchat3"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' },  
+		{ label = rsrc['user4'], shortcut = rsrc["userchat4"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' }
+	}	
 	
     local fontColor=Turbine.UI.Color(1,.9,.5);
-    local fontFace=Turbine.UI.Lotro.Font.TrajanPro14;	
+    local fontFace=Turbine.UI.Lotro.Font.Verdana14;	
 	
 	self:SetSize(50,35);
 	self:SetRowHighlight(false);
 	
 	local title = Turbine.UI.Label();
     title:SetParent( self );
-    title:SetText( 'Link Item To Chat' );
+    title:SetText( rsrc["linkitem"] );
     title:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
     title:SetSize( 130, 18 );
     title:SetFont(fontFace);

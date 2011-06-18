@@ -19,6 +19,7 @@ import "Turbine.UI";
 import "Turbine.UI.Lotro";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
+import "Compendium.Common.Resources";
 
 local moormapZones = {
 	["angmar"] = 4,
@@ -168,16 +169,24 @@ function CoordinateControl:Constructor()
 end
 
 function CoordinateControl:ShowMenu( y, ns, x, ew, zone, name, quest )
+	--Turbine.Shell.WriteLine( y .. ', ' .. ns .. ', ' .. x .. ', ' .. ew .. ', ' .. zone);
 	-- no support
 	if not self.moormap and not self.showCompass then return end;
+	
+	local lang = Compendium.Common.Resources.Settings:GetSetting('Language');
 	
 	if zone == nil then zone = 'Unknown' end;
 	if self.moormap then
 		local id = moormapZones[self:CleanZone(zone)];
 		if id ~= nil then
 			local mmy, mmx = y, x;
-			if string.lower(ns) == 's' then mmy = - mmy end;
-			if string.lower(ew) == 'w' then mmx = - mmx end;
+			if string.lower(ns) == 's' then 
+				mmy = '-' .. mmy 
+			end;
+			local lew = string.lower(ew);
+			if ( lew == 'w' or ( lang == 'fr' and lew == 'o' ) ) then 
+				mmx = '-' ..mmx 
+			end;
 			
 			local sc = Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '' );
 			sc:SetData(string.format('/Moormap ping %s:%s:%s:%s:%s', id,mmy,mmx,name,quest));
@@ -204,6 +213,8 @@ end
 function CoordinateControl:CleanZone( zone )
 	zone = string.lower(zone);
 	zone = string.gsub(zone, "^the%s+", "");
+	zone = string.gsub(zone, "^die%s+", "");
+	zone = string.gsub(zone, "^das%s+", "");
 	zone = string.gsub(zone, "[^a-z0-9]", "");
 	return zone;
 end

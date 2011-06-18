@@ -13,6 +13,5 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ]]
-import "Compendium.Common.Utils.Class";
-import "Compendium.Common.Utils.PluginData";
-import "Compendium.Common.Utils.DataCursor";
+import "Compendium.Common.Resources.Bundle";
+import "Compendium.Common.Resources.Settings";

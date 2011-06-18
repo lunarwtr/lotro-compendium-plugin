@@ -32,7 +32,7 @@ function CompendiumWindow:Constructor()
     self.selBackColor=Turbine.UI.Color(.09,.09,.09);
     self.trimColor=Turbine.UI.Color(.75,.75,.75);
     self.colorDarkGrey=Turbine.UI.Color(.1,.1,.1);
-    self.fontFace=Turbine.UI.Lotro.Font.TrajanPro14;
+    self.fontFace=Turbine.UI.Lotro.Font.Verdana14;
     self.fontFaceSmall=Turbine.UI.Lotro.Font.Verdana12;
         
     self.white = Turbine.UI.Color(1,1,1);

@@ -19,7 +19,7 @@ import "Turbine.Gameplay";
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
 import "Compendium.Common.Utils";
-
+import "Compendium.Common.Resources";
 --[[
 	A base window class with reusable constants	and functions defined.
 ]]
@@ -43,8 +43,15 @@ function CompendiumControl:Constructor()
     self.selBackColor=Turbine.UI.Color(.09,.09,.09);
     self.trimColor=Turbine.UI.Color(.75,.75,.75);
     self.colorDarkGrey=Turbine.UI.Color(.1,.1,.1);
-    self.fontFace=Turbine.UI.Lotro.Font.TrajanPro14;
-    self.fontFaceSmall=Turbine.UI.Lotro.Font.Verdana12;
+    self.fontFace=Turbine.UI.Lotro.Font.Verdana14;
+    
+    local font = Compendium.Common.Resources.Settings:GetSetting('FontSize');
+    --Turbine.Shell.WriteLine('Font: ' .. font);
+    if font == 'large' then
+    	self.fontFaceSmall = Turbine.UI.Lotro.Font.Verdana14;
+    else 
+    	self.fontFaceSmall = Turbine.UI.Lotro.Font.Verdana12;
+    end
     
     -- colors for quest levels
     self.purple = Turbine.UI.Color(1,0,1);
