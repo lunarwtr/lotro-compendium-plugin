@@ -22,13 +22,16 @@ import "Compendium.Items.CompendiumItemsDB";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 import "Compendium.Items.ItemCategoryMenu";
+import "Compendium.Common.Resources.Bundle";
+local rsrc = {};
 
 local rowHeight = 25;
 	
 CompendiumItemControl = class( Compendium.Common.UI.CompendiumControl );
 function CompendiumItemControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
-
+	rsrc = Compendium.Common.Resources.Bundle:GetResources();
+	
 	self.searchDisabled = true;
 	self.currentIndexFilters = {};
 	self.currentManualFilters = {};
@@ -63,7 +66,7 @@ function CompendiumItemControl:Constructor()
     filterButton:SetParent(self);
     filterButton:SetPosition(9,3);
     filterButton:SetSize(85,20);
-    filterButton:SetText(" Filter By");
+    filterButton:SetText(" "..rsrc['filterby']);
  	filterButton:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
 	filterButton.Click = function( sender, args ) 
     	self.menu:ShowMenu();
@@ -87,7 +90,7 @@ function CompendiumItemControl:Constructor()
     searchLabel:SetForeColor(self.fontColor);
     searchLabel:SetOutlineColor(Turbine.UI.Color(0,0,0));
     searchLabel:SetFontStyle(Turbine.UI.FontStyle.Outline);
-    searchLabel:SetText("Search:");
+    searchLabel:SetText(rsrc['search']);
 
     local searchWidth = self:GetWidth()-(searchLabel:GetWidth()+searchLabel:GetLeft())-55;
     self.SearchBorder=Turbine.UI.Control();
@@ -127,7 +130,7 @@ function CompendiumItemControl:Constructor()
     -- add a search reset button
     local reset = Turbine.UI.Lotro.Button();
     reset:SetParent( self );
-    reset:SetText( "reset" );
+    reset:SetText( rsrc['reset']);
     reset:SetPosition( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 1, self.SearchBorder:GetTop() );
     reset:SetSize( 50, self.SearchBorder:GetHeight() );
     reset.Click = function( sender, args )
@@ -140,7 +143,7 @@ function CompendiumItemControl:Constructor()
     filtersLabel:SetSize(self:GetWidth() - 7,20);
     filtersLabel:SetFont(self.fontFace);
     filtersLabel:SetForeColor(self.trimColor);
-    filtersLabel:SetText("No filters set");	
+    filtersLabel:SetText(rsrc['nofiltersset']);	
 	self.filtersLabel = filtersLabel;
 
     self.itemContainer=Turbine.UI.Control();
@@ -341,7 +344,7 @@ end
 function CompendiumItemControl:AddFilters(filters)
 	
 	local count = 0;
-	local filterText = 'Filters: ';
+	local filterText = rsrc['filters']..' ';
 
 	local distinctCats = {};
 	for i,cat in pairs(self.currentIndexFilters) do distinctCats[cat] = i end;
@@ -371,13 +374,13 @@ function CompendiumItemControl:AddFilters(filters)
 		if count > 0 then filterText = filterText .. ', ' end;
 		if rec.type == 'level' then
 			if rec.from ~= nil and rec.to ~= nil then
-				filterText = filterText .. string.format('Levels %s-%s', rec.from, rec.to);
+				filterText = filterText .. string.format(rsrc["levelbtwn"], rec.from, rec.to);
 				table.insert(self.currentManualFilters, rec); 
 			elseif rec.from ~= nil then
-				filterText = filterText .. string.format('Levels > %s',rec.from);
+				filterText = filterText .. string.format(rsrc["levelgt"],rec.from);
 				table.insert(self.currentManualFilters, rec); 
 			elseif rec.to ~= nil then
-				filterText = filterText .. string.format('Levels < %s',rec.to);
+				filterText = filterText .. string.format(rsrc["levellt"],rec.to);
 				table.insert(self.currentManualFilters, rec);
 			end
 		end
@@ -413,16 +416,16 @@ function CompendiumItemControl:LoadItems(records)
         local cats = {};
         for i,c in pairs(rec['c']) do
         	if c == 'Quest Reward' then
-        		c = c .. ' (' .. rec['qu'] .. ')';
+        		c = rsrc["questreward"] .. ' (' .. rec['qu'] .. ')';
         	elseif c == 'Craftable' then
-        		c = c .. ' (' .. rec['lb'] .. ')';
+        		c = rsrc["craftable"] .. ' (' .. rec['lb'] .. ')';
         	end
         	table.insert(cats,c);
         end
         local cat = table.concat(cats,', ');
-        local name = self:FormatItem(rec) .. ' lvl' .. level .. ' | ' .. rec['q'] .. ' | ' .. cat;
+        local name = self:FormatItem(rec) .. ' '..rsrc['lvl'] .. level .. ' | ' .. rec['q'] .. ' | ' .. cat;
         
-        if rec['lg'] ~= nil then name = name .. ' | Legendary' end;
+        if rec['lg'] ~= nil then name = name .. ' | ' .. rsrc["legendary"] end;
         if rec['ib'] ~= nil then name = name .. ' | ' .. rec['ib'] end;
         
         local label = Turbine.UI.Label();
@@ -451,7 +454,7 @@ function CompendiumItemControl:Reset()
 	self.SearchText:SetText('');
 	self.currentIndexFilters = {};
 	self.currentManualFilters = {};
-	self.filtersLabel:SetText('No filters set');
+	self.filtersLabel:SetText(rsrc['nofiltersset']);
 	self.cursor = nil;
 	self.searchDisabled = false;
 	self:BuildCursor();	

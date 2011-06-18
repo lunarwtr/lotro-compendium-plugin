@@ -38,7 +38,7 @@ function DropDownList:Constructor()
 	self.CurrentValue:SetPosition(1,1);
 	self.CurrentValue:SetHeight(18);
 	self.CurrentValue:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
-	self.CurrentValue:SetFont(Turbine.UI.Lotro.Font.TrajanPro14);
+	self.CurrentValue:SetFont(Turbine.UI.Lotro.Font.Verdana14);
 	self.CurrentValue.DataValue=nil;
 	self.DropButtonBack=Turbine.UI.Label();
 	self.RowHeight=18; -- the default row height
@@ -154,7 +154,7 @@ function DropDownList:AddItem(text, datavalue)
 	listItem:SetOpacity(self:GetOpacity());
 	listItem:SetBackColor(self.ListData:GetBackColor());
 	listItem:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
-	listItem:SetFont(Turbine.UI.Lotro.Font.TrajanPro14);
+	listItem:SetFont(Turbine.UI.Lotro.Font.Verdana14);
 	listItem:SetText(text);
 	listItem.DataValue=datavalue;
 	listItem.isVisible=true;

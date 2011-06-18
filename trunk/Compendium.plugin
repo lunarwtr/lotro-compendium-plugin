@@ -3,7 +3,7 @@
 	<Information>
 		<Name>Compendium</Name>
 		<Author>Lunarwater</Author>
-		<Version>1.5.3-beta</Version>
+		<Version>1.6-beta</Version>
 		<website>http://lotrocompendium.sourceforge.net/</website>
 	</Information>
 	<Package>Compendium.Launcher.Main</Package>

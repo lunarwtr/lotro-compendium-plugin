@@ -16,11 +16,13 @@
 
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
-
-
+import "Compendium.Common.Resources";
+local rsrc = {};
+	
 CategoryMenu = class( Turbine.UI.ContextMenu );
 function CategoryMenu:Constructor(categories, index)
     Turbine.UI.ContextMenu.Constructor( self );
+	rsrc = Compendium.Common.Resources.Bundle:GetResources();
 
 	self.ClickCategory = function(categories) 
 		-- do nothing (to be overriden
@@ -45,7 +47,8 @@ function CategoryMenu:BuildMenu(treenode, menulist, categories, index)
     	local rec = treenode[cat];
     	
     	-- build a menu row for them
-    	local item = Turbine.UI.MenuItem(cat);
+    	local text = rsrc["FILTERS"][cat] or cat;
+    	local item = Turbine.UI.MenuItem(text);
     	menulist:Add(item);
 		
 		-- build a copy of the categories up to this point 

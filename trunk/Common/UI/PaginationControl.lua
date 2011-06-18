@@ -19,13 +19,16 @@ import "Turbine.UI";
 import "Turbine.UI.Lotro";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
+import "Compendium.Common.Resources.Bundle";
+local rsrc = {};
 
 PaginationControl = class( Turbine.UI.Label );
 function PaginationControl:Constructor( cursor )
     Turbine.UI.Label.Constructor( self );
+	rsrc = Compendium.Common.Resources.Bundle:GetResources();
 
     local fontColor=Turbine.UI.Color(1,.9,.5);
-    local fontFace=Turbine.UI.Lotro.Font.TrajanPro14;
+    local fontFace=Turbine.UI.Lotro.Font.Verdana14;
 
     self:SetSize(100,20);
    	self:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
@@ -43,7 +46,7 @@ function PaginationControl:Constructor( cursor )
     
     local prevBtn = Turbine.UI.Lotro.Button();
     prevBtn:SetParent(self);
-    prevBtn:SetText('  Prev');
+    prevBtn:SetText(rsrc["prev"]);
     prevBtn:SetVisible(false);
    	prevBtn:SetSize(55,20);
    	prevBtn:SetPosition(0,0);
@@ -58,7 +61,7 @@ function PaginationControl:Constructor( cursor )
    	
     local nextBtn = Turbine.UI.Lotro.Button();
     nextBtn:SetParent(self);
-    nextBtn:SetText(' Next');
+    nextBtn:SetText(rsrc["next"]);
     nextBtn:SetVisible(false);
    	nextBtn:SetSize(55,20);
    	nextBtn:SetPosition(self:GetWidth() - nextBtn:GetWidth(),0);   
@@ -79,7 +82,7 @@ function PaginationControl:Constructor( cursor )
    	
    	self.prevBtn = prevBtn;
    	self.nextBtn = nextBtn;
-   	self.paginationText = 'Results';
+   	self.paginationText = rsrc["results"];
    	self:UpdatePagination();
    	
 end

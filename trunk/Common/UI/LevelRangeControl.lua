@@ -19,10 +19,13 @@ import "Turbine.UI";
 import "Turbine.UI.Lotro";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
+import "Compendium.Common.Resources.Bundle";
+local rsrc = {};
 
 LevelRangeControl = class( Compendium.Common.UI.LabelMenu );
 function LevelRangeControl:Constructor( )
     Compendium.Common.UI.LabelMenu.Constructor( self );
+	rsrc = Compendium.Common.Resources.Bundle:GetResources();
 	
 	self:SetSize(175,25);
 	self:SetRowHighlight(false);
@@ -30,11 +33,11 @@ function LevelRangeControl:Constructor( )
     local fontColor = Turbine.UI.Color(1,.9,.5);
     local backColor = Turbine.UI.Color(.05,.05,.05);
    	local gray = Turbine.UI.Color(0.3,0.3,0.3);
-   	local fontFace = Turbine.UI.Lotro.Font.TrajanPro14;
+   	local fontFace = Turbine.UI.Lotro.Font.Verdana14;
 
 	local range = Turbine.UI.Label();
 	range:SetSize(150,20);
-	range:SetText('from:       to:');
+	range:SetText(rsrc['from']..'       '..rsrc['to']);
     range:SetFont(fontFace);
     range:SetForeColor(fontColor);
     self.range = range;

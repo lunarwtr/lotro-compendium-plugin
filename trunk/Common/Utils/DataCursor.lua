@@ -1,9 +1,13 @@
 
 import "Compendium.Common.Utils";
+import "Compendium.Common.Resources.Bundle";
+local rsrc = {};
 
 DataCursor = class();
 
 function DataCursor:Constructor(data, pagesize)
+	rsrc = Compendium.Common.Resources.Bundle:GetResources();
+	
 	self.data = data;
 	self.pagesize = pagesize;
 	self.total = #data;
@@ -72,7 +76,7 @@ end
 
 function DataCursor:tostring()
 	if self.total >= 1 then
-		return "Page " .. self:CurPageNum() .. "/" .. self:PageCount() .. " | " .. self.total;
+		return rsrc["page"] .. " " .. self:CurPageNum() .. "/" .. self:PageCount() .. " | " .. self.total;
 	else 
 		return "0";
 	end

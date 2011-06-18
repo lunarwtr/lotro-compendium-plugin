@@ -19,11 +19,14 @@ import "Turbine.UI.Lotro";
 
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
+import "Compendium.Common.Resources.Bundle";
+local rsrc = {};
 
 QuestCommentsControl= class( Compendium.Common.UI.CompendiumControl );
 function QuestCommentsControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
-
+	rsrc = Compendium.Common.Resources.Bundle:GetResources();
+	
     local comments=Turbine.UI.Label();
     comments:SetParent(self);
     comments:SetPosition(0,0);
@@ -47,7 +50,7 @@ function QuestCommentsControl:Constructor()
 			local s = math.max(comments:GetSelectionStart() - 13,1);
 			local e = math.min(string.len(text),s + 26);
 			local piece = string.sub(text,s,e);
-			local i, j, whole, y, ns, x, ew = string.find(piece, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWew]))");
+			local i, j, whole, y, ns, x, ew = string.find(piece, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
 			if i ~= nil then
 				comments:SetSelection(nil,nil);
 				comments:SetSelection(s + (i - 1), string.len(whole));
@@ -60,7 +63,7 @@ function QuestCommentsControl:Constructor()
     local pagination = Compendium.Common.UI.PaginationControl();
     pagination:SetParent(self);
     pagination:SetPosition(3,0);
-    pagination:SetPaginationText('Comments');
+    pagination:SetPaginationText(rsrc['comments']);
 	pagination.PageChanged = function(sender,direction,records)
 		self.comments:SetText(records[1].val);
 	    if records[1].modifiable == true then
@@ -76,7 +79,7 @@ function QuestCommentsControl:Constructor()
     local centry =Turbine.UI.Lotro.TextBox();
     centry:SetParent(self);
     centry:SetPosition(3,0);
-    centry:SetFont(self.fontFaceSmall);
+    centry:SetFont(Turbine.UI.Lotro.Font.Verdana12);
     centry:SetForeColor(self.fontColor);
     centry:SetBackColor(self.backColor)
     centry:SetSelectable(true);
@@ -94,7 +97,7 @@ function QuestCommentsControl:Constructor()
     quick:SetSize( 30, 30 );
     quick:SetPosition(0,0);
     quick:SetEnabled(true);
-    quick:SetShortcut( Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '/comp addcoord [;loc|;target]' ) );
+    quick:SetShortcut( Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '/comp addcoord ['..rsrc['loc']..'|'..rsrc['target']..']' ) );
     quick:SetVisible(true);
 
 	local coordicon = Turbine.UI.Control();
@@ -110,7 +113,7 @@ function QuestCommentsControl:Constructor()
     -- add a search add button
     local add = Turbine.UI.Lotro.Button();
     add:SetParent( self );
-    add:SetText( "Add" );
+    add:SetText( rsrc['add'] );
     add:SetSize( 50, 30 );
     add:SetPosition(coord:GetLeft() + coord:GetWidth() + 2, centry:GetTop() + 5 );
     add.Click = function( sender, args )

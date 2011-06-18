@@ -19,16 +19,19 @@ import "Turbine.UI";
 import "Turbine.UI.Lotro";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI.CompendiumWindow";
+import "Compendium.Common.Resources.Bundle";
+local rsrc = {};
 
 CompendiumAboutWindow = class( Compendium.Common.UI.CompendiumWindow );
 function CompendiumAboutWindow:Constructor()
     Compendium.Common.UI.CompendiumWindow.Constructor( self );
-
+	rsrc = Compendium.Common.Resources.Bundle:GetResources();
+	
     self:SetSize(400,200);
     self:SetOpacity( 1 );
     self:SetVisible(false);
 
-    self:SetText( "About Compendium" );
+    self:SetText( rsrc["aboutcomp"] );
     self.MainPanel=Turbine.UI.Control();
     self.MainPanel:SetParent(self);
     self.MainPanel:SetSize(self:GetWidth()-10,self:GetHeight()-10);
@@ -47,7 +50,7 @@ function CompendiumAboutWindow:Constructor()
 	version:SetParent(self.MainPanel);
 	version:SetSize(70,30);
 	version:SetPosition(3,102);
-	version:SetText('version\n' .. Plugins.Compendium:GetVersion());
+	version:SetText(rsrc["version"]..'\n' .. Plugins.Compendium:GetVersion());
     version:SetFont(self.fontFace);
     version:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
     
@@ -61,11 +64,7 @@ function CompendiumAboutWindow:Constructor()
     block:SetOutlineColor(Turbine.UI.Color(0,0,0));
     block:SetFontStyle(Turbine.UI.FontStyle.Outline);   
     block:SetSelectable(true);
-    block:SetText('To Open Compendium:\n      /comp or /Compendium\n\n' ..
-    			  'Visit us at: \n   http://lotrocompendium.sourceforge.net/\n\n' ..
-    			  'More coming soon!\n\n'..
-    			  'Special Thanks to the folks at lotrointerface.com\n\n'..
-    			  '© 2011 Lunarwater  |  Apache License V2.0');
+    block:SetText(rsrc["aboutmessage"]);
     	
     local scroll=Turbine.UI.Lotro.ScrollBar();
     scroll:SetOrientation(Turbine.UI.Orientation.Vertical);

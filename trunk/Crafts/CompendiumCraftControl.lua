@@ -22,13 +22,16 @@ import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 import "Compendium.Crafts.CompendiumCraftsDB";
 import "Compendium.Crafts.CraftCategoryMenu";
+import "Compendium.Common.Resources.Bundle";
+local rsrc = {};
 
 local rowHeight = 45;
 	
 CompendiumCraftControl = class( Compendium.Common.UI.CompendiumControl );
 function CompendiumCraftControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
-
+	rsrc = Compendium.Common.Resources.Bundle:GetResources();
+	
 	self.searchDisabled = true;
 
     self.menu = Compendium.Crafts.CraftCategoryMenu();
@@ -40,7 +43,7 @@ function CompendiumCraftControl:Constructor()
     filterButton:SetParent(self);
     filterButton:SetPosition(9,3);
     filterButton:SetSize(85,20);
-    filterButton:SetText(" Filter By");
+    filterButton:SetText(" " .. rsrc["filterby"]);
  	filterButton:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
 	filterButton.Click = function( sender, args ) 
     	self.menu:ShowMenu();
@@ -64,7 +67,7 @@ function CompendiumCraftControl:Constructor()
     searchLabel:SetForeColor(self.fontColor);
     searchLabel:SetOutlineColor(Turbine.UI.Color(0,0,0));
     searchLabel:SetFontStyle(Turbine.UI.FontStyle.Outline);
-    searchLabel:SetText("Search:");
+    searchLabel:SetText(rsrc['search']);
 
     local searchWidth = self:GetWidth()-(searchLabel:GetWidth()+searchLabel:GetLeft())-55;
     self.SearchBorder=Turbine.UI.Control();
@@ -104,7 +107,7 @@ function CompendiumCraftControl:Constructor()
     -- add a search reset button
     local reset = Turbine.UI.Lotro.Button();
     reset:SetParent( self );
-    reset:SetText( "reset" );
+    reset:SetText( rsrc["reset"] );
     reset:SetPosition( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 1, self.SearchBorder:GetTop() );
     reset:SetSize( 50, self.SearchBorder:GetHeight() );
     reset.Click = function( sender, args )
@@ -117,7 +120,7 @@ function CompendiumCraftControl:Constructor()
     filtersLabel:SetSize(self:GetWidth() - 7,20);
     filtersLabel:SetFont(self.fontFace);
     filtersLabel:SetForeColor(self.trimColor);
-    filtersLabel:SetText("No filters set");	
+    filtersLabel:SetText(rsrc["nofiltersset"]);	
 	self.filtersLabel = filtersLabel;
 
     self.craftContainer=Turbine.UI.Control();
@@ -338,7 +341,7 @@ function CompendiumCraftControl:AddFilters(categories)
 	end
 	self.currentFilters = {};
 	local count = 0;
-	local filterText = 'Filters: ';
+	local filterText = rsrc["filters"]..' ';
 	for cat,v in pairs(distinctCats) do
 		if count > 0 then filterText = filterText .. ', ' end;
 		filterText = filterText .. cat;
@@ -392,9 +395,9 @@ function CompendiumCraftControl:LoadItems(records)
         
         local det = rec['t'];
         if rec['tr'] ~= '' then
-        	det = det .. ' Tier ' .. rec['tr'];
+        	det = det .. ' '..rsrc["tier"]..' ' .. rec['tr'];
         end
-        det = det .. ' | Usage: ' .. rec['u'];
+        det = det .. ' | '..rsrc['usage']..' ' .. rec['u'];
 
         local row = Turbine.UI.Control();
         row:SetSize(width - 13, rowHeight);
@@ -437,7 +440,7 @@ function CompendiumCraftControl:LoadItems(records)
 		regular:SetParent(row);
         regular:SetSize(iwidth, 13);
         regular:SetMultiline(false);
-        regular:SetText('Reg:' .. self:FormatItem(rec['r']));
+        regular:SetText(rsrc["reg"] .. self:FormatItem(rec['r']));
         regular:SetBackColor(bgColor);
         regular:SetFont(Turbine.UI.Lotro.Font.Verdana13);
         regular:SetSelectable(true);
@@ -455,7 +458,7 @@ function CompendiumCraftControl:LoadItems(records)
 	        crit:SetParent(row);
 	        crit:SetSize(iwidth, 13);
 	        crit:SetMultiline(false);
-	        crit:SetText('Crit:' .. self:FormatItem(rec['c']));
+	        crit:SetText(rsrc["crit"] .. self:FormatItem(rec['c']));
 	        crit:SetBackColor(bgColor);
 	        crit:SetFont(Turbine.UI.Lotro.Font.Verdana13);
 	        crit:SetSelectable(true);
@@ -474,7 +477,7 @@ function CompendiumCraftControl:LoadItems(records)
 			learn:SetParent(row);
 	        learn:SetSize(iwidth, 13);
 	        learn:SetMultiline(false);
-	        learn:SetText('Learn:' .. self:FormatItem(rec['f']));
+	        learn:SetText(rsrc["learn"] .. self:FormatItem(rec['f']));
 	        learn:SetBackColor(bgColor);
 	        learn:SetFont(Turbine.UI.Lotro.Font.Verdana13);
 	        learn:SetSelectable(true);
@@ -512,7 +515,7 @@ function CompendiumCraftControl:LoadIngredients( rec )
 	
 	local label = Turbine.UI.Label();
     label:SetParent( menu );
-    label:SetText('Ingredients');
+    label:SetText(rsrc["ingredients"]);
     label:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
     label:SetSize( 250, 18 );
     label:SetFont(self.fontFace);
@@ -534,7 +537,7 @@ function CompendiumCraftControl:LoadIngredients( rec )
 	else
 		label = Turbine.UI.Label();
 	    label:SetParent( menu );
-	    label:SetText( '  (unknown)' );
+	    label:SetText( '  '..rsrc["unknown"] );
 	    label:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
 	    label:SetSize( 250, 18 );
 	    label:SetFont(self.fontFace);
@@ -550,7 +553,7 @@ function CompendiumCraftControl:Reset()
 	self:ClearItems();
 	self.SearchText:SetText('');
 	self.currentFilters = {};
-	self.filtersLabel:SetText('No filters set');
+	self.filtersLabel:SetText(rsrc["nofiltersset"]);
 	self.cursor = nil;
 	self.searchDisabled = false;
 	self:BuildCursor();	

@@ -29,7 +29,7 @@ function Tab:Constructor( text )
     Turbine.UI.Control.Constructor( self );
     
     local fontColor=Turbine.UI.Color(1,.9,.5);
-    local fontFace=Turbine.UI.Lotro.Font.TrajanPro14;
+    local fontFace=Turbine.UI.Lotro.Font.Verdana14;
     
 	self:SetSize(50,20);
 	
