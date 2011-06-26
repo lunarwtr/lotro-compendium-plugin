@@ -28,7 +28,7 @@ local rsrc = {};
 
 local pagesize = 200;
 local rewardLabels = { 
-    reputation,destinypoints,money,receive,virtues,titles,selectoneof,traits 
+    "reputation","destinypoints","money","receive","virtues","titles","selectoneof","traits" 
 };
 
 
@@ -746,7 +746,7 @@ function CompendiumQuestControl:BuildCursor()
 		local rec = questtable[id];
         local include = true;
         if not ise then
-            if string.find(string.lower(rec["name"]),escapedSearch) ~= 1 then
+            if string.find(string.lower(rec["name"]),escapedSearch) == nil then
                 include = false;
             end
         end

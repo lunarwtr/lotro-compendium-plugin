@@ -22,7 +22,7 @@ import "Compendium.Items.CompendiumItemsDB";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 import "Compendium.Items.ItemCategoryMenu";
-import "Compendium.Common.Resources.Bundle";
+import "Compendium.Common.Resources";
 local rsrc = {};
 
 local rowHeight = 25;
@@ -31,6 +31,14 @@ CompendiumItemControl = class( Compendium.Common.UI.CompendiumControl );
 function CompendiumItemControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 	rsrc = Compendium.Common.Resources.Bundle:GetResources();
+	
+    local font = Compendium.Common.Resources.Settings:GetSetting('FontSize');
+    --Turbine.Shell.WriteLine('Font: ' .. font);
+    if font == 'large' then
+    	rowHeight = 30;
+    else 
+    	rowHeight = 25;
+    end	
 	
 	self.searchDisabled = true;
 	self.currentIndexFilters = {};
@@ -308,7 +316,7 @@ function CompendiumItemControl:BuildCursor()
 		local rec = itemstable[id];
         local include = true;
         if not ise then
-            if string.find(string.lower(rec["n"]),escapedSearch) ~= 1 then
+            if string.find(string.lower(rec["n"]),escapedSearch) == nil then
                 include = false;
             end
         end
