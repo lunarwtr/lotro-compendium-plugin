@@ -28,7 +28,7 @@ local rsrc = {};
 
 local pagesize = 200;
 local rewardLabels = { 
-    reputation,destinypoints,money,receive,virtues,titles,selectoneof,traits 
+    "reputation","destinypoints","money","receive","virtues","titles","selectoneof","traits"
 };
 
 CompendiumDeedControl= class( Compendium.Common.UI.CompendiumControl );
@@ -512,6 +512,7 @@ function CompendiumDeedControl:LoadDeedDetails(record)
     if record['zone'] ~= nil then self:AddDeedDetail(rsrc["zone"] .. " " .. record['zone']); end
     
     for j, reward in pairs(rewardLabels) do
+    	
     	local display = rsrc[reward];
     	if record[reward] ~= nil then
     		local vals = record[reward];
@@ -707,7 +708,7 @@ function CompendiumDeedControl:BuildCursor()
 		local rec = deedtable[id];
         local include = true;
         if not ise then
-            if string.find(string.lower(rec["name"]),escapedSearch) ~= 1 then
+            if string.find(string.lower(rec["name"]),escapedSearch) == nil then
                 include = false;
             end
         end

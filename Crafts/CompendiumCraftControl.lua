@@ -313,7 +313,7 @@ function CompendiumCraftControl:BuildCursor()
 		local rec = crafttable[id];
         local include = true;
         if not ise then
-            if string.find(string.lower(rec["n"]),escapedSearch) ~= 1 then
+            if string.find(string.lower(rec["n"]),escapedSearch) == nil then
                 include = false;
             end
         end
