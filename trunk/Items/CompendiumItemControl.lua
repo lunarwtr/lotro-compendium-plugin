@@ -435,6 +435,7 @@ function CompendiumItemControl:LoadItems(records)
         
         if rec['lg'] ~= nil then name = name .. ' | ' .. rsrc["legendary"] end;
         if rec['ib'] ~= nil then name = name .. ' | ' .. rec['ib'] end;
+        if rec['nt'] ~= nil then name = name .. ' | ' .. rec['nt'] end;
         
         local label = Turbine.UI.Label();
         label:SetSize(width - 13, rowHeight);

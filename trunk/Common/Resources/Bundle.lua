@@ -20,6 +20,8 @@ local resources = {
 		["de"]                        	   = "German",
 		["fr"]                        	   = "French",
 	
+		["advice"]                         = "Advice",	
+		["officer"]                        = "Officer",
 		["say"]                        	   = "Say",
 		["kinship"]                        = "Kinship",
 		["fellowship"]                     = "Fellowship",
@@ -41,6 +43,8 @@ local resources = {
 		["userchat2"]					   = "/2",	
 		["userchat3"]					   = "/3",	
 		["userchat4"]					   = "/4",	
+		["officerchat"]                    = "/o",		
+		["advicechat"]                     = "/advice",		
 		
 		["fontsize"]					   = "Font Size (requires reload)",
 		["fontsmall"]					   = "Small",
@@ -304,7 +308,9 @@ local resources = {
 		["en"]                        	   = "English",
 		["de"]                        	   = "German",
 		["fr"]                        	   = "French",
-	
+		
+		["advice"]                         = "Advice",	
+		["officer"]                        = "Officer",		
 		["say"]                        	   = "Say",
 		["kinship"]                        = "Kinship",
 		["fellowship"]                     = "Fellowship",
@@ -328,7 +334,9 @@ local resources = {
 		["userchat2"]					   = "/2",	
 		["userchat3"]					   = "/3",	
 		["userchat4"]					   = "/4",	
-				
+		["officerchat"]                    = "/so",		
+		["advicechat"]                     = "/beratung",	
+						
 		["fontsize"]					   = "Font Size (requires reload)",
 		["fontsmall"]					   = "Small",
 		["fontlarge"]					   = "Large",		
@@ -432,6 +440,8 @@ local resources = {
 		["de"]                        	   = "German",
 		["fr"]                        	   = "French",
 	
+		["advice"]                         = "Advice",	
+		["officer"]                        = "Officer",		
 		["say"]                        	   = "Say",
 		["kinship"]                        = "Kinship",
 		["fellowship"]                     = "Fellowship",
@@ -455,6 +465,9 @@ local resources = {
 		["userchat2"]					   = "/2",	
 		["userchat3"]					   = "/3",	
 		["userchat4"]					   = "/4",		
+		["officerchat"]                    = "/off",		
+		["advicechat"]                     = "/conseil",	
+		 
 		
 		["fontsize"]					   = "Font Size (requires reload)",
 		["fontsmall"]					   = "Small",

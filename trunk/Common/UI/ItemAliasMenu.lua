@@ -30,7 +30,9 @@ function ItemAliasMenu:Constructor()
 	channelConfig = {
 		{ label = rsrc['say'], shortcut = rsrc["saychat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' },  
 		{ label = rsrc['kinship'], shortcut = rsrc["kinchat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' }, 
+        { label = rsrc['officer'], shortcut = rsrc["officerchat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' }, 
 		{ label = rsrc['fellowship'], shortcut = rsrc["fellowchat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' }, 
+        { label = rsrc['advice'], shortcut = rsrc["advicechat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' }, 		
 		{ label = rsrc['raid'], shortcut = rsrc["raidchat"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' }, 
 		{ label = rsrc['tradewtb'], shortcut = rsrc["tradechat"]..' WTB <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine>' },  
 		{ label = rsrc['user1'], shortcut = rsrc["userchat1"]..' <Examine:IIDDID:0x0000000000000000:0x%s>[%s]<\Examine> <rgb=#FF80FF>('..rsrc['fromcomp']..')</rgb>' },  
