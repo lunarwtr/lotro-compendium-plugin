@@ -161,6 +161,56 @@ function ItemCategoryMenu:Constructor()
 		["Legendary"] = 0,
 		["Source"] = {
 			["Craftable"] = 0,
+		    ["Dungeon Drop"]={
+		    	["All"]=0,
+		        ["A-H"]={
+		            ["Annuminas"]=0,
+		            ["Barad Gularan"]=0,
+		            ["Barad Guldur"]=0,
+		            ["Carn Dum"]=0,
+		            ["Dark Delvings"]=0,
+		            ["Dar Narbugud"]=0,
+		            ["Dungeons of Dol Guldur"]=0,
+		            ["Epic II.6.8 - Azanarukar"]=0,
+		            ["Fil Gashan"]=0,
+		            ["Filikul"]=0,
+		            ["Fornost"]=0,
+		            ["Garth Agarwen"]=0,
+		            ["Great Barrows"]=0,
+		            ["Halls of Crafting"]=0,
+		            ["Halls of Night"]=0,
+		            ["Haudh Iarchith"]=0,
+		            ["Helegrod"]=0
+	            },
+		        ["I-Z"]={
+		            ["Inn of the Forsaken"]=0,
+		            ["Lost Temple"]=0,
+		            ["Lumul-nar"]=0,
+		            ["Nala-dum"]=0,
+		            ["Northcotton Farms"]=0,
+		            ["Ost Dunhoth"]=0,
+		            ["Sammath Gul"]=0,
+		            ["Sâri-surma"]=0,
+		            ["Sarnur"]=0,
+		            ["Skumfil"]=0,
+		            ["Sword-hall of Dol Guldur"]=0,
+		            ["The Forges of Khazad-dum"]=0,
+		            ["The Forgotten Treasury"]=0,
+		            ["The Grand Stair"]=0,
+		            ["The Library at Tham Mirdain"]=0,
+		            ["The Rift of Nurz Ghashu"]=0,
+		            ["The School at Tham Mirdain"]=0,
+		            ["The Sixteenth Hall"]=0,
+		            ["The Vile Maw"]=0,
+		            ["Town of Stoneheight"]=0,
+		            ["Urugarth"]=0,
+		            ["Warg-pens of Dol Guldur"]=0
+		            }
+		        },
+		    ["PvP"]={
+		    	["All"]=0,
+		        ["Ettenmoors"]=0
+        	},
 			["Quest Reward"] = 0
 		},
 		["Recipe"] = {
