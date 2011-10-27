@@ -140,7 +140,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},
 			["Farmer"] = {
 				["All"] =0,
@@ -149,7 +150,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},
 			["Forester"] = {
 				["All"] =0,
@@ -158,7 +160,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},
 			["Jeweller"] = {
 				["All"] =0,
@@ -167,7 +170,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},
 			["Metalsmith"] = {
 				["All"] =0,
@@ -176,7 +180,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},
 			["Prospector"] = {
 				["All"] =0,
@@ -185,7 +190,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},
 			["Scholar"] = {
 				["All"] =0,
@@ -194,7 +200,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},
 			["Tailor"] = {
 				["All"] =0,
@@ -203,7 +210,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},
 			["Weaponsmith"] = {
 				["All"] =0,
@@ -212,7 +220,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},			
 			["Woodworker"] = {
 				["All"] =0,
@@ -221,7 +230,8 @@ function CraftCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"] = 0,
+				["Tier 7"] = 0
 			},
 		},
 		["Weapon"] = {

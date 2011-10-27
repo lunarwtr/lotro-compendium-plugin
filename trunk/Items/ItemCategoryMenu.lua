@@ -469,7 +469,7 @@ function ItemCategoryMenu:Constructor()
 				["Word-smith's Armour"]=0,
 				["Written Word (Armour of the)"]=0
 				}
-			},			
+			},
 		 ["Jewellery"] = {
 		 	 ["All"] = 0,
 		     ["Wrist"] = 0,
@@ -500,13 +500,16 @@ function ItemCategoryMenu:Constructor()
 				["Device"] = 0,
 				["Dye"] = 0,
 				["Fish"] = 0,
-				["Food"] = 0,	
+				["Food"] = 0,
+				["Legendary Item Increase Max Level"]=0,
+				["Legendary Item Legendary Points Reset"]=0,
+				["Legendary Item Replace Legacy"]=0,
+				["Legendary Item XP"]=0,				
 				["Key"] = 0,
 				["Misc."] = 0,
 				["Mounts"] = 0,		
 			},
 			["N-Z"] = {
-				["Outfit: Class"] = 0,
 				["Perks"] = 0,
 				["Pipeweed"] = 0,
 				["Poles"] = 0,
@@ -523,6 +526,16 @@ function ItemCategoryMenu:Constructor()
 				["Trophy"] = 0,
 				["Weapon Oils"] = 0		
 			}
+		},
+		["Outfits"] = {
+			["Outfit: Back"]=0,
+			["Outfit: Class"]=0,
+			["Outfit: Feet"]=0,
+			["Outfit: Hands"]=0,
+			["Outfit: Head"]=0,
+			["Outfit: Lowerbody"]=0,
+			["Outfit: Shoulders"]=0,
+			["Outfit: Upperbody"]=0
 		},
 		["Legendary"] = 0,
 		["Source"] = {
@@ -588,7 +601,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},
 			["Farming"] = {
 				["All"] =0,
@@ -597,7 +611,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},
 			["Forestry"] = {
 				["All"] =0,
@@ -606,7 +621,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},
 			["Jeweller"] = {
 				["All"] =0,
@@ -615,7 +631,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},
 			["Metalworking"] = {
 				["All"] =0,
@@ -624,7 +641,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},
 			["Prospecting"] = {
 				["All"] =0,
@@ -633,7 +651,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},
 			["Scholar"] = {
 				["All"] =0,
@@ -642,7 +661,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},
 			["Tailor"] = {
 				["All"] =0,
@@ -651,7 +671,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},
 			["Weaponsmith"] = {
 				["All"] =0,
@@ -660,7 +681,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},			
 			["Woodworking"] = {
 				["All"] =0,
@@ -669,7 +691,8 @@ function ItemCategoryMenu:Constructor()
 				["Tier 3"] = 0,
 				["Tier 4"] = 0,
 				["Tier 5"] = 0,
-				["Tier 6"] = 0
+				["Tier 6"]=0,
+				["Tier 7"]=0
 			},
 		},
 		["Weapon"] = {
