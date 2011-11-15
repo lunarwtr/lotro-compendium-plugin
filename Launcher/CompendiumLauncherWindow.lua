@@ -546,26 +546,6 @@ function CompendiumLauncherWindow:persist()
 	self.tabs:persist();
 end
 
-function CompendiumLauncherWindow:ProcessCommandArguments(args)
-	
-	local cmd, loc, target = args:match "^%s*(addcoord)%s*%[([^%|]+)%|([^%]]+)%]"; --%[[^:]+:%\s*([^:]+):\s*([^%|]+)%|([^%]]+)%s*%]$";
-	if cmd == 'addcoord' then
-		 local area, coord = loc:match "%s*([^:]+):%s*([^:]+)$";
-		 
-		 local coordrec = nil
-		 if area ~= nil then
-		 	coordrec = { area = area, coord = coord, target = target };
-		 else
-		 	coordrec = { area = loc, target = target };
-		 end
-		 
-		 local control = self.tabs:GetActiveControl();
-		 if control.AddCoordinate ~= nil then
-		 	control:AddCoordinate(coordrec);
-		 end
-	end
-
-end
 
 function CompendiumLauncherWindow:SetFadeSpeed( value )
     self.fadeSpeed = 1 / value;
@@ -624,4 +604,51 @@ function CompendiumLauncherWindow:Update( sender, args )
 
     self.currentOpacity = newOpacity;
     Compendium.Common.UI.CompendiumWindow.SetOpacity( self, newOpacity );
+end
+
+
+function CompendiumLauncherWindow:ProcessCommandArguments(args)
+
+	if args == 'help' then
+		Turbine.Shell.WriteLine(self:GetHelp(true));
+	elseif args == 'hide' then
+		self:SetVisible(false);
+	elseif args == 'show' then
+		self:SetVisible(true);
+	else
+		local cmd, loc, target = args:match "^%s*(addcoord)%s*%[([^%|]+)%|([^%]]+)%]"; --%[[^:]+:%\s*([^:]+):\s*([^%|]+)%|([^%]]+)%s*%]$";
+		if cmd == 'addcoord' then
+			 local area, coord = loc:match "%s*([^:]+):%s*([^:]+)$";
+			 
+			 local coordrec = nil
+			 if area ~= nil then
+			 	coordrec = { area = area, coord = coord, target = target };
+			 else
+			 	coordrec = { area = loc, target = target };
+			 end
+			 
+			 local control = self.tabs:GetActiveControl();
+			 if control.AddCoordinate ~= nil then
+			 	control:AddCoordinate(coordrec);
+			 end
+		else
+			Turbine.Shell.WriteLine(self:GetHelp(true));
+		end
+	end
+
+end
+
+function CompendiumLauncherWindow:GetHelp(tagged)
+
+	if tagged then
+		return "<rgb=#008080>Compendium</rgb> " .. Plugins.Compendium:GetVersion() .. " by <rgb=#FF80FF>Lunarwater</rgb>\n" ..
+			 "    <rgb=#008080>/comp help</rgb> : shows Compendium help \n" ..
+			 "    <rgb=#008080>/comp show</rgb> : shows Compendium \n" ..
+			 "    <rgb=#008080>/comp hide</rgb> : hides Compendium \n";
+	else
+		return "Compendium " .. Plugins.Compendium:GetVersion() .. " by Lunarwater\n" ..
+			 "    /comp help : shows Compendium help \n" ..
+			 "    /comp show : shows Compendium \n" ..
+			 "    /comp hide : hides Compendium \n";
+	end 
 end

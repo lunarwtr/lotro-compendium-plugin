@@ -15,7 +15,8 @@
 ]]
 import "Compendium.Launcher.CompendiumLauncherWindow";
 local clw = CompendiumLauncherWindow();
-
+Turbine.Shell.WriteLine("<rgb=#008080>Compendium</rgb> " .. Plugins.Compendium:GetVersion() .. " by <rgb=#FF80FF>Lunarwater</rgb>");
+		
 CompendiumWindowCommand = Turbine.ShellCommand();
 
 function CompendiumWindowCommand:Execute( command, arguments )
@@ -26,11 +27,11 @@ function CompendiumWindowCommand:Execute( command, arguments )
 end
 
 function CompendiumWindowCommand:GetHelp()
-    return "Shows the Compendium window.";
+    return clw:GetHelp(false);
 end
 
 function CompendiumWindowCommand:GetShortHelp()
-    return "Shows Compendium.";
+    return "Compendium (/comp)";
 end
 
 Turbine.Shell.AddCommand( "Comp;Compendium;comp addcoord", CompendiumWindowCommand );
