@@ -37,6 +37,8 @@ function CompendiumQuestControl:Constructor(language)
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 	rsrc = Compendium.Common.Resources.Bundle:GetResources();
 
+	self.questprogressionmodified = false;	
+	self.questprogression = {};
 	self.localquestdatamodified = false;
 	self.localquestdata = {};
     self.currentIndexFilters = {};
@@ -192,13 +194,13 @@ function CompendiumQuestControl:Constructor(language)
         if self.prevIdx ~= nil then
             local oldItem = self.qlContainer.QuestList:GetItem(self.prevIdx);
             if oldItem ~= nil then
-                oldItem:SetBackColor(self.backColor);
+                oldItem:GetControls():Get(1):SetBackColor(self.backColor);
             end
         end
         if idx ~= 0 then
             self.prevIdx = idx;
             local item = self.qlContainer.QuestList:GetItem(idx);
-            item:SetBackColor(self.selBackColor);
+            item:GetControls():Get(1):SetBackColor(self.selBackColor);
             -- Display Quest
             self:LoadQuestDetails(questtable[item.QuestId]);
         end
@@ -345,6 +347,8 @@ function CompendiumQuestControl:Constructor(language)
 		detailTabs:SetWidth(width - 10);
 		for index=1,self.qlContainer.QuestList:GetItemCount() do
 			local label = self.qlContainer.QuestList:GetItem(index);
+			label:GetControls():Get(1):SetWidth(qlwidth - 32);
+			label:GetControls():Get(2):SetLeft(qlwidth - 32);
 			label:SetWidth(qlwidth - 14);
 		end
 		for index=1,self.qdContainer.QuestDetails:GetItemCount() do
@@ -451,13 +455,32 @@ function CompendiumQuestControl:LoadQuests(records)
         if rec["faction"] == 'Mon' then
         	name = name .. ' (M)';
         end
+
+        local quest = Turbine.UI.Control();
+        quest:SetSize(width - 10, 18);
+        
         local label = Turbine.UI.Label();
         label:SetMultiline(false);
-        label:SetSize(width - 10, 15);
+        label:SetParent(quest);
+        label:SetPosition( 0, 0 );
+        label:SetSize(quest:GetWidth() - 18, 18);
         label:SetSelectable(true);
         label:SetText(name);
         label:SetBackColor(bgColor);
         label:SetFont(self.fontFaceSmall);
+	    label:SetTextAlignment( Turbine.UI.CheckBox.MiddelCenter );
+	    
+	    local complete = self.questprogression[rec["name"]];
+	    if complete == nil then complete = false end;
+	    
+		local checkbox = Turbine.UI.Lotro.CheckBox();
+	    checkbox:SetParent( quest );
+	    checkbox:SetPosition(label:GetWidth(), 0);
+	    checkbox:SetSize( 25, 18 );
+	    checkbox:SetChecked(complete);
+		checkbox.CheckedChanged = function(s,a)
+			self:UpdateLocalRecord(self.currentRecord,'modifyprog',s:IsChecked());
+		end              
         
         local color = self.fontColor;
         if level ~= nil and level ~= '' then
@@ -465,8 +488,8 @@ function CompendiumQuestControl:LoadQuests(records)
         end
         label:SetForeColor(color);
                 
-        label.QuestId = tonumber(rec["id"]);
-        self.qlContainer.QuestList:AddItem(label);
+        quest.QuestId = tonumber(rec["id"]);
+        self.qlContainer.QuestList:AddItem(quest);
     end
     
 end
@@ -860,7 +883,10 @@ function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
 			end
 			self.localquestdata[quest]['c'] = comments;
 			self.localquestdatamodified = true;
-		end			
+		end
+	elseif type == 'modifyprog' then
+		self.questprogression[quest] = data;
+		self.questprogressionmodified = true;					
 	else
 		-- unknown update type
 	end
@@ -868,12 +894,21 @@ function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
 end
 
 function CompendiumQuestControl:persist()
-	if self.localquestdatamodified then
+	if self.localquestdatamodified or self.questprogressionmodified then
 		Turbine.Shell.WriteLine(rsrc["savingquests"]);
+	end
+	if self.localquestdatamodified then
 		Compendium.Common.Utils.PluginData.Save( Turbine.DataScope.Account, "LocalQuestData", self.localquestdata );
 		self.localquestdatamodified = false;
-		Turbine.Shell.WriteLine(rsrc["savingcomplete"]);
 	end
+	if self.questprogressionmodified then
+		Compendium.Common.Utils.PluginData.Save( Turbine.DataScope.Character, "CompendiumQuestProgression", self.questprogression );
+		self.localquestdatamodified = false;
+	end
+	if self.localquestdatamodified or self.questprogressionmodified then
+		Turbine.Shell.WriteLine(rsrc["savingcomplete"]);
+	end	
+	
 end
 
 function CompendiumQuestControl:LoadLocalQuests()
@@ -881,6 +916,10 @@ function CompendiumQuestControl:LoadLocalQuests()
 	if self.localquestdata == nil then
 		self.localquestdata = {};
 	end
+	self.questprogression = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Character , "CompendiumQuestProgression")
+	if self.questprogression == nil then
+		self.questprogression = {};
+	end	
 end
 
 function CompendiumQuestControl:AddCoordinate( record )

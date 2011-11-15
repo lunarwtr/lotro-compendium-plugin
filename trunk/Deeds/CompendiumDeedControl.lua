@@ -37,7 +37,9 @@ function CompendiumDeedControl:Constructor()
 	rsrc = Compendium.Common.Resources.Bundle:GetResources();
 	
 	self.localdeeddatamodified = false;
+	self.deedprogressionmodified = false;	
 	self.localdeeddata = {};
+	self.deedprogression = {};
 	self.currentIndexFilters = {};
 	self.currentManualFilters = {};
 	self.searchDisabled = true;
@@ -190,13 +192,13 @@ function CompendiumDeedControl:Constructor()
         if self.prevIdx ~= nil then
             local oldItem = self.qlContainer.DeedList:GetItem(self.prevIdx);
             if oldItem ~= nil then
-                oldItem:SetBackColor(self.backColor);
+                oldItem:GetControls():Get(1):SetBackColor(self.backColor);
             end
         end
         if idx ~= 0 then
             self.prevIdx = idx;
             local item = self.qlContainer.DeedList:GetItem(idx);
-            item:SetBackColor(self.selBackColor);
+            item:GetControls():Get(1):SetBackColor(self.selBackColor);
             -- Display Deed
             self:LoadDeedDetails(deedtable[item.DeedId]);
         end
@@ -344,6 +346,8 @@ function CompendiumDeedControl:Constructor()
 		detailTabs:SetWidth(width - 10);
 		for index=1,self.qlContainer.DeedList:GetItemCount() do
 			local label = self.qlContainer.DeedList:GetItem(index);
+			label:GetControls():Get(1):SetWidth(qlwidth - 32);
+			label:GetControls():Get(2):SetLeft(qlwidth - 32);
 			label:SetWidth(qlwidth - 14);
 		end
 		for index=1,self.qdContainer.DeedDetails:GetItemCount() do
@@ -450,13 +454,34 @@ function CompendiumDeedControl:LoadDeeds(records)
         if rec["faction"] == 'Mon' then
         	name = name .. ' (M)';
         end
+        
+        local deed = Turbine.UI.Control();
+        --deed:SetMultiline(false);
+        deed:SetSize(width - 10, 18);
+        --deed:SetBackColor(bgColor);
+        
         local label = Turbine.UI.Label();
         label:SetMultiline(false);
-        label:SetSize(width - 10, 15);
+        label:SetParent(deed);
+        label:SetPosition( 0, 0 );
+        label:SetSize(deed:GetWidth() - 18, 18);
         label:SetSelectable(true);
         label:SetText(name);
         label:SetBackColor(bgColor);
         label:SetFont(self.fontFaceSmall);
+	    label:SetTextAlignment( Turbine.UI.CheckBox.MiddelCenter );
+	    
+	    local complete = self.deedprogression[rec["name"]];
+	    if complete == nil then complete = false end;
+	    
+		local checkbox = Turbine.UI.Lotro.CheckBox();
+	    checkbox:SetParent( deed );
+	    checkbox:SetPosition(label:GetWidth(), 0);
+	    checkbox:SetSize( 25, 18 );
+	    checkbox:SetChecked(complete);
+		checkbox.CheckedChanged = function(s,a)
+			self:UpdateLocalRecord(self.currentRecord,'modifyprog',s:IsChecked());
+		end        
         
         local color = self.fontColor;
         if level ~= nil and level ~= '' then
@@ -464,8 +489,8 @@ function CompendiumDeedControl:LoadDeeds(records)
         end
         label:SetForeColor(color);
                 
-        label.DeedId = tonumber(rec["id"]);
-        self.qlContainer.DeedList:AddItem(label);
+        deed.DeedId = tonumber(rec["id"]);
+        self.qlContainer.DeedList:AddItem(deed);
     end
     
 end
@@ -824,6 +849,9 @@ function CompendiumDeedControl:UpdateLocalRecord(deedrecord, type, data)
 			self.localdeeddata[deed]['c'] = comments;
 			self.localdeeddatamodified = true;
 		end			
+	elseif type == 'modifyprog' then
+		self.deedprogression[deed] = data;
+		self.deedprogressionmodified = true;
 	else
 		-- unknown update type
 	end
@@ -831,10 +859,18 @@ function CompendiumDeedControl:UpdateLocalRecord(deedrecord, type, data)
 end
 
 function CompendiumDeedControl:persist()
-	if self.localdeeddatamodified then
+	if self.localdeeddatamodified or self.deedprogressionmodified then
 		Turbine.Shell.WriteLine(rsrc["savingdeeds"]);
+	end
+	if self.localdeeddatamodified then
 		Compendium.Common.Utils.PluginData.Save( Turbine.DataScope.Account, "LocalDeedData", self.localdeeddata );
 		self.localdeeddatamodified = false;
+	end
+	if self.deedprogressionmodified then
+		Compendium.Common.Utils.PluginData.Save( Turbine.DataScope.Character, "CompendiumDeedProgression", self.deedprogression );
+		self.localdeeddatamodified = false;
+	end
+	if self.localdeeddatamodified or self.deedprogressionmodified then
 		Turbine.Shell.WriteLine(rsrc["savingcomplete"]);
 	end
 end
@@ -843,6 +879,10 @@ function CompendiumDeedControl:LoadLocalDeeds()
 	self.localdeeddata = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Account , "LocalDeedData")
 	if self.localdeeddata == nil then
 		self.localdeeddata = {};
+	end
+	self.deedprogression = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Character , "CompendiumDeedProgression")
+	if self.deedprogression == nil then
+		self.deedprogression = {};
 	end
 end
 
