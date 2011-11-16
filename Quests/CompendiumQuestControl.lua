@@ -66,7 +66,9 @@ function CompendiumQuestControl:Constructor(language)
 			if (top + mh) > h then top = h - mh end;
 			if (left + mw) > w then left = w - mw end;
 			self.range:SetPosition(left,top);
-			self.range:ShowMenu(true);    		
+			self.range:ShowMenu(true); 
+    	elseif size > 0 and (categories[size] == 'Complete' or categories[size] == 'Incomplete') then
+	   		self:AddFilters({ manual = { progression = { value = (categories[size] == 'Complete') } } });
     	else
 			self:AddFilters({ indexes = categories });
     	end
@@ -783,7 +785,16 @@ function CompendiumQuestControl:BuildCursor()
 					if rec['level'] < from or rec['level'] > to then
 						include = false;
 						break; 
-					end			
+					end		
+				elseif filter.type == 'progression' then
+					local prog = self.questprogression[rec["name"]];
+					if filter.value and (prog == nil or false == prog ) then
+						include = false;
+						break;
+					elseif not filter.value and true == prog then
+						include = false;
+						break;
+					end
 				end
 			end
 		end        
@@ -848,6 +859,13 @@ function CompendiumQuestControl:AddFilters(filters)
 				filterText = filterText .. string.format(rsrc["levellt"],rec.to);
 				table.insert(self.currentManualFilters, rec);
 			end
+		elseif rec.type == 'progression' then
+			if rec.value then
+				filterText = filterText .. rsrc["complete"];
+			else
+				filterText = filterText .. rsrc["incomplete"];
+			end
+			table.insert(self.currentManualFilters, rec);
 		end
 		count = count + 1;
 	end

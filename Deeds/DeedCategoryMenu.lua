@@ -40,6 +40,10 @@ function DeedCategoryMenu:Constructor()
 			["Reputation"]=0,
 			["Slayer"]=0
 			},
+		["Progression"]={
+			["Complete"]=0,
+			["Incomplete"]=0,
+			},			
 		["Level Ranges"]={
 			["11-15"]=0,
 			["1-5"]=0,

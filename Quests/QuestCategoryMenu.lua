@@ -453,6 +453,10 @@ function QuestCategoryMenu:Constructor()
 						}
 					}
 				},
+			["Progression"]={
+				["Complete"]=0,
+				["Incomplete"]=0,
+				},
 			["Quest Type"]={
 				["Epic"]=0,
 				["Fellowship"]=0,
