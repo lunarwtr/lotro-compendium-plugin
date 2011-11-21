@@ -22,7 +22,10 @@ function CraftCategoryMenu:Constructor()
     Compendium.Common.UI.CategoryMenu.Constructor( self, {
 		["Armour"] = {
 			["All"] =0,
-			["Back"] = 0,	
+			["Back"] = 0,
+			["Light"] = 0,
+			["Medium"] = 0,
+			["Heavy"] = 0,				
 			["Feet"] = {
 				["All"] =0,
 				["Light"] = 0,

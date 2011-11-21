@@ -30,23 +30,24 @@ function CompendiumShortcut:Constructor()
 	self:SetVisible( true );
 	--self:SetOpacity(1);
 	--self:SetBlendMode( Turbine.UI.BlendMode.Overlay );
-	--self:SetBackColor( Turbine.UI.Color(0,0,0,0) );
+	self:SetBackColor( Turbine.UI.Color(0,0,0,0) );
 	
 	self.button = Turbine.UI.Control();
 	self.button:SetParent(self);
 	self.button:SetPosition(0,0);
 	self.button:SetSize(35,35);
 	self.button:SetBlendMode( Turbine.UI.BlendMode.AlphaBlend );
-	self.button:SetBackground("Compendium/Common/Resources/images/icon.tga");
+	--self.button:SetBackground("Compendium/Common/Resources/images/icon.tga");
+	self:SetMode("large");
 	
 	self.ShortcutClick = function() end
 	self.ShortcutMoved = function(left, top) end
 
 	self.button.MouseEnter = function(sender,args)
-		self.button:SetBackground("Compendium/Common/Resources/images/icon-highlight.tga");
+		self.button:SetBackground("Compendium/Common/Resources/images/" .. self.iconHighlight);
 	end
 	self.button.MouseLeave = function(sender,args)
-		self.button:SetBackground("Compendium/Common/Resources/images/icon.tga");
+		self.button:SetBackground("Compendium/Common/Resources/images/" .. self.icon);
 	end		
 	self.button.MouseDown = function( sender, args )
 		if(args.Button == Turbine.UI.MouseButton.Left) then
@@ -78,4 +79,20 @@ function CompendiumShortcut:Constructor()
 			sender.dragged = true;
 		end
 	end
+end
+
+function CompendiumShortcut:SetMode(mode) 
+
+	self:SetVisible( false );
+	if mode == 'mini' then
+		self.icon = "iconmini.tga";
+		self.iconHighlight = "iconmini-highlight.tga"
+		self:SetSize(16,16);		
+	else 
+		self.icon = "icon.tga";
+		self.iconHighlight = "icon-highlight.tga"
+		self:SetSize(35,35);
+	end
+	self.button:SetBackground("Compendium/Common/Resources/images/" .. self.icon);
+	self:SetVisible( true );
 end
