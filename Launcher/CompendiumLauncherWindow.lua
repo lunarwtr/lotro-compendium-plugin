@@ -75,6 +75,8 @@ function CompendiumLauncherWindow:Constructor()
 	shortcut.ShortcutClick = function() 
 		self:SetVisible( not self:IsVisible() );
 	end
+	if self.Settings.UseMiniIcon then shortcut:SetMode('mini') end;
+	shortcut:SetVisible(self.Settings.UseIcon);		
 	
 	shortcut.ShortcutMoved = function(left, top)
 		self.Settings.IconPos.left = left;
@@ -266,6 +268,53 @@ function CompendiumLauncherWindow:Constructor()
 		end
 	end
 	
+	cbtop = cbtop + 20;
+	checkbox = Turbine.UI.Lotro.CheckBox();
+    checkbox:SetParent( settingControl );
+    checkbox:SetMultiline( true );
+    checkbox:SetPosition( 20, cbtop );
+    checkbox:SetSize( 250, 20 );
+    checkbox:SetFont(self.fontFace);
+    checkbox:SetForeColor(self.fontColor);    
+    checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
+    checkbox:SetText( "  " .. rsrc["icon"] );
+    checkbox:SetChecked(self.Settings.UseIcon);
+	checkbox.CheckedChanged = function(s,a)
+		if s:IsChecked() then
+			self.Settings.UseIcon = true;
+			self.allowFade = true;
+		else
+			self.Settings.UseIcon = false;
+		end
+		self:SaveSettings();
+		shortcut:SetVisible(self.Settings.UseIcon);		
+	end	
+	
+	cbtop = cbtop + 20;
+	checkbox = Turbine.UI.Lotro.CheckBox();
+    checkbox:SetParent( settingControl );
+    checkbox:SetMultiline( true );
+    checkbox:SetPosition( 40, cbtop );
+    checkbox:SetSize( 250, 20 );
+    checkbox:SetFont(self.fontFace);
+    checkbox:SetForeColor(self.fontColor);    
+    checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
+    checkbox:SetText( "  " .. rsrc["iconmini"] );
+    checkbox:SetChecked(self.Settings.UseMiniIcon);
+	checkbox.CheckedChanged = function(s,a)
+		if s:IsChecked() then
+			self.Settings.UseMiniIcon = true;
+			self.allowFade = true;
+		else
+			self.Settings.UseMiniIcon = false;
+		end
+		self:SaveSettings();
+		if self.Settings.UseMiniIcon then
+			shortcut:SetMode('mini');
+		else
+			shortcut:SetMode('large');
+		end;
+	end		
 	
 	local plugs = Turbine.PluginManager.GetAvailablePlugins();
 	local loaded = Turbine.PluginManager.GetLoadedPlugins();
@@ -489,7 +538,9 @@ function CompendiumLauncherWindow:LoadSettings()
 			ActiveTabIndex = 1,
 			Components = {},
 			Language = 'en',
-			FontSize = 'small'
+			FontSize = 'small',
+			UseIcon = true,
+			UseMiniIcon = false
 		};
 		for i, rec in pairs(compendiumdbs) do
 			self.Settings.Components[rec.title] = true;
@@ -514,6 +565,12 @@ function CompendiumLauncherWindow:LoadSettings()
 		end
 		if self.Settings.FontSize == nil then
 			self.Settings.FontSize = 'small';
+		end
+		if self.Settings.UseIcon == nil then
+			self.Settings.UseIcon = true;
+		end
+		if self.Settings.UseMiniIcon == nil then
+			self.Settings.UseMiniIcon = false;
 		end
 		for i, rec in pairs(compendiumdbs) do
 			if self.Settings.Components[rec.title] == nil then
