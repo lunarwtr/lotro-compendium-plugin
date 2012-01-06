@@ -77,34 +77,43 @@ function CoordinateControl:Constructor()
 	
 	self:SetRowHighlight(false);
 
-	local found=false;
+	local foundMoor=false;
+	local foundWay=false;
 	local loaded = Turbine.PluginManager:GetLoadedPlugins();
 	for i, p in pairs(loaded) do
 		if p.Name=="MoorMap" then
-			found=true;
-			break;
+			foundMoor=true;
+		elseif p.Name=="Waypoint" then
+			foundWay=true;
 		end
 	end
 	
-	self.showCompass = false; -- disabling for now
+	self.showCompass = false;
 	self.moormap = false;
-	if not found then
+	if not foundMoor or not foundWay then
 		local avail = Turbine.PluginManager:GetAvailablePlugins();
 		local moorCfg = nil;
+		local wayCfg = nil;
 		for i, p in pairs(avail) do
-			if p.Name == 'MoorMap' then
+			if not foundMoor and p.Name == 'MoorMap' then
 				moorCfg = p;
-				break;
+			elseif not foundWay and p.Name == 'Waypoint' then
+				wayCfg = p;
 			end
 		end
 		if moorCfg ~= nil then
 			Turbine.PluginManager.LoadPlugin("MoorMap");
-			found = true;
+			foundMoor = true;
 			self.moormap = true;
 		end
-	else
-		self.moormap = true;
-	end	
+		if wayCfg ~= nil then
+			Turbine.PluginManager.LoadPlugin("Waypoint");
+			foundWay = true;
+			self.showCompass = true;
+		end		
+	end
+	if foundMoor then self.moormap = true end;	
+	if foundWay then self.showCompass = true end;	
 	
 	local left, width = 1, 40;
 	if not self.showCompass then
@@ -203,7 +212,7 @@ function CoordinateControl:ShowMenu( y, ns, x, ew, zone, name, quest )
 	end
 	if self.showCompass then
 		local sc = Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '' );
-		sc:SetData(string.format('/comp waypoint [;loc|%s%s|%s%s|%s|%s]', y, ns, x, ew, name, quest));
+		sc:SetData(string.format('/way target %s%s, %s%s', y, ns, x, ew));
 		self.compassQS:SetShortcut( sc );
 	end
 	

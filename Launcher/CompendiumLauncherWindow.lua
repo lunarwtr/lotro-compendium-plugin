@@ -77,6 +77,7 @@ function CompendiumLauncherWindow:Constructor()
 	end
 	if self.Settings.UseMiniIcon then shortcut:SetMode('mini') end;
 	shortcut:SetVisible(self.Settings.UseIcon);		
+	self.shortcut = shortcut;
 	
 	shortcut.ShortcutMoved = function(left, top)
 		self.Settings.IconPos.left = left;
@@ -163,7 +164,7 @@ function CompendiumLauncherWindow:Constructor()
     checkbox:SetParent( settingControl );
     checkbox:SetMultiline( true );
     checkbox:SetPosition( 20, cbtop );
-    checkbox:SetSize( 250, 20 );
+    checkbox:SetSize( 350, 20 );
     checkbox:SetFont(self.fontFace);
     checkbox:SetForeColor(self.fontColor);    
     checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
@@ -322,7 +323,8 @@ function CompendiumLauncherWindow:Constructor()
 	for i,a in pairs(loaded) do
 		loadedhash[a.Name] = a;
 	end
-	local moormap = false
+	local moormap = false;
+	local waypoint = false;
 	for i,a in pairs(plugs) do
 		if string.find(a.Name, "CompendiumExtension") ~= nil then
 			if loadedhash[a.Name] == nil then
@@ -338,6 +340,7 @@ function CompendiumLauncherWindow:Constructor()
 			tabs:AddTab(ext:GetExtensionName(), ext);
 		end
 		if a.Name == 'MoorMap' then moormap = true end
+		if a.Name == 'Waypoint' then waypoint = true end
 	end
 	
 	if moormap == false and self.Settings.MoorMapNotice ~= true then
@@ -509,6 +512,13 @@ function CompendiumLauncherWindow:Constructor()
     self.KeyDown = function( sender, args )
         if ( args.Action == Turbine.UI.Lotro.Action.Escape ) then
             self:SetVisible( false );
+        elseif ( args.Action == 268435635 ) then
+        	self:SetVisible( false );
+        	if self.shortcut:IsVisible() then
+        		self.shortcut:SetVisible(false);
+        	else
+        		self.shortcut:SetVisible(true);
+        	end
         end
 	end
     	
@@ -672,6 +682,7 @@ function CompendiumLauncherWindow:ProcessCommandArguments(args)
 		self:SetVisible(false);
 	elseif args == 'show' then
 		self:SetVisible(true);
+		self.shortcut:SetVisible(true);
 	else
 		local cmd, loc, target = args:match "^%s*(addcoord)%s*%[([^%|]+)%|([^%]]+)%]"; --%[[^:]+:%\s*([^:]+):\s*([^%|]+)%|([^%]]+)%s*%]$";
 		if cmd == 'addcoord' then
