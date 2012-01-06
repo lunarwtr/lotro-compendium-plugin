@@ -561,6 +561,7 @@ end
 
 function CompendiumCraftControl:FormatItem(record)
 	local item = '';
+	if record['n'] == nil then return item end;
 	if record['id'] ~= nil then
 		local name = record['n'];
 		item = string.format(self.itemExampleTpl,record['id'],name);

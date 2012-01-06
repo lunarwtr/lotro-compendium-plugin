@@ -311,7 +311,7 @@ function CompendiumDeedControl:Constructor()
     	end
     end
     comments.CoordClicked = function( sender, y, ns, x, ew )
-    	if self.currentRecord ~= nil and self.currentRecord['zone'] ~= nil then
+    	if self.currentRecord ~= nil then
     		self:CoordClicked( y, ns, x, ew, self.currentRecord['zone'], rsrc["miscpoi"], self.currentRecord['name']);
     	end		
     end
