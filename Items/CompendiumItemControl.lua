@@ -27,6 +27,15 @@ local rsrc = {};
 
 local rowHeight = 25;
 	
+local qualityMap = {
+	u = "Uncommon",
+	c = "Common",
+	e = "Epic",
+	r = "Rare",
+	i = "Incomparable",
+	un = "Unknown"
+};
+	
 CompendiumItemControl = class( Compendium.Common.UI.CompendiumControl );
 function CompendiumItemControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
@@ -423,15 +432,18 @@ function CompendiumItemControl:LoadItems(records)
         local level = rec["l"];
         local cats = {};
         for i,c in pairs(rec['c']) do
-        	if c == 'Quest Reward' then
+        	if c == categoryids['Quest Reward'] then
         		c = rsrc["questreward"] .. ' (' .. rec['qu'] .. ')';
-        	elseif c == 'Craftable' then
+        	elseif c == categoryids['Craftable'] then
         		c = rsrc["craftable"] .. ' (' .. rec['lb'] .. ')';
+        	else
+        		c = categoryids[c];
         	end
         	table.insert(cats,c);
         end
         local cat = table.concat(cats,', ');
-        local name = self:FormatItem(rec) .. ' '..rsrc['lvl'] .. level .. ' | ' .. rec['q'] .. ' | ' .. cat;
+        
+        local name = self:FormatItem(rec) .. ' '..rsrc['lvl'] .. level .. ' | ' .. qualityMap[rec['q']] .. ' | ' .. cat;
         
         if rec['lg'] ~= nil then name = name .. ' | ' .. rsrc["legendary"] end;
         if rec['ib'] ~= nil then name = name .. ' | ' .. rec['ib'] end;
