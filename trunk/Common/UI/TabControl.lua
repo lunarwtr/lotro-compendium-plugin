@@ -139,6 +139,9 @@ function TabControl:RefreshUI()
 end
 
 function TabControl:SetActiveIndex(index)
+	if (index > #self.tabs) then
+		index = #self.tabs;
+	end
 	local id = self.tabs[index].id;
 	self:SetActiveTabById(id);
 end

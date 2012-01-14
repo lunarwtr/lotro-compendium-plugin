@@ -270,6 +270,19 @@ function CompendiumLauncherWindow:Constructor()
 	end
 	
 	cbtop = cbtop + 20;
+	local reloadButton = Turbine.UI.Lotro.Button();
+	reloadButton:SetParent(settingControl);
+	reloadButton:SetSize(75,20);
+ 	reloadButton:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
+	reloadButton:SetText(rsrc["reload"]);
+	reloadButton:SetPosition(20, cbtop );
+	reloadButton.Click = function(s,a)
+		-- unload reloader if its on
+		Turbine.PluginManager.UnloadScriptState("CompendiumReloader");
+		Turbine.PluginManager.LoadPlugin("CompendiumReloader");
+	end
+	
+	cbtop = cbtop + 40;
 	checkbox = Turbine.UI.Lotro.CheckBox();
     checkbox:SetParent( settingControl );
     checkbox:SetMultiline( true );
@@ -316,6 +329,8 @@ function CompendiumLauncherWindow:Constructor()
 			shortcut:SetMode('large');
 		end;
 	end		
+	
+	
 	
 	local plugs = Turbine.PluginManager.GetAvailablePlugins();
 	local loaded = Turbine.PluginManager.GetLoadedPlugins();
