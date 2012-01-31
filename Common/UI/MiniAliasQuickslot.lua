@@ -33,6 +33,7 @@ function MiniAliasQuickslot:Constructor()
 	quick:SetParent(self);
     quick:SetSize( 10, 10 );
     quick:SetPosition(1,1);
+    quick:SetAllowDrop(false);
   	self.quick = quick;
   	
 	quick.MouseEnter = function(sender, args) 
@@ -52,6 +53,9 @@ end
 
 function MiniAliasQuickslot:SetShortcut( s )
 	self.quick:SetShortcut(s);
+	self.quick.DragDrop=function()
+		self.quick:SetShortcut(s);
+	end    
 	self.quick:SetVisible(true);
 end
 

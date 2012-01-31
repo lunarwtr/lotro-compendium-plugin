@@ -91,15 +91,20 @@ function QuestCommentsControl:Constructor()
     coord:SetParent(self);
     coord:SetSize( 30, 30 );
     coord:SetPosition(centry:GetWidth() + 8, centry:GetTop() + 2);
-	    	
+
+	local shortcut = Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '/comp addcoord ['..rsrc['loc']..'|'..rsrc['target']..']' );	    	
 	local quick = Turbine.UI.Lotro.Quickslot();
 	quick:SetParent(coord);
     quick:SetSize( 30, 30 );
     quick:SetPosition(0,0);
     quick:SetEnabled(true);
-    quick:SetShortcut( Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '/comp addcoord ['..rsrc['loc']..'|'..rsrc['target']..']' ) );
+    quick:SetShortcut( shortcut );
     quick:SetVisible(true);
-
+    quick:SetAllowDrop(false);
+	quick.DragDrop=function()
+		quick:SetShortcut(shortcut);
+	end
+	
 	local coordicon = Turbine.UI.Control();
 	coordicon:SetBackground( "Compendium/Common/Resources/images/add-coords.tga" );
 	coordicon:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);    

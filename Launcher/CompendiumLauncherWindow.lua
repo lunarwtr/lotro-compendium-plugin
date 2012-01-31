@@ -241,6 +241,7 @@ function CompendiumLauncherWindow:Constructor()
     end		
 	cbtop = cbtop + 40;
 	
+	local itemTabId = nil;
 	for i, rec in pairs(compendiumdbs) do
 		local db = rec.key;
 		checkbox = Turbine.UI.Lotro.CheckBox();
@@ -265,7 +266,10 @@ function CompendiumLauncherWindow:Constructor()
 		cbtop = cbtop + 20;
 		
 		if self.Settings.Components[db] == true then
-			tabs:AddTab(rec.title, rec.init());
+			local curId = tabs:AddTab(rec.title, rec.init());
+			if db == 'Items' then
+				itemTabId = curId;
+			end
 		end
 	end
 	
@@ -296,7 +300,6 @@ function CompendiumLauncherWindow:Constructor()
 	checkbox.CheckedChanged = function(s,a)
 		if s:IsChecked() then
 			self.Settings.UseIcon = true;
-			self.allowFade = true;
 		else
 			self.Settings.UseIcon = false;
 		end
@@ -318,7 +321,6 @@ function CompendiumLauncherWindow:Constructor()
 	checkbox.CheckedChanged = function(s,a)
 		if s:IsChecked() then
 			self.Settings.UseMiniIcon = true;
-			self.allowFade = true;
 		else
 			self.Settings.UseMiniIcon = false;
 		end
@@ -330,7 +332,31 @@ function CompendiumLauncherWindow:Constructor()
 		end;
 	end		
 	
-	
+	cbtop = cbtop + 40;
+	checkbox = Turbine.UI.Lotro.CheckBox();
+    checkbox:SetParent( settingControl );
+    checkbox:SetMultiline( true );
+    checkbox:SetPosition( 20, cbtop );
+    checkbox:SetSize( 250, 20 );
+    checkbox:SetFont(self.fontFace);
+    checkbox:SetForeColor(self.fontColor);    
+    checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
+    checkbox:SetText( "  " .. rsrc["showitemquickslots"] );
+    checkbox:SetChecked(self.Settings.ShowItemQuickslots);
+	checkbox.CheckedChanged = function(s,a)
+		if s:IsChecked() then
+			self.Settings.ShowItemQuickslots = true;
+		else
+			self.Settings.ShowItemQuickslots = false;
+		end
+		self:SaveSettings();
+		if itemTabId ~= nil then
+			local it = tabs:GetTabById(itemTabId);
+			if it ~= nil then
+				it.control:Reset();
+			end;
+		end
+	end	
 	
 	local plugs = Turbine.PluginManager.GetAvailablePlugins();
 	local loaded = Turbine.PluginManager.GetLoadedPlugins();
@@ -565,7 +591,8 @@ function CompendiumLauncherWindow:LoadSettings()
 			Language = 'en',
 			FontSize = 'small',
 			UseIcon = true,
-			UseMiniIcon = false
+			UseMiniIcon = false,
+			ShowItemQuickslots = true
 		};
 		for i, rec in pairs(compendiumdbs) do
 			self.Settings.Components[rec.title] = true;
@@ -573,6 +600,9 @@ function CompendiumLauncherWindow:LoadSettings()
 		
 	else
 		-- for backwards compatibility
+		if self.Settings.ShowItemQuickslots == nil then
+			self.Settings.ShowItemQuickslots = true;
+		end
 		if self.Settings.WindowVisible == nil then
 			self.Settings.WindowVisible = true;
 		end

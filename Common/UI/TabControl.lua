@@ -89,6 +89,14 @@ function TabControl:OnActiveTabChange(index)
 	-- for folks to override
 end
 
+function TabControl:GetTabById(id)
+	for index, rec in pairs(self.tabs) do
+		if index == id then 
+			return rec;
+		end;
+	end
+end
+
 function TabControl:AddTab(title, control)
 	-- build label
     local tab = Compendium.Common.UI.Tab(title);
@@ -119,6 +127,8 @@ function TabControl:AddTab(title, control)
 	end	
 	
 	self:RefreshUI();
+	
+	return id;
 end
 
 function TabControl:RefreshUI()

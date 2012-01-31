@@ -3,8 +3,9 @@
 	<Information>
 		<Name>Compendium</Name>
 		<Author>Lunarwater</Author>
-		<Version>1.7.4-beta</Version>
-		<website>http://lotrocompendium.sourceforge.net/</website>
+		<Version>1.7.5-beta</Version>
+		<Description>Compendium is a in-game resource of Questing, Deed, Item, and Crafting Information</Description>
+		<Image>Compendium/Common/Resources/images/logo.jpg</Image>
 	</Information>
 	<Package>Compendium.Launcher.Main</Package>
 	<Configuration Apartment="Compendium" />
