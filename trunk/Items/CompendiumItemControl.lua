@@ -44,7 +44,7 @@ function CompendiumItemControl:Constructor()
     local font = Compendium.Common.Resources.Settings:GetSetting('FontSize');
     --Turbine.Shell.WriteLine('Font: ' .. font);
     if font == 'large' then
-    	rowHeight = 30;
+    	rowHeight = 35;
     else 
     	rowHeight = 25;
     end	
@@ -422,19 +422,34 @@ function CompendiumItemControl:JoinIndex(a, b)
     return data;
 end
 
+local makesc = function(hex, quicks) 
+	local shortcut = Turbine.UI.Lotro.Shortcut(Turbine.UI.Lotro.ShortcutType.Item , string.format('0x0000000000000000,0x%s', hex ))
+	quicks:SetShortcut( shortcut );
+	quicks.DragDrop=function()
+		--quicks:SetShortcut(shortcut);
+	end
+	quicks.MouseDown=function()
+		-- hack to prevent real item from being consumed by a click
+		quicks:SetShortcut(nil);
+		quicks:SetShortcut(shortcut);
+	end	
+	return shortcut, type;
+end
+
 function CompendiumItemControl:LoadItems(records)
 
     local bgColor = self.itemContainer.ItemList:GetBackColor();
     local width = self.itemContainer.ItemList:GetWidth();
     local playerLevel = Turbine.Gameplay.LocalPlayer.GetInstance():GetLevel();
-
+	local useItemQs = true == Compendium.Common.Resources.Settings:GetSetting('ShowItemQuickslots');
+	
     for i,rec in pairs(records) do
         local level = rec["l"];
         local cats = {};
         for i,c in pairs(rec['c']) do
-        	if c == categoryids['Quest Reward'] then
+        	if 'Quest Reward' == categoryids[c] then
         		c = rsrc["questreward"] .. ' (' .. rec['qu'] .. ')';
-        	elseif c == categoryids['Craftable'] then
+        	elseif 'Craftable' == categoryids[c] then
         		c = rsrc["craftable"] .. ' (' .. rec['lb'] .. ')';
         	else
         		c = categoryids[c];
@@ -449,8 +464,32 @@ function CompendiumItemControl:LoadItems(records)
         if rec['ib'] ~= nil then name = name .. ' | ' .. rec['ib'] end;
         if rec['nt'] ~= nil then name = name .. ' | ' .. rec['nt'] end;
         
+        local itemRow = Turbine.UI.Control();
+        itemRow:SetSize(width - 13, rowHeight);
+        itemRow:SetBackColor(bgColor);
+
+        local left = 0;
+        local width = itemRow:GetWidth(); 
+        
+        if useItemQs then
+			local qs = Turbine.UI.Lotro.Quickslot();
+			qs:SetSize(35,35);
+			qs:SetVisible(true);	        
+	        qs:SetAllowDrop(false); 
+	        qs:SetEnabled(false);	
+	        local s = pcall(makesc, rec['id'], qs);
+	        if s then
+				qs:SetParent(itemRow);
+				qs:SetPosition(left, 0);
+				width = width - 35;
+				left = 36;
+			end
+        end
+        
         local label = Turbine.UI.Label();
-        label:SetSize(width - 13, rowHeight);
+        label:SetSize(width, rowHeight);
+        label:SetParent(itemRow);
+        label:SetPosition(left,0);
         label:SetText(name);
         label:SetBackColor(bgColor);
         label:SetFont(self.fontFaceSmall);
@@ -463,7 +502,7 @@ function CompendiumItemControl:LoadItems(records)
             color = self:GetLevelColor(playerLevel, tonumber(level));
         end
         label:SetForeColor(color);
-        self.itemContainer.ItemList:AddItem(label);
+        self.itemContainer.ItemList:AddItem(itemRow);
 
     end
     

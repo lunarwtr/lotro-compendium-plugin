@@ -134,6 +134,7 @@ function CoordinateControl:Constructor()
 	    compassQS:SetPosition(left,1);
 	    compassQS:SetEnabled(true);
 	    compassQS:SetVisible(true);
+	    compassQS:SetAllowDrop(false);
 		compassQS.MouseClick = function() 
 			self:HideMenu();
 		end
@@ -157,6 +158,7 @@ function CoordinateControl:Constructor()
 	    mapQS:SetEnabled(true);
 	    --mapQS:SetShortcut( Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '/comp addcoord [;loc|;target]' ) );
 	    mapQS:SetVisible(true);
+	    mapQS:SetAllowDrop(false);
 		mapQS.MouseClick = function(s,a) 
 			self:HideMenu();
 		end	    
@@ -200,6 +202,9 @@ function CoordinateControl:ShowMenu( y, ns, x, ew, zone, name, quest )
 			local sc = Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '' );
 			sc:SetData(string.format('/Moormap ping %s:%s:%s:%s:%s', id,mmy,mmx,name,quest));
 			self.mapQS:SetShortcut( sc );
+			self.mapQS.DragDrop=function()
+				self.mapQS:SetShortcut(sc);
+			end	  	  			
 			self.map:SetVisible(true);
 			self.mapQS:SetVisible(true);			
 		else
@@ -214,6 +219,9 @@ function CoordinateControl:ShowMenu( y, ns, x, ew, zone, name, quest )
 		local sc = Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '' );
 		sc:SetData(string.format('/way target %s%s, %s%s', y, ns, x, ew));
 		self.compassQS:SetShortcut( sc );
+		self.compassQS.DragDrop=function()
+			self.compassQS:SetShortcut(sc);
+		end	  		
 	end
 	
 	Compendium.Common.UI.LabelMenu.ShowMenu(self);
