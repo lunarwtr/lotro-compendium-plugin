@@ -171,6 +171,8 @@ function CompendiumDeedControl:Constructor()
 		self:Reset();
     end
 
+
+
     self.qlContainer=Turbine.UI.Control();
     self.qlContainer:SetParent(self);
     self.qlContainer:SetPosition(5,filtersLabel:GetTop() + filtersLabel:GetHeight() + 1);
@@ -178,8 +180,8 @@ function CompendiumDeedControl:Constructor()
     self.qlContainer:SetBackColor(Turbine.UI.Color(0,0,0)); -- this one has to stay fixed for grid to show
     self.qlContainer.DeedList=Turbine.UI.ListBox();
     self.qlContainer.DeedList:SetParent(self.qlContainer);
-    self.qlContainer.DeedList:SetPosition(2,1);
-    self.qlContainer.DeedList:SetSize(self.qlContainer:GetWidth()-4,self.qlContainer:GetHeight()-3);
+    self.qlContainer.DeedList:SetPosition(2,19);
+    self.qlContainer.DeedList:SetSize(self.qlContainer:GetWidth()-4,self.qlContainer:GetHeight()-21);
     self.qlContainer.DeedList:SetBackColor(self.backColor);
     self.qlContainer.DeedList.VScrollBar=Turbine.UI.Lotro.ScrollBar();
     self.qlContainer.DeedList.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
@@ -187,7 +189,7 @@ function CompendiumDeedControl:Constructor()
     self.qlContainer.DeedList.VScrollBar:SetBackColor(self.backColor);
     self.qlContainer.DeedList.VScrollBar:SetPosition(self.qlContainer:GetWidth()-16,0)
     self.qlContainer.DeedList.VScrollBar:SetWidth(12);
-    self.qlContainer.DeedList.VScrollBar:SetHeight(self.qlContainer:GetHeight()-2);
+    self.qlContainer.DeedList.VScrollBar:SetHeight(self.qlContainer.DeedList:GetHeight()-2);
     self.qlContainer.DeedList:SetVerticalScrollBar(self.qlContainer.DeedList.VScrollBar);
     self.qlContainer.DeedList.SelectedIndexChanged=function(sender, args)
         local idx = self.qlContainer.DeedList:GetSelectedIndex();
@@ -207,6 +209,55 @@ function CompendiumDeedControl:Constructor()
 
     end
 
+    local qlHeader = Turbine.UI.Control();
+    qlHeader:SetSize(self.qlContainer:GetWidth()-16, 19);
+    qlHeader:SetParent(self.qlContainer);
+    qlHeader:SetPosition(2, 1);
+    qlHeader:SetBackColor( self.colorDarkGrey);
+    local nameCol = Turbine.UI.Label();
+    nameCol:SetMultiline(false);
+    nameCol:SetParent(qlHeader);
+    nameCol:SetPosition( 2, 1 );
+    nameCol:SetSize(qlHeader:GetWidth() - 30, 17);
+    nameCol:SetSelectable(true);
+    nameCol:SetText('Deed Name / Level');
+    nameCol:SetBackColor( self.colorDarkGrey);
+    nameCol:SetFont(self.fontFace);
+    nameCol:SetForeColor(self.fontColor);
+    nameCol:SetOutlineColor(Turbine.UI.Color(0,0,0));
+    nameCol:SetFontStyle(Turbine.UI.FontStyle.Outline);    
+    nameCol:SetTextAlignment( Turbine.UI.CheckBox.MiddleCenter );
+
+	local selectAllCB = Turbine.UI.Lotro.CheckBox();
+    selectAllCB:SetParent( qlHeader );
+    selectAllCB:SetPosition(nameCol:GetWidth(), 1);
+    selectAllCB:SetSize( 25, 18 );
+    selectAllCB:SetChecked(complete);
+    selectAllCB:SetText('');
+    selectAllCB.undo = false;
+	selectAllCB.CheckedChanged = function(s,a)
+		if s.undo then return end;
+		local val = s:IsChecked();
+		local type = rsrc['complete'];
+		if not val then type = rsrc['incomplete'] end;
+		Compendium.Common.UI.Dialog.Confirm:Show(rsrc['confirm'], string.format(rsrc['selectdeedmsg'],type),
+							function()
+								self:UpdateAllFilteredRecord('modifyprog',s:IsChecked()); 
+							end,
+							function()
+								s.undo = true;
+								s:SetChecked(not val);
+								s.undo = false;
+							end);	
+	end 
+	qlHeader.SetWidth = function(s, w) 
+		Turbine.UI.Control.SetWidth(s, w);
+		local ncw = w - 16;
+		nameCol:SetWidth(ncw);
+		selectAllCB:SetLeft(ncw);
+	end
+	
+
     local pagination = Compendium.Common.UI.PaginationControl();
     pagination:SetParent(self.qlContainer);
     pagination:SetVisible(false);
@@ -221,11 +272,11 @@ function CompendiumDeedControl:Constructor()
    		local sb = ql.VScrollBar;
    		local ch = self.qlContainer:GetHeight();
    		if pagination:IsVisible() then
-   			ql:SetHeight(ch - 23);
-   			sb:SetHeight(ch - 22);
+   			ql:SetHeight(ch - 41);
+   			sb:SetHeight(ch - 40);
    		else
-   			ql:SetHeight(ch - 3);
-   			sb:SetHeight(ch - 2);
+   			ql:SetHeight(ch - 21);
+   			sb:SetHeight(ch - 20);
    		end
    	end
    	
@@ -334,6 +385,7 @@ function CompendiumDeedControl:Constructor()
         self.qlContainer:SetWidth(qlwidth);
         self.qdContainer:SetLeft(self.qlContainer:GetLeft() + qlwidth + 5);
         self.qdContainer:SetWidth(qlwidth);
+        qlHeader:SetWidth(qlwidth - 16);
         self.qlContainer.DeedList:SetWidth(qlwidth - 4);
         self.qdContainer.DeedDetails:SetWidth(qlwidth - 4);
         self.qlContainer.DeedList.VScrollBar:SetLeft(qlwidth-16);
@@ -368,11 +420,11 @@ function CompendiumDeedControl:Constructor()
 		local ql = self.qlContainer.DeedList;
    		local sb = ql.VScrollBar;
    		if pagination:IsVisible() then
-   			ql:SetHeight(lheight - 23);
-   			sb:SetHeight(lheight - 22);
+   			ql:SetHeight(lheight - 41);
+   			sb:SetHeight(lheight - 40);
    		else
-   			ql:SetHeight(lheight - 3);
-   			sb:SetHeight(lheight - 2);
+   			ql:SetHeight(lheight - 21);
+   			sb:SetHeight(lheight - 20);
    		end
 		pagination:SetTop(lheight - 22);
 		
@@ -838,7 +890,17 @@ function CompendiumDeedControl:AddFilters(filters)
 	self:BuildCursor();
 end
 
-
+function CompendiumDeedControl:UpdateAllFilteredRecord(type, data)
+	if self.cursor ~= nil then
+		local records = self.cursor.data;
+		for i, rec in pairs(records) do
+			self:UpdateLocalRecord(rec, type, data);
+		end
+		self:ClearDeeds();
+		self:LoadDeeds(records);		
+	end
+end
+	
 function CompendiumDeedControl:UpdateLocalRecord(deedrecord, type, data)
 
 	local deed = deedrecord['name'];
