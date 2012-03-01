@@ -180,8 +180,8 @@ function CompendiumQuestControl:Constructor(language)
     self.qlContainer:SetBackColor(Turbine.UI.Color(0,0,0)); -- this one has to stay fixed for grid to show
     self.qlContainer.QuestList=Turbine.UI.ListBox();
     self.qlContainer.QuestList:SetParent(self.qlContainer);
-    self.qlContainer.QuestList:SetPosition(2,1);
-    self.qlContainer.QuestList:SetSize(self.qlContainer:GetWidth()-4,self.qlContainer:GetHeight()-3);
+    self.qlContainer.QuestList:SetPosition(2,19);
+    self.qlContainer.QuestList:SetSize(self.qlContainer:GetWidth()-4,self.qlContainer:GetHeight()-21);
     self.qlContainer.QuestList:SetBackColor(self.backColor);
     self.qlContainer.QuestList.VScrollBar=Turbine.UI.Lotro.ScrollBar();
     self.qlContainer.QuestList.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
@@ -189,7 +189,7 @@ function CompendiumQuestControl:Constructor(language)
     self.qlContainer.QuestList.VScrollBar:SetBackColor(self.backColor);
     self.qlContainer.QuestList.VScrollBar:SetPosition(self.qlContainer:GetWidth()-16,0)
     self.qlContainer.QuestList.VScrollBar:SetWidth(12);
-    self.qlContainer.QuestList.VScrollBar:SetHeight(self.qlContainer:GetHeight()-2);
+    self.qlContainer.QuestList.VScrollBar:SetHeight(self.qlContainer.QuestList:GetHeight()-2);
     self.qlContainer.QuestList:SetVerticalScrollBar(self.qlContainer.QuestList.VScrollBar);
     self.qlContainer.QuestList.SelectedIndexChanged=function(sender, args)
         local idx = self.qlContainer.QuestList:GetSelectedIndex();
@@ -209,6 +209,54 @@ function CompendiumQuestControl:Constructor(language)
 
     end
 
+    local qlHeader = Turbine.UI.Control();
+    qlHeader:SetSize(self.qlContainer:GetWidth()-16, 19);
+    qlHeader:SetParent(self.qlContainer);
+    qlHeader:SetPosition(2, 1);
+    qlHeader:SetBackColor( self.colorDarkGrey);
+    local nameCol = Turbine.UI.Label();
+    nameCol:SetMultiline(false);
+    nameCol:SetParent(qlHeader);
+    nameCol:SetPosition( 2, 1 );
+    nameCol:SetSize(qlHeader:GetWidth() - 30, 17);
+    nameCol:SetSelectable(true);
+    nameCol:SetText(rsrc['questheader']);
+    nameCol:SetBackColor( self.colorDarkGrey);
+    nameCol:SetFont(self.fontFace);
+    nameCol:SetForeColor(self.fontColor);
+    nameCol:SetOutlineColor(Turbine.UI.Color(0,0,0));
+    nameCol:SetFontStyle(Turbine.UI.FontStyle.Outline);    
+    nameCol:SetTextAlignment( Turbine.UI.CheckBox.MiddleCenter );
+
+	local selectAllCB = Turbine.UI.Lotro.CheckBox();
+    selectAllCB:SetParent( qlHeader );
+    selectAllCB:SetPosition(nameCol:GetWidth(), 1);
+    selectAllCB:SetSize( 25, 18 );
+    selectAllCB:SetChecked(complete);
+    selectAllCB:SetText('');
+    selectAllCB.undo = false;
+	selectAllCB.CheckedChanged = function(s,a)
+		if s.undo then return end;
+		local val = s:IsChecked();
+		local type = rsrc['complete'];
+		if not val then type = rsrc['incomplete'] end;
+		Compendium.Common.UI.Dialog.Confirm:Show(rsrc['confirm'], string.format(rsrc['selectquestmsg'],type),
+							function()
+								self:UpdateAllFilteredRecord('modifyprog',s:IsChecked()); 
+							end,
+							function()
+								s.undo = true;
+								s:SetChecked(not val);
+								s.undo = false;
+							end);	
+	end 
+	qlHeader.SetWidth = function(s, w) 
+		Turbine.UI.Control.SetWidth(s, w);
+		local ncw = w - 16;
+		nameCol:SetWidth(ncw);
+		selectAllCB:SetLeft(ncw);
+	end
+
     local pagination = Compendium.Common.UI.PaginationControl();
     pagination:SetParent(self.qlContainer);
     pagination:SetVisible(false);
@@ -223,11 +271,11 @@ function CompendiumQuestControl:Constructor(language)
    		local sb = ql.VScrollBar;
    		local ch = self.qlContainer:GetHeight();
    		if pagination:IsVisible() then
-   			ql:SetHeight(ch - 23);
-   			sb:SetHeight(ch - 22);
+   			ql:SetHeight(ch - 41);
+   			sb:SetHeight(ch - 40);
    		else
-   			ql:SetHeight(ch - 3);
-   			sb:SetHeight(ch - 2);
+   			ql:SetHeight(ch - 21);
+   			sb:SetHeight(ch - 20);
    		end
    	end
    	
@@ -335,6 +383,7 @@ function CompendiumQuestControl:Constructor(language)
         self.qlContainer:SetWidth(qlwidth);
         self.qdContainer:SetLeft(self.qlContainer:GetLeft() + qlwidth + 5);
         self.qdContainer:SetWidth(qlwidth);
+        qlHeader:SetWidth(qlwidth - 16);
         self.qlContainer.QuestList:SetWidth(qlwidth - 4);
         self.qdContainer.QuestDetails:SetWidth(qlwidth - 4);
         self.qlContainer.QuestList.VScrollBar:SetLeft(qlwidth-16);
@@ -369,11 +418,11 @@ function CompendiumQuestControl:Constructor(language)
 		local ql = self.qlContainer.QuestList;
    		local sb = ql.VScrollBar;
    		if pagination:IsVisible() then
-   			ql:SetHeight(lheight - 23);
-   			sb:SetHeight(lheight - 22);
+   			ql:SetHeight(lheight - 41);
+   			sb:SetHeight(lheight - 40);
    		else
-   			ql:SetHeight(lheight - 3);
-   			sb:SetHeight(lheight - 2);
+   			ql:SetHeight(lheight - 21);
+   			sb:SetHeight(lheight - 20);
    		end
 		pagination:SetTop(lheight - 22);
 		
@@ -872,6 +921,18 @@ function CompendiumQuestControl:AddFilters(filters)
 	
 	self.filtersLabel:SetText(filterText);
 	self:BuildCursor();
+end
+
+
+function CompendiumQuestControl:UpdateAllFilteredRecord(type, data)
+	if self.cursor ~= nil then
+		local records = self.cursor.data;
+		for i, rec in pairs(records) do
+			self:UpdateLocalRecord(rec, type, data);
+		end
+		self:ClearQuests();
+		self:LoadQuests(records);		
+	end
 end
 
 function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
