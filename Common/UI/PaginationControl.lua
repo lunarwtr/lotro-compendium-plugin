@@ -87,6 +87,11 @@ function PaginationControl:Constructor( cursor )
    	
 end
 
+function PaginationControl:SetWidth(w)
+	Turbine.UI.Label.SetWidth(self, w);
+	if self.SizeChanged ~= nil then self:SizeChanged() end;
+end
+
 function PaginationControl:NextPage()
 	if self.cursor ~= nil then
 		local records = self.cursor:NextPage();

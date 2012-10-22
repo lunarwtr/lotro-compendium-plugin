@@ -94,7 +94,7 @@ function CompendiumLauncherWindow:Constructor()
 		self:SaveSettings();
 	end
 
-    self:SetText( "Compendium " );
+    self:SetText( "Compendium        " );
  
  	self.allowFade = false;
 	self:SetOpacity( 1 );
@@ -442,7 +442,7 @@ function CompendiumLauncherWindow:Constructor()
         Turbine.UI.Lotro.Window.SetWidth(self,width);
         tabs:SetWidth(width - 18);
 		self.footer:SetWidth(self:GetWidth() - 50);
-		version:SetLeft((width / 2) + 35);		
+		version:SetLeft((width / 2)+ 10);		
     end
 	self.SetSize = function(sender,width, height) 
 		self:SetWidth(width);

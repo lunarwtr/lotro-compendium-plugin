@@ -74,7 +74,6 @@ function AutoSizingLabel:SetWidth(w)
 	self:SetHorizontalScrollBar(nil);
 	self.width = w;
 	if w == 'auto' then
-
 		self:SetHorizontalScrollBar(self.bars.hor);
 		if  self.bars.hor:IsVisible() then
 			local count = 1; 
@@ -88,6 +87,7 @@ function AutoSizingLabel:SetWidth(w)
 	else
 	 	Turbine.UI.Label.SetWidth(self,w);
 	end
+	if self.SizeChanged ~= nil then self:SizeChanged(); end
 end
 
 function AutoSizingLabel:SetHeight(h)
@@ -110,6 +110,7 @@ function AutoSizingLabel:SetHeight(h)
 	else
 	 	Turbine.UI.Label.SetHeight(self,h);
 	end
+	if self.SizeChanged ~= nil then self:SizeChanged(); end
 end
 
 function AutoSizingLabel:destroy()
