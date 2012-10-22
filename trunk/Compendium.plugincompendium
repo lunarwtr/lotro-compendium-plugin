@@ -2,7 +2,7 @@
 <PluginConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Id>526</Id>
   <Name>LOTRO Compendium</Name>
-  <Version>1.7.7-beta</Version>
+  <Version>1.7.8-beta</Version>
   <Author>Lunarwater</Author>
   <InfoUrl>http://www.lotrointerface.com/downloads/info526</InfoUrl>
   <DownloadUrl>http://www.lotrointerface.com/downloads/download526</DownloadUrl>

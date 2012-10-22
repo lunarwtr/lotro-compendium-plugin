@@ -650,7 +650,7 @@ function CompendiumQuestControl:LoadQuestDetails(record)
         if questindexes[record['arcs']] ~= nil then
 	        arclabel.MouseClick = function(sender, args)
 	        	self:Reset();
-	        	self:AddFilters({ record['arcs'] });
+	        	self:AddFilters({ indexes = { record['arcs'] }});
 	        end;
 	    end
     end

@@ -67,6 +67,7 @@ function TabControl:Constructor()
         tabContainer:SetHeight(contHeight);
        	for index, rec in pairs(self.tabs) do
 			rec.control:SetHeight(contHeight-3);
+			if rec.control.SizeChanged ~= nil then rec.control:SizeChanged(); end
 		end
     end
  	self.SetWidth = function(sender,width)
@@ -77,6 +78,7 @@ function TabControl:Constructor()
         tabContainer:SetWidth(contWidth);
        	for index, rec in pairs(self.tabs) do
 			rec.control:SetWidth(contWidth-4);
+			if rec.control.SizeChanged ~= nil then rec.control:SizeChanged(); end
 		end
     end
     self.SetSize = function(s,w,h)
