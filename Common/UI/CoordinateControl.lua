@@ -1,19 +1,4 @@
---[[
-   Copyright 2011 Kelly Riley (lunarwater)
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-]]
 
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
@@ -22,59 +7,17 @@ import "Compendium.Common.UI";
 import "Compendium.Common.Resources";
 
 local moormapZones = {
-	["angmar"] = 4,
-	["annuminas"] = 20,
-	["archet"] = 6,
-	["bree"] = 9,
-	["breeland"] = 5,
-	["breelandhomesteads"] = 10,
-	["carasgaladhon"] = 32,
-	["durinsway"] = 35,
-	["enedwaith"] = 12,
-	["eredluin"] = 13,
-	["eregion"] = 17,
-	["eriador"] = 3,
-	["ettenmoors"] = 1,
-	["evendim"] = 19,
-	["falathlornhomesteads"] = 14,
-	["flamingdeeps"] = 36,
-	["forochel"] = 21,
-	["foundationsofstone"] = 37,
-	["frostbluff"] = 22,
-	["grandstair"] = 40,
-	["greatdelving"] = 41,
-	["lonelands"] = 23,
-	["lothlrien"] = 31,
-	["middleearth"] = 2,
-	["mirkwood"] = 33,
-	["mistymountatins"] = 24,
-	["mistymountains"] = 24,
-	["moria"] = 34,
-	["northdowns"] = 25,
-	["northernbarrowdowns"] = 7,
-	["nudmelek"] = 38,
-	["oldforest"] = 11,
-	["redhornlodes"] = 39,
-	["rhovanion"] = 30,
-	["rivendell"] = 29,
-	["shire"] = 26,
-	["shirehomesteads"] = 27,
-	["silvertinelodes"] = 42,
-	["southernbarrowdowns"] = 8,
-	["thorinsgate"] = 15,
-	["thorinshallhomesteads"] = 16,
-	["trollshaws"] = 28,
-	["wallsofmoria"] = 18,
-	["waterworks"] = 43,
-	["zelemmelek"] = 44,
-	["zirakzigil"] = 45
+	["gundabad"] = 515,
+	["rohaneastemnet"] = 228,
+	["rohanwestemnet"] = 287,
+	["rohanwildermore"] = 277
 }
 
 
 CoordinateControl = class( Compendium.Common.UI.LabelMenu );
 function CoordinateControl:Constructor()
     Compendium.Common.UI.LabelMenu.Constructor( self );
-	
+
 	self:SetRowHighlight(false);
 
 	local foundMoor=false;
@@ -87,7 +30,7 @@ function CoordinateControl:Constructor()
 			foundWay=true;
 		end
 	end
-	
+
 	self.showCompass = false;
 	self.moormap = false;
 	if not foundMoor or not foundWay then
@@ -105,16 +48,30 @@ function CoordinateControl:Constructor()
 			Turbine.PluginManager.LoadPlugin("MoorMap");
 			foundMoor = true;
 			self.moormap = true;
+
+			-- Loading MoorMap IDS
+			assert(pcall(function()
+				import 'GaranStuff.MoorMap.Defaults';
+				import 'GaranStuff.MoorMap.Strings';
+				import 'GaranStuff.MoorMap.Table';
+				local MM = GaranStuff.MoorMap;
+				MM.PatchDataSave = function() end
+				local mapData = {}
+				MM.LoadDefaults({}, mapData);
+				for i, rec in pairs(mapData) do
+					moormapZones[self:CleanZone(MM.Resource[1][rec[2]])] = rec[1];
+				end
+			end))
 		end
 		if wayCfg ~= nil then
 			Turbine.PluginManager.LoadPlugin("Waypoint");
 			foundWay = true;
 			self.showCompass = true;
-		end		
+		end
 	end
-	if foundMoor then self.moormap = true end;	
-	if foundWay then self.showCompass = true end;	
-	
+	if foundMoor then self.moormap = true end;
+	if foundWay then self.showCompass = true end;
+
 	local left, width = 1, 40;
 	if not self.showCompass then
 		width = width - 16;
@@ -122,11 +79,11 @@ function CoordinateControl:Constructor()
 	if not self.moormap then
 		width = width - 16
 	end
-	
+
 	local coord = Turbine.UI.Label();
     coord:SetVisible(true);
     coord:SetSize( width, 18 );
-	
+
 	if self.showCompass then
 		local compassQS = Turbine.UI.Lotro.Quickslot();
 		compassQS:SetParent(coord);
@@ -135,21 +92,21 @@ function CoordinateControl:Constructor()
 	    compassQS:SetEnabled(true);
 	    compassQS:SetVisible(true);
 	    compassQS:SetAllowDrop(false);
-		compassQS.MouseClick = function() 
+		compassQS.MouseClick = function()
 			self:HideMenu();
 		end
 		local compass = Turbine.UI.Control();
 		compass:SetBackground( "Compendium/Common/Resources/images/compass.tga" );
-		compass:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);    
-		compass:SetParent(coord);    
+		compass:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);
+		compass:SetParent(coord);
 	    compass:SetSize( 16, 16 );
-	    compass:SetPosition(left,1);	
+	    compass:SetPosition(left,1);
 	    compass:SetZOrder(compassQS:GetZOrder() + 1);
 	    compass:SetMouseVisible(false);
 	    self.compassQS = compassQS;
 	    left = left + 16;
 	end
-    
+
     if self.moormap then
 		local mapQS = Turbine.UI.Lotro.Quickslot();
 		mapQS:SetParent(coord);
@@ -159,60 +116,60 @@ function CoordinateControl:Constructor()
 	    --mapQS:SetShortcut( Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '/comp addcoord [;loc|;target]' ) );
 	    mapQS:SetVisible(true);
 	    mapQS:SetAllowDrop(false);
-		mapQS.MouseClick = function(s,a) 
+		mapQS.MouseClick = function(s,a)
 			self:HideMenu();
-		end	    
+		end
 		local map = Turbine.UI.Control();
 		map:SetBackground( "Compendium/Common/Resources/images/map.tga" );
-		map:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);    
-		map:SetParent(coord);    
+		map:SetBlendMode(Turbine.UI.BlendMode.AlphaBlend);
+		map:SetParent(coord);
 	    map:SetSize( 16, 16 );
-	    map:SetPosition(left,1);	
+	    map:SetPosition(left,1);
 	    map:SetZOrder(mapQS:GetZOrder() + 1);
 	    map:SetMouseVisible(false);
 	    self.map = map;
 	    self.mapQS = mapQS;
-	end    
+	end
 
 	self:AddItem(coord);
-	self.coord = coord;  
-   	
+	self.coord = coord;
+
 end
 
-function CoordinateControl:ShowMenu( y, ns, x, ew, zone, name, quest )
+function CoordinateControl:ShowMenu( y, ns, x, ew, zone, isdungeon, name, quest )
 	--Turbine.Shell.WriteLine( y .. ', ' .. ns .. ', ' .. x .. ', ' .. ew .. ', ' .. zone);
 	-- no support
 	if not self.moormap and not self.showCompass then return end;
-	
+
 	local lang = Compendium.Common.Resources.Settings:GetSetting('Language');
-	
+
 	if zone == nil then zone = 'Unknown' end;
 	if self.moormap then
 		local id = moormapZones[self:CleanZone(zone)];
-		if id ~= nil then
+		if not isdungeon and id ~= nil then
 			local mmy, mmx = y, x;
-			if string.lower(ns) == 's' then 
-				mmy = '-' .. mmy 
+			if string.lower(ns) == 's' then
+				mmy = '-' .. mmy
 			end;
 			local lew = string.lower(ew);
-			if ( lew == 'w' or ( lang == 'fr' and lew == 'o' ) ) then 
-				mmx = '-' ..mmx 
+			if ( lew == 'w' or ( lang == 'fr' and lew == 'o' ) ) then
+				mmx = '-' ..mmx
 			end;
-			
+
 			local sc = Turbine.UI.Lotro.Shortcut( Turbine.UI.Lotro.ShortcutType.Alias, '' );
 			sc:SetData(string.format('/Moormap ping %s:%s:%s:%s:%s', id,mmy,mmx,name,quest));
 			self.mapQS:SetShortcut( sc );
 			self.mapQS.DragDrop=function()
 				self.mapQS:SetShortcut(sc);
-			end	  	  			
+			end
 			self.map:SetVisible(true);
-			self.mapQS:SetVisible(true);			
+			self.mapQS:SetVisible(true);
 		else
 			self.map:SetVisible(false);
 			self.mapQS:SetVisible(false);
-			if not self.showCompass then 	
+			if not self.showCompass then
 				return
-			end	
+			end
 		end
 	end
 	if self.showCompass then
@@ -221,9 +178,9 @@ function CoordinateControl:ShowMenu( y, ns, x, ew, zone, name, quest )
 		self.compassQS:SetShortcut( sc );
 		self.compassQS.DragDrop=function()
 			self.compassQS:SetShortcut(sc);
-		end	  		
+		end
 	end
-	
+
 	Compendium.Common.UI.LabelMenu.ShowMenu(self);
 end
 
@@ -232,6 +189,7 @@ function CoordinateControl:CleanZone( zone )
 	zone = string.gsub(zone, "^the%s+", "");
 	zone = string.gsub(zone, "^die%s+", "");
 	zone = string.gsub(zone, "^das%s+", "");
+	--zone = string.gsub(zone, "^rohan%s+-%s+", "");
 	zone = string.gsub(zone, "[^a-z0-9]", "");
 	return zone;
 end

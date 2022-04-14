@@ -1,18 +1,4 @@
---[[
-   Copyright 2011 Kelly Riley (lunarwater)
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-]]
 import "Turbine";
 import "Turbine.Gameplay";
 import "Turbine.UI";
@@ -46,7 +32,7 @@ local pat,n,count,L = "(.-)"..p, 1,0,#t
 end
 
 local rsrc = {};
-local compendiumdbs = { 
+local compendiumdbs = {
 		{ key = 'Quest', title = 'Quest', init = function() return Compendium.Quests.CompendiumQuestControl() end },
 		{ key = 'Deeds', title = 'Deeds', init = function() return Compendium.Deeds.CompendiumDeedControl() end },
 		{ key = 'Items', title = 'Items', init = function() return Compendium.Items.CompendiumItemControl() end },
@@ -66,36 +52,38 @@ function CompendiumLauncherWindow:Constructor()
 	compendiumdbs[2]["title"] = rsrc['deeds'];
 	compendiumdbs[3]["title"] = rsrc['items'];
 	compendiumdbs[4]["title"] = rsrc['crafting'];
-	
+
+
+
 	self:SetPosition(self.Settings.WindowPos.left,self.Settings.WindowPos.top);
 	self:SetVisible(self.Settings.WindowVisible);
-	
+
 	local shortcut = CompendiumShortcut();
 	shortcut:SetPosition(self.Settings.IconPos.left,self.Settings.IconPos.top);
-	shortcut.ShortcutClick = function() 
+	shortcut.ShortcutClick = function()
 		self:SetVisible( not self:IsVisible() );
 	end
 	if self.Settings.UseMiniIcon then shortcut:SetMode('mini') end;
-	shortcut:SetVisible(self.Settings.UseIcon);		
+	shortcut:SetVisible(self.Settings.UseIcon);
 	self.shortcut = shortcut;
-	
+
 	shortcut.ShortcutMoved = function(left, top)
 		self.Settings.IconPos.left = left;
 		self.Settings.IconPos.top = top;
 		self:SaveSettings();
 	end
-	self.PositionChanged = function(sender,args) 
+	self.PositionChanged = function(sender,args)
 		self.Settings.WindowPos.left = self:GetLeft();
 		self.Settings.WindowPos.top = self:GetTop();
-		self:SaveSettings();		
+		self:SaveSettings();
 	end
-	self.VisibleChanged = function() 
+	self.VisibleChanged = function()
 		self.Settings.WindowVisible = self:IsVisible();
 		self:SaveSettings();
 	end
 
-    self:SetText( "Compendium        " );
- 
+    self:SetText( "Compendium     " );
+
  	self.allowFade = false;
 	self:SetOpacity( 1 );
 	self:SetFadeSpeed( 5 );
@@ -114,29 +102,29 @@ function CompendiumLauncherWindow:Constructor()
 
  	local version = Turbine.UI.Label();
  	version:SetParent(self);
- 	version:SetSize(100,15);
+ 	version:SetSize(80,15);
  	version:SetText('(' .. Plugins.Compendium:GetVersion() .. ')');
  	version:SetPosition((self:GetWidth() / 2) + 65,10);
  	version:SetFont(Turbine.UI.Lotro.Font.TrajanPro13);
     version:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleCenter );
  	version:SetForeColor(self.fontColor);
- 
+
     self.footer=Turbine.UI.Control();
     self.footer:SetSize(self:GetWidth() - 50, 20);
     self.footer:SetPosition(30, self:GetHeight() - 25);
     self.footer:SetParent(self);
-    
+
     local footerText = Turbine.UI.Label();
-    footerText:SetSize(300,18);
+    footerText:SetSize(400,18);
     footerText:SetPosition(18, 1);
     footerText:SetParent(self.footer);
-    footerText:SetFont(self.fontFace);
+    footerText:SetFont(Turbine.UI.Lotro.Font.Verdana12);
     footerText:SetForeColor(self.fontColor);
     footerText:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    footerText:SetFontStyle(Turbine.UI.FontStyle.Outline);   
+    footerText:SetFontStyle(Turbine.UI.FontStyle.Outline);
     footerText:SetSelectable(true);
-    footerText:SetText('http://lotrocompendium.sourceforge.net/');
-       
+    footerText:SetText('https://www.lotrointerface.com/downloads/info526-LOTROCompendium.html');
+
     -- add help/about button
     self.about = Compendium.Common.UI.CompendiumAboutWindow();
     local help = Turbine.UI.Label();
@@ -145,11 +133,11 @@ function CompendiumLauncherWindow:Constructor()
     help:SetPosition( 0, 1 );
     help:SetSize( 13, 18 );
     help:SetFont(Turbine.UI.Lotro.Font.Verdana12);
-    help:SetForeColor(self.white); 
+    help:SetForeColor(self.white);
     help.MouseClick = function( sender, args )
 		self.about:SetVisible( true );
 		self.about:Activate();
-    end  
+    end
 
 	local tabs = Compendium.Common.UI.TabControl();
 	tabs:SetParent(self);
@@ -158,7 +146,7 @@ function CompendiumLauncherWindow:Constructor()
 
 	local settingControl = Turbine.UI.Control();
 	settingControl:SetSize(200,200);
-	
+
 	local cbtop = 20;
 	local checkbox = Turbine.UI.Lotro.CheckBox();
     checkbox:SetParent( settingControl );
@@ -166,7 +154,7 @@ function CompendiumLauncherWindow:Constructor()
     checkbox:SetPosition( 20, cbtop );
     checkbox:SetSize( 350, 20 );
     checkbox:SetFont(self.fontFace);
-    checkbox:SetForeColor(self.fontColor);    
+    checkbox:SetForeColor(self.fontColor);
     checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
     checkbox:SetText( "  " .. rsrc["fadewindow"] );
     checkbox:SetChecked(self.Settings.FadeWindow);
@@ -177,20 +165,20 @@ function CompendiumLauncherWindow:Constructor()
 		else
 			self.Settings.FadeWindow = false;
 		end
-		self:SaveSettings();			
+		self:SaveSettings();
 	end
-    
+
 	cbtop = cbtop + 40;
-	
+
 	local langlbl = Turbine.UI.Label();
 	langlbl:SetParent( settingControl );
 	langlbl:SetText(rsrc["language"]);
 	langlbl:SetPosition(20, cbtop);
     langlbl:SetSize( 195, 40 );
     langlbl:SetFont(self.fontFace);
-    langlbl:SetForeColor(self.fontColor);    
+    langlbl:SetForeColor(self.fontColor);
     langlbl:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
-    
+
     local langlist=Compendium.Common.UI.DropDownList();
     langlist:SetParent(settingControl);
     langlist:SetPosition(langlbl:GetLeft()+langlbl:GetWidth()+3,langlbl:GetTop()-3);
@@ -209,18 +197,18 @@ function CompendiumLauncherWindow:Constructor()
 		self.Settings.Language = langlist:GetValue();
 		--Turbine.Shell.WriteLine(self.Settings.Language);
     	self:SaveSettings();
-    end	
+    end
 	cbtop = cbtop + 40;
-	
+
 	local fontlbl = Turbine.UI.Label();
 	fontlbl:SetParent( settingControl );
 	fontlbl:SetText(rsrc["fontsize"]);
 	fontlbl:SetPosition(20, cbtop);
     fontlbl:SetSize( 195, 40 );
     fontlbl:SetFont(self.fontFace);
-    fontlbl:SetForeColor(self.fontColor);    
+    fontlbl:SetForeColor(self.fontColor);
     fontlbl:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
-    
+
     local fontlist=Compendium.Common.UI.DropDownList();
     fontlist:SetParent(settingControl);
     fontlist:SetPosition(fontlbl:GetLeft()+fontlbl:GetWidth()+3,fontlbl:GetTop()-3);
@@ -238,9 +226,9 @@ function CompendiumLauncherWindow:Constructor()
 		self.Settings.FontSize = fontlist:GetValue();
 		--Turbine.Shell.WriteLine(self.Settings.Language);
     	self:SaveSettings();
-    end		
+    end
 	cbtop = cbtop + 40;
-	
+
 	local itemTabId = nil;
 	for i, rec in pairs(compendiumdbs) do
 		local db = rec.key;
@@ -250,7 +238,7 @@ function CompendiumLauncherWindow:Constructor()
 	    checkbox:SetPosition( 20, cbtop );
 	    checkbox:SetSize( 400, 20 );
 	    checkbox:SetFont(self.fontFace);
-	    checkbox:SetForeColor(self.fontColor);    
+	    checkbox:SetForeColor(self.fontColor);
 	    checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
 	    checkbox:SetText( "  "..string.format(rsrc["loadscompendium"], rec.title) );
 	    checkbox:SetChecked(self.Settings.Components[db]);
@@ -262,9 +250,9 @@ function CompendiumLauncherWindow:Constructor()
 			end
 			self.Settings.ActiveTabIndex = 1;
 			self:SaveSettings();
-		end	
+		end
 		cbtop = cbtop + 20;
-		
+
 		if self.Settings.Components[db] == true then
 			local curId = tabs:AddTab(rec.title, rec.init());
 			if db == 'Items' then
@@ -272,7 +260,7 @@ function CompendiumLauncherWindow:Constructor()
 			end
 		end
 	end
-	
+
 	cbtop = cbtop + 20;
 	local reloadButton = Turbine.UI.Lotro.Button();
 	reloadButton:SetParent(settingControl);
@@ -285,7 +273,7 @@ function CompendiumLauncherWindow:Constructor()
 		Turbine.PluginManager.UnloadScriptState("CompendiumReloader");
 		Turbine.PluginManager.LoadPlugin("CompendiumReloader");
 	end
-	
+
 	cbtop = cbtop + 40;
 	checkbox = Turbine.UI.Lotro.CheckBox();
     checkbox:SetParent( settingControl );
@@ -293,7 +281,7 @@ function CompendiumLauncherWindow:Constructor()
     checkbox:SetPosition( 20, cbtop );
     checkbox:SetSize( 250, 20 );
     checkbox:SetFont(self.fontFace);
-    checkbox:SetForeColor(self.fontColor);    
+    checkbox:SetForeColor(self.fontColor);
     checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
     checkbox:SetText( "  " .. rsrc["icon"] );
     checkbox:SetChecked(self.Settings.UseIcon);
@@ -304,9 +292,9 @@ function CompendiumLauncherWindow:Constructor()
 			self.Settings.UseIcon = false;
 		end
 		self:SaveSettings();
-		shortcut:SetVisible(self.Settings.UseIcon);		
-	end	
-	
+		shortcut:SetVisible(self.Settings.UseIcon);
+	end
+
 	cbtop = cbtop + 20;
 	checkbox = Turbine.UI.Lotro.CheckBox();
     checkbox:SetParent( settingControl );
@@ -314,7 +302,7 @@ function CompendiumLauncherWindow:Constructor()
     checkbox:SetPosition( 40, cbtop );
     checkbox:SetSize( 250, 20 );
     checkbox:SetFont(self.fontFace);
-    checkbox:SetForeColor(self.fontColor);    
+    checkbox:SetForeColor(self.fontColor);
     checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
     checkbox:SetText( "  " .. rsrc["iconmini"] );
     checkbox:SetChecked(self.Settings.UseMiniIcon);
@@ -330,8 +318,8 @@ function CompendiumLauncherWindow:Constructor()
 		else
 			shortcut:SetMode('large');
 		end;
-	end		
-	
+	end
+
 	cbtop = cbtop + 40;
 	checkbox = Turbine.UI.Lotro.CheckBox();
     checkbox:SetParent( settingControl );
@@ -339,7 +327,7 @@ function CompendiumLauncherWindow:Constructor()
     checkbox:SetPosition( 20, cbtop );
     checkbox:SetSize( 250, 20 );
     checkbox:SetFont(self.fontFace);
-    checkbox:SetForeColor(self.fontColor);    
+    checkbox:SetForeColor(self.fontColor);
     checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
     checkbox:SetText( "  " .. rsrc["showitemquickslots"] );
     checkbox:SetChecked(self.Settings.ShowItemQuickslots);
@@ -356,8 +344,8 @@ function CompendiumLauncherWindow:Constructor()
 				it.control:Reset();
 			end;
 		end
-	end	
-	
+	end
+
 	local plugs = Turbine.PluginManager.GetAvailablePlugins();
 	local loaded = Turbine.PluginManager.GetLoadedPlugins();
 	local loadedhash = {};
@@ -375,7 +363,7 @@ function CompendiumLauncherWindow:Constructor()
 			local cls = _G;
 			for j, b in split(a.Package, '%.') do
 				cls = cls[b];
-			end	
+			end
 
 			local ext = cls();
 			tabs:AddTab(ext:GetExtensionName(), ext);
@@ -383,9 +371,9 @@ function CompendiumLauncherWindow:Constructor()
 		if a.Name == 'MoorMap' then moormap = true end
 		if a.Name == 'Waypoint' then waypoint = true end
 	end
-	
+
 	if moormap == false and self.Settings.MoorMapNotice ~= true then
-	
+
 		local notice = Compendium.Common.UI.CompendiumWindow()
 		notice:SetSize(300,290);
 		notice:SetText('Notice');
@@ -402,7 +390,7 @@ function CompendiumLauncherWindow:Constructor()
 	    noticeMsg:SetFont(self.fontFace);
 	    noticeMsg:SetForeColor(self.fontColor);
 	    noticeMsg:SetOutlineColor(Turbine.UI.Color(0,0,0));
-	    noticeMsg:SetFontStyle(Turbine.UI.FontStyle.Outline);   
+	    noticeMsg:SetFontStyle(Turbine.UI.FontStyle.Outline);
 		noticeMsg:SetText(rsrc["download"]);
 		noticeMsg:SetPosition((notice:GetWidth() / 2) - (noticeMsg:GetWidth() / 2), noticeImg:GetTop() + noticeImg:GetHeight() + 5);
 		local ok = Turbine.UI.Lotro.Button();
@@ -419,36 +407,36 @@ function CompendiumLauncherWindow:Constructor()
 		notice:SetVisible(true);
 		notice:Activate();
 		self.notice = notice;
-		
+
 	end
-	
+
 	tabs:AddTab(rsrc["settings"],  settingControl);
 	tabs:SetActiveIndex(self.Settings.ActiveTabIndex);
 
-	tabs.OnActiveTabChange = function (sender,index) 
+	tabs.OnActiveTabChange = function (sender,index)
 		self.Settings.ActiveTabIndex = index;
 		self:SaveSettings();
 	end
 	self.tabs = tabs;
-	
+
  	self.SetHeight = function(sender,height)
         if height<150 then height=150 end;
         Turbine.UI.Lotro.Window.SetHeight(self,height);
         tabs:SetHeight(height - 55);
-		self.footer:SetTop(height - 25);        
+		self.footer:SetTop(height - 25);
     end
  	self.SetWidth = function(sender,width)
         if width<110 then width=110 end;
         Turbine.UI.Lotro.Window.SetWidth(self,width);
         tabs:SetWidth(width - 18);
 		self.footer:SetWidth(self:GetWidth() - 50);
-		version:SetLeft((width / 2)+ 10);		
+		version:SetLeft((width / 2)+ 10);
     end
-	self.SetSize = function(sender,width, height) 
+	self.SetSize = function(sender,width, height)
 		self:SetWidth(width);
 		self:SetHeight(height);
-	end	
-	
+	end
+
     self.Resizing=false;
     self.MoveX=-1;
     self.MoveY=-1;
@@ -538,17 +526,17 @@ function CompendiumLauncherWindow:Constructor()
 			self.Settings.WindowSize.width = self:GetWidth();
 			self.Settings.WindowSize.height = self:GetHeight();
 			self:SaveSettings();
-		end	        
+		end
     end
-    
+
 	self:SetSize(self.Settings.WindowSize.width, self.Settings.WindowSize.height);
 	if Plugins.Compendium.Unload == nil then
-		Plugins.Compendium.Unload = function() 
+		Plugins.Compendium.Unload = function()
 			self:persist();
 			self:destroy();
 		end
 	end
-	
+
     self:SetWantsKeyEvents( true );
     self.KeyDown = function( sender, args )
         if ( args.Action == Turbine.UI.Lotro.Action.Escape ) then
@@ -562,24 +550,24 @@ function CompendiumLauncherWindow:Constructor()
         	end
         end
 	end
-    	
+
     self.allowFade = true;
-    
+
 end
 
 function CompendiumLauncherWindow:LoadSettings()
 	self.Settings = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Account , "CompendiumSettings")
-	
+
 	if self.Settings == nil then
-		self.Settings = { 
+		self.Settings = {
 			WindowVisible = true,
-			WindowPos = {  
+			WindowPos = {
 				["left"] = tostring(( Turbine.UI.Display:GetWidth() - 560) / 2),
 				["top"] = tostring(( Turbine.UI.Display:GetHeight() - 480) / 2)
 			},
 			WindowSize = {
 				["width"] = 560,
-				["height"] = 480    
+				["height"] = 480
 			},
 			IconPos = {
 				["left"] = tostring(Turbine.UI.Display.GetWidth()-55),
@@ -597,7 +585,7 @@ function CompendiumLauncherWindow:LoadSettings()
 		for i, rec in pairs(compendiumdbs) do
 			self.Settings.Components[rec.title] = true;
 		end
-		
+
 	else
 		-- for backwards compatibility
 		if self.Settings.ShowItemQuickslots == nil then
@@ -608,7 +596,7 @@ function CompendiumLauncherWindow:LoadSettings()
 		end
 		if self.Settings.ActiveTabIndex == nil then
 			self.Settings.ActiveTabIndex = 1;
-		end	
+		end
 		if self.Settings.FadeWindow == nil then
 			self.Settings.FadeWindow = true;
 		end
@@ -632,9 +620,23 @@ function CompendiumLauncherWindow:LoadSettings()
 				self.Settings.Components[rec.title] = true;
 			end
 		end
+		local displayWidth=Turbine.UI.Display:GetWidth();
+		local displayHeight=Turbine.UI.Display:GetHeight();
+		if tonumber(self.Settings.WindowPos.left) > ( displayWidth - 100 ) or tonumber(self.Settings.WindowPos.top) > ( displayHeight - 100 ) then
+			self.Settings.WindowPos = {
+				["left"] = tostring((displayWidth - self.Settings.WindowSize.width) / 2),
+				["top"] = tostring(( displayHeight - self.Settings.WindowSize.height) / 2)
+			};
+		end
+		if tonumber(self.Settings.IconPos.left) > displayWidth or tonumber(self.Settings.IconPos.top) > displayHeight then
+			self.Settings.IconPos = {
+				["left"] = tostring(displayWidth-55),
+				["top"] = "230";
+			};
+		end
 	end
 	Compendium.Common.Resources.Settings:SetSettings(self.Settings);
-	
+
 end
 
 function CompendiumLauncherWindow:SaveSettings()
@@ -648,7 +650,7 @@ function CompendiumLauncherWindow:destroy()
 	self.MouseMove = nil;
 	self.MouseUp = nil;
 	self.PositionChanged = nil;
-	self.VisibleChanged = nil;	
+	self.VisibleChanged = nil;
 	self.tabs:destroy();
 end
 
@@ -732,14 +734,14 @@ function CompendiumLauncherWindow:ProcessCommandArguments(args)
 		local cmd, loc, target = args:match "^%s*(addcoord)%s*%[([^%|]+)%|([^%]]+)%]"; --%[[^:]+:%\s*([^:]+):\s*([^%|]+)%|([^%]]+)%s*%]$";
 		if cmd == 'addcoord' then
 			 local area, coord = loc:match "%s*([^:]+):%s*([^:]+)$";
-			 
+
 			 local coordrec = nil
 			 if area ~= nil then
 			 	coordrec = { area = area, coord = coord, target = target };
 			 else
 			 	coordrec = { area = loc, target = target };
 			 end
-			 
+
 			 local control = self.tabs:GetActiveControl();
 			 if control.AddCoordinate ~= nil then
 			 	control:AddCoordinate(coordrec);
@@ -763,5 +765,5 @@ function CompendiumLauncherWindow:GetHelp(tagged)
 			 "    /comp help : shows Compendium help \n" ..
 			 "    /comp show : shows Compendium \n" ..
 			 "    /comp hide : hides Compendium \n";
-	end 
+	end
 end

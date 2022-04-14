@@ -1,18 +1,4 @@
---[[
-   Copyright 2011 Kelly Riley (lunarwater)
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-]]
 import "Turbine";
 import "Turbine.Gameplay";
 import "Turbine.UI";
@@ -27,24 +13,31 @@ import "Compendium.Common.Resources.Bundle";
 local rsrc = {};
 
 local pagesize = 200;
-local rewardLabels = { 
-    "reputation","destinypoints","money","receive","virtues","titles","selectoneof","traits"
+local rewardLabels = {
+    ["reputation"] = "ri" ,
+	["destinypoints"] = "destinypoints",
+	["money"] = "mo",
+	["receive"] = "rc",
+	["virtues"] = "vr",
+	["titles"] = "ti",
+	["selectoneof"] = "so",
+	["traits"] = "tr"
 };
 
 CompendiumDeedControl= class( Compendium.Common.UI.CompendiumControl );
 function CompendiumDeedControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 	rsrc = Compendium.Common.Resources.Bundle:GetResources();
-	
+
 	self.localdeeddatamodified = false;
-	self.deedprogressionmodified = false;	
+	self.deedprogressionmodified = false;
 	self.localdeeddata = {};
 	self.deedprogression = {};
 	self.currentIndexFilters = {};
 	self.currentManualFilters = {};
 	self.searchDisabled = true;
 	self:LoadLocalDeeds();
-	
+
 	self.range = Compendium.Common.UI.LevelRangeControl();
 	self.range:SetParent(self);
 	self.range.RangeApplied = function( s, from, to )
@@ -53,9 +46,9 @@ function CompendiumDeedControl:Constructor()
 		if to ~= nil then rec.to = tonumber(to) end;
 		self:AddFilters({ manual = { level = rec } });
 	end
-	
+
     self.menu = Compendium.Deeds.DeedCategoryMenu();
-    self.menu.ClickCategory = function(categories) 
+    self.menu.ClickCategory = function(categories)
     	local size = #categories;
     	if size > 0 and categories[size] == 'Custom' then
 			local x, y = self:PointToClient(Turbine.UI.Display:GetMousePosition());
@@ -65,42 +58,42 @@ function CompendiumDeedControl:Constructor()
 			if (top + mh) > h then top = h - mh end;
 			if (left + mw) > w then left = w - mw end;
 			self.range:SetPosition(left,top);
-			self.range:ShowMenu(true);    		
+			self.range:ShowMenu(true);
     	elseif size > 0 and (categories[size] == 'Complete' or categories[size] == 'Incomplete') then
 	   		self:AddFilters({ manual = { progression = { value = (categories[size] == 'Complete') } } });
    		else
 			self:AddFilters({ indexes = categories });
     	end
-	end        
+	end
     local filterButton = Turbine.UI.Lotro.Button();
     filterButton:SetParent(self);
     filterButton:SetPosition(9,3);
     filterButton:SetSize(85,20);
     filterButton:SetText(" " .. rsrc["filterby"]);
  	filterButton:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
-	filterButton.Click = function( sender, args ) 
+	filterButton.Click = function( sender, args )
     	self.menu:ShowMenu();
     end
-    
+
     local filterIcon = Turbine.UI.Control();
     filterIcon:SetParent( filterButton );
     filterIcon:SetBackground(0x41007e19);
     filterIcon:SetBlendMode(Turbine.UI.BlendMode.Overlay);
     filterIcon:SetPosition( filterButton:GetWidth() - 20, 1 );
     filterIcon:SetSize( 16, 16 );
-    filterIcon.MouseClick = function( sender, args ) 
+    filterIcon.MouseClick = function( sender, args )
     	self.menu:ShowMenu();
     end
-      
-      --[[ 
+
+      --[[
 	self.logo = Turbine.UI.Control();
 	self.logo:SetBlendMode(Turbine.UI.BlendMode.Screen);
 	self.logo:SetBackground( "Compendium/Common/Resources/images/CompendiumLogoSmall.tga" );
 	self.logo:SetPosition(self:GetWidth() - 80 ,0);
 	self.logo:SetSize(75,100);
-	self.logo:SetParent( self );    
+	self.logo:SetParent( self );
      ]]
-     
+
     local searchLabel = Turbine.UI.Label();
     searchLabel:SetParent(self);
     searchLabel:SetPosition(97,5);
@@ -151,16 +144,16 @@ function CompendiumDeedControl:Constructor()
         end
     end
 	--]]
-	
+
     local filtersLabel = Turbine.UI.Label();
     filtersLabel:SetParent(self);
     filtersLabel:SetPosition(5,filterButton:GetTop() +  filterButton:GetHeight());
     filtersLabel:SetSize(self:GetWidth() - 7,20);
     filtersLabel:SetFont(self.fontFace);
     filtersLabel:SetForeColor(self.trimColor);
-    filtersLabel:SetText(rsrc["nofiltersset"]);	
-	self.filtersLabel = filtersLabel;	
-	
+    filtersLabel:SetText(rsrc["nofiltersset"]);
+	self.filtersLabel = filtersLabel;
+
     -- add a search reset button
     local reset = Turbine.UI.Lotro.Button();
     reset:SetParent( self );
@@ -225,7 +218,7 @@ function CompendiumDeedControl:Constructor()
     nameCol:SetFont(self.fontFace);
     nameCol:SetForeColor(self.fontColor);
     nameCol:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    nameCol:SetFontStyle(Turbine.UI.FontStyle.Outline);    
+    nameCol:SetFontStyle(Turbine.UI.FontStyle.Outline);
     nameCol:SetTextAlignment( Turbine.UI.CheckBox.MiddleCenter );
 
 	local selectAllCB = Turbine.UI.Lotro.CheckBox();
@@ -242,21 +235,21 @@ function CompendiumDeedControl:Constructor()
 		if not val then type = rsrc['incomplete'] end;
 		Compendium.Common.UI.Dialog.Confirm:Show(rsrc['confirm'], string.format(rsrc['selectdeedmsg'],type),
 							function()
-								self:UpdateAllFilteredRecord('modifyprog',s:IsChecked()); 
+								self:UpdateAllFilteredRecord('modifyprog',s:IsChecked());
 							end,
 							function()
 								s.undo = true;
 								s:SetChecked(not val);
 								s.undo = false;
-							end);	
-	end 
-	qlHeader.SetWidth = function(s, w) 
+							end);
+	end
+	qlHeader.SetWidth = function(s, w)
 		Turbine.UI.Control.SetWidth(s, w);
 		local ncw = w - 16;
 		nameCol:SetWidth(ncw);
 		selectAllCB:SetLeft(ncw);
 	end
-	
+
 
     local pagination = Compendium.Common.UI.PaginationControl();
     pagination:SetParent(self.qlContainer);
@@ -267,7 +260,7 @@ function CompendiumDeedControl:Constructor()
    		self:ClearDeeds();
 		self:LoadDeeds(records);
    	end
-   	pagination.VisibleChanged = function(s,a) 
+   	pagination.VisibleChanged = function(s,a)
    		local ql = self.qlContainer.DeedList;
    		local sb = ql.VScrollBar;
    		local ch = self.qlContainer:GetHeight();
@@ -279,9 +272,9 @@ function CompendiumDeedControl:Constructor()
    			sb:SetHeight(ch - 20);
    		end
    	end
-   	
+
     self.pagination = pagination;
-    
+
     self.qdContainer=Turbine.UI.Control();
     self.qdContainer:SetParent(self);
     self.qdContainer:SetPosition(self.qlContainer:GetLeft()+self.qlContainer:GetWidth()+5,self.qlContainer:GetTop());
@@ -299,13 +292,13 @@ function CompendiumDeedControl:Constructor()
     self.qdContainer.DeedDetails.VScrollBar:SetPosition(self.qdContainer:GetWidth()-16,0)
     self.qdContainer.DeedDetails.VScrollBar:SetWidth(12);
     self.qdContainer.DeedDetails.VScrollBar:SetHeight(self.qdContainer:GetHeight()-2);
-    self.qdContainer.DeedDetails:SetVerticalScrollBar(self.qdContainer.DeedDetails.VScrollBar);    
+    self.qdContainer.DeedDetails:SetVerticalScrollBar(self.qdContainer.DeedDetails.VScrollBar);
 
     local bottom = self.qdContainer:GetTop() + self.qdContainer:GetHeight() + 2;
 	local detailTabs = Compendium.Common.UI.TabControl();
 	detailTabs:SetParent(self);
 	detailTabs:SetPosition(7,bottom);
-	    
+
     self.deedDesc=Turbine.UI.Label();
     self.deedDesc:SetPosition(0,0);
     self.deedDesc:SetFont(self.fontFace);
@@ -319,7 +312,7 @@ function CompendiumDeedControl:Constructor()
     self.deedDesc.VScrollBar:SetWidth(12);
     self.deedDesc.VScrollBar:SetHeight(self.deedDesc:GetHeight()-2);
     self.deedDesc:SetVerticalScrollBar(self.deedDesc.VScrollBar);
-    self.deedDesc.SizeChanged = function(s,a) 
+    self.deedDesc.SizeChanged = function(s,a)
     	local width = s:GetWidth();
 		local height = s:GetHeight();
 	    self.deedDesc.VScrollBar:SetPosition(width-12,0);
@@ -339,24 +332,24 @@ function CompendiumDeedControl:Constructor()
     self.deedObj.VScrollBar:SetWidth(12);
     self.deedObj.VScrollBar:SetHeight(self.deedObj:GetHeight()-2);
     self.deedObj:SetVerticalScrollBar(self.deedObj.VScrollBar);
-    self.deedObj.SizeChanged = function(s,a) 
+    self.deedObj.SizeChanged = function(s,a)
     	local width = s:GetWidth();
 		local height = s:GetHeight();
 	    self.deedObj.VScrollBar:SetPosition(width-12,0);
 	    self.deedObj.VScrollBar:SetHeight(height - 2);
     end
 
-    
+
 	self.coord = Compendium.Common.UI.CoordinateControl();
-	self.coord:SetParent(self);  
-	
+	self.coord:SetParent(self);
+
     local comments= Compendium.Deeds.DeedCommentsControl();
-    comments.CommentAdded = function(s, value) 
+    comments.CommentAdded = function(s, value)
     	if self.currentRecord ~= nil then
     		self:UpdateLocalRecord(self.currentRecord,'addcomment', { val = value , modifiable = true, time = Turbine.Engine:GetLocalTime() } );
     	end
     end
-    comments.CommentDeleted  = function(s, value) 
+    comments.CommentDeleted  = function(s, value)
     	if self.currentRecord ~= nil then
     		self:UpdateLocalRecord(self.currentRecord,'delcomment', value );
     	end
@@ -364,7 +357,7 @@ function CompendiumDeedControl:Constructor()
     comments.CoordClicked = function( sender, y, ns, x, ew )
     	if self.currentRecord ~= nil then
     		self:CoordClicked( y, ns, x, ew, self.currentRecord['zone'], rsrc["miscpoi"], self.currentRecord['name']);
-    	end		
+    	end
     end
 	self.comments = comments;
 
@@ -372,15 +365,15 @@ function CompendiumDeedControl:Constructor()
 	detailTabs:AddTab(rsrc["description"],  self.deedDesc);
 	detailTabs:AddTab(rsrc["comments"],  comments);
 	detailTabs:SetSize(self:GetWidth()-10, 150);
-    
+
     self:ClearDeeds();
 	self.searchDisabled = false;
 
-    
+
  	self.SetWidth = function(sender,width)
         if width<100 then width=100 end;
         Turbine.UI.Control.SetWidth(self,width);
-        
+
         local qlwidth = (width/2) - 7;
         self.qlContainer:SetWidth(qlwidth);
         self.qdContainer:SetLeft(self.qlContainer:GetLeft() + qlwidth + 5);
@@ -391,12 +384,12 @@ function CompendiumDeedControl:Constructor()
         self.qlContainer.DeedList.VScrollBar:SetLeft(qlwidth-16);
         self.qdContainer.DeedDetails.VScrollBar:SetLeft(qlwidth-16);
         pagination:SetWidth(qlwidth - 4);
-        
+
 		local swidth = width - (searchLabel:GetWidth()+searchLabel:GetLeft())-55;
     	self.SearchBorder:SetWidth(swidth);
     	self.SearchText:SetWidth(swidth);
 	    reset:SetLeft( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 1 );
-		
+
 		detailTabs:SetWidth(width - 10);
 		for index=1,self.qlContainer.DeedList:GetItemCount() do
 			local label = self.qlContainer.DeedList:GetItem(index);
@@ -410,11 +403,11 @@ function CompendiumDeedControl:Constructor()
 		end
 
     end
-		
+
  	self.SetHeight = function(sender,height)
         if height<300 then height=300 end;
         local lheight = height - self.qlContainer:GetTop() - detailTabs:GetHeight() - 5;
-        
+
         Turbine.UI.Control.SetHeight(self,height);
 		self.qlContainer:SetHeight(lheight);
 		local ql = self.qlContainer.DeedList;
@@ -427,39 +420,39 @@ function CompendiumDeedControl:Constructor()
    			sb:SetHeight(lheight - 20);
    		end
 		pagination:SetTop(lheight - 22);
-		
+
 		self.qdContainer:SetHeight(lheight);
 		self.qdContainer.DeedDetails:SetHeight(lheight - 3);
 		self.qdContainer.DeedDetails.VScrollBar:SetHeight(lheight - 2);
-		detailTabs:SetTop(self.qdContainer:GetTop() + lheight + 2);   	
-    end	
-	
-	self.SetSize = function(sender,width, height) 
+		detailTabs:SetTop(self.qdContainer:GetTop() + lheight + 2);
+    end
+
+	self.SetSize = function(sender,width, height)
 		self:SetWidth(width);
 		self:SetHeight(height);
-	end	
-	
+	end
+
 	self:BuildCursor();
-		    
+
 end
 
 function CompendiumDeedControl:ClearDeeds()
 	for index=1,self.qlContainer.DeedList:GetItemCount() do
 		local item = self.qlContainer.DeedList:GetItem(index);
 		self:strip(item, 1);
-	end	
+	end
 	self.qlContainer.DeedList:ClearItems();
 	for index=1,self.qdContainer.DeedDetails:GetItemCount() do
 		local item = self.qdContainer.DeedDetails:GetItem(index);
 		self:strip(item, 1);
-	end		
+	end
     self.qdContainer.DeedDetails:ClearItems();
     self.deedDesc:SetText("");
     self.deedObj:SetText("");
 	self.comments:ClearComments();
     self:AddDeedDetail(rsrc["nodeedselected"]);
     self.prevIdx = nil;
-	self.currentRecord = nil;    
+	self.currentRecord = nil;
 end
 
 function CompendiumDeedControl:AddDeedDetail(text, hyperlink)
@@ -484,13 +477,13 @@ end
 
 function CompendiumDeedControl:JoinIndex(a, b)
 	if a == nil then return b; end
-	
+
     local set = {};
     local data = {};
     for i,k in pairs(a) do set[tostring(k)] = true; end
     for i,k in pairs(b) do
-        if set[tostring(k)] then 
-        	table.insert(data, k); 
+        if set[tostring(k)] then
+        	table.insert(data, k);
         end
     end
     return data;
@@ -508,12 +501,12 @@ function CompendiumDeedControl:LoadDeeds(records)
         if rec["faction"] == 'Mon' then
         	name = name .. ' (M)';
         end
-        
+
         local deed = Turbine.UI.Control();
         --deed:SetMultiline(false);
         deed:SetSize(width - 10, 18);
         --deed:SetBackColor(bgColor);
-        
+
         local label = Turbine.UI.Label();
         label:SetMultiline(false);
         label:SetParent(deed);
@@ -524,10 +517,10 @@ function CompendiumDeedControl:LoadDeeds(records)
         label:SetBackColor(bgColor);
         label:SetFont(self.fontFaceSmall);
 	    label:SetTextAlignment( Turbine.UI.CheckBox.MiddelCenter );
-	    
+
 	    local complete = self.deedprogression[rec["name"]];
 	    if complete == nil then complete = false end;
-	    
+
 		local checkbox = Turbine.UI.Lotro.CheckBox();
 	    checkbox:SetParent( deed );
 	    checkbox:SetPosition(label:GetWidth(), 0);
@@ -535,24 +528,24 @@ function CompendiumDeedControl:LoadDeeds(records)
 	    checkbox:SetChecked(complete);
 		checkbox.CheckedChanged = function(s,a)
 			self:UpdateLocalRecord(self.currentRecord,'modifyprog',s:IsChecked());
-		end        
-        
+		end
+
         local color = self.fontColor;
         if level ~= nil and level ~= '' then
             color = self:GetLevelColor(playerLevel, tonumber(level));
         end
         label:SetForeColor(color);
-                
+
         deed.DeedId = tonumber(rec["id"]);
         self.qlContainer.DeedList:AddItem(deed);
     end
-    
+
 end
 
-function CompendiumDeedControl:Reset() 
+function CompendiumDeedControl:Reset()
 	self.searchDisabled = true;
 	self.SearchText:SetText('');
-    self:ClearDeeds();	
+    self:ClearDeeds();
     self.currentIndexFilters = {};
     self.currentManualFilters = {};
 	self.filtersLabel:SetText(rsrc["nofiltersset"]);
@@ -568,50 +561,50 @@ function CompendiumDeedControl:FormatItem(record)
 	else
 		item = '['..record['val']..']';
 	end
-	
+
 	if record['q'] ~= nil and record['q'] ~= '' then
 		item = item .. ' ' .. record['q'];
 	end
-	
-	return item; 
+
+	return item;
 end
 
 function CompendiumDeedControl:LoadDeedDetails(record)
-    
+
     local localrecord = self.localdeeddata[record['name']];
 
     self.qdContainer.DeedDetails:ClearItems();
 	self.comments:ClearComments();
     self.currentRecord = record;
-    
+
     self:AddDeedDetail(rsrc['name']);
     self:AddDeedDetail("  " .. record['name']);
     self:AddDeedDetail(rsrc["level"] .. " " .. record['level']);
     if record['t'] ~= nil then self:AddDeedDetail(rsrc["type"] .. " " .. record['t']); end
     if record['zone'] ~= nil then self:AddDeedDetail(rsrc["zone"] .. " " .. record['zone']); end
-    
-    for j, reward in pairs(rewardLabels) do
-    	
-    	local display = rsrc[reward];
+
+    for reward, rewardkey in pairs(rewardLabels) do
+
+    	local display = rsrc[rewardkey];
     	if record[reward] ~= nil then
     		local vals = record[reward];
 	    	if #vals > 1 then
 	    		for i,item in pairs(vals) do
 	    			local prefix = "     ";
 	    			if i == 1 then prefix = display .. ": "; end
-	    			
+
 	    			local dispval = item['val']
 	    			if reward == 'receive' or reward == 'selectoneof' then
 	    				dispval = self:FormatItem(item);
 	    			end
-	    			
+
 	    			self:AddDeedDetail(prefix .. dispval)
 	    		end
 	    	else
     			local dispval = vals[1]['val']
     			if reward == 'receive' or reward == 'selectoneof' then
     				dispval = self:FormatItem(vals[1]);
-    			end	    	
+    			end
 	    		self:AddDeedDetail(display .. ": " .. dispval);
 	    	end
     	end
@@ -622,8 +615,8 @@ function CompendiumDeedControl:LoadDeedDetails(record)
         if sep == false then self:AddDeedDetail(""); end
         sep = true
         self:AddDeedDetail(rsrc["prereqs"]);
-        for i,previd in pairs(record['prev']) do     
-        	local name = deedtable[previd]['name'];   
+        for i,previd in pairs(record['prev']) do
+        	local name = deedtable[previd]['name'];
 	        self:AddDeedDetail("  " .. name, true).MouseClick = function(sender, args)
 	            self:LoadDeedDetails(deedtable[previd]);
 	        end;
@@ -633,14 +626,14 @@ function CompendiumDeedControl:LoadDeedDetails(record)
         if sep == false then self:AddDeedDetail(""); end
         sep = true
         self:AddDeedDetail(rsrc["nextdeeds"]);
-        for i,nextid in pairs(record['next']) do     
-        	local name = deedtable[nextid]['name'];   
+        for i,nextid in pairs(record['next']) do
+        	local name = deedtable[nextid]['name'];
 	        self:AddDeedDetail("  " .. name, true).MouseClick = function(sender, args)
 	            self:LoadDeedDetails(deedtable[nextid]);
 	        end;
         end
     end
-    
+
     sep = false
     if record['mobs'] ~= nil and #record['mobs'] > 0 then
         if sep == false then self:AddDeedDetail(""); end
@@ -650,14 +643,14 @@ function CompendiumDeedControl:LoadDeedDetails(record)
             local name = "  " .. mob['name'];
             if mob['locations'] ~= nil then
 	            if #mob['locations'] > 1 then
-	            	self:AddDeedDetail(name); 
+	            	self:AddDeedDetail(name);
 	            	for i,loc in pairs(mob['locations']) do
 		            	self:AddDeedDetail('       ' .. loc).MouseClick = function(s,a)
 		            		local tmp, tmp, tmp, y, ns, x, ew = string.find(loc, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
 		            		if i ~= nil then
 		            			self:CoordClicked( y, ns, x, ew, mob['zone'], mob['name'], rsrc['deed']..' - ' .. string.gsub(record['name'],':','-') .. ' / '..rsrc['mob']..' - ' .. mob['name']);
 		            		end
-		            	end	            	
+		            	end
 	            	end
 	            elseif #mob['locations'] == 1 then
 	            	name = name .. ' (' .. mob['locations'][1] .. ')';
@@ -668,7 +661,7 @@ function CompendiumDeedControl:LoadDeedDetails(record)
 	            		end
 	            	end
 	            end
-	        else 
+	        else
 	        	self:AddDeedDetail(name);
 	        end
         end
@@ -682,14 +675,14 @@ function CompendiumDeedControl:LoadDeedDetails(record)
             local name = "  " .. poi['name'];
             if poi['locations'] ~= nil then
 	            if #poi['locations'] > 1 then
-	            	self:AddDeedDetail(name); 
+	            	self:AddDeedDetail(name);
 	            	for i,loc in pairs(poi['locations']) do
 		            	self:AddDeedDetail('       ' .. loc).MouseClick = function(s,a)
 		            		local tmp, tmp, tmp, y, ns, x, ew = string.find(loc, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
 		            		if i ~= nil then
 		            			self:CoordClicked( y, ns, x, ew, poi['zone'], poi['name'], rsrc['deed']..' - ' .. string.gsub(record['name'],':','-') .. ' / ' .. poi['name']);
 		            		end
-		            	end	            	
+		            	end
 	            	end
 	            elseif #poi['locations'] == 1 then
 	            	name = name .. ' (' .. poi['locations'][1] .. ')';
@@ -700,12 +693,12 @@ function CompendiumDeedControl:LoadDeedDetails(record)
 	            		end
 	            	end
 	            end
-	        else 
+	        else
 	        	self:AddDeedDetail(name);
 	        end
         end
     end
-    
+
     -- description
     self.deedDesc:SetVerticalScrollBar(nil);
     self.deedDesc:SetText(record['d']);
@@ -715,9 +708,9 @@ function CompendiumDeedControl:LoadDeedDetails(record)
     self.deedObj:SetText(record['o']);
     self.deedObj:SetVerticalScrollBar(self.deedObj.VScrollBar);
 
-	
 
-    
+
+
     if record['c'] ~= nil then
     	local comrecs = {};
     	for i, value in pairs(record['c']) do
@@ -742,13 +735,13 @@ function CompendiumDeedControl:BuildCursor()
     self:ClearDeeds();
 	self.pagination:SetCursor(nil);
 	self.pagination:SetVisible(false);
-	
+
 	-- filter results using our category indexes
 	local ids = nil;
 	for i,cat in pairs(self.currentIndexFilters) do
 		if deedindexes[cat] ~= nil then
 			ids = self:JoinIndex(ids,deedindexes[cat]);
-		end 
+		end
 	end
 	-- determine if a text search was used
 	local searchText = self.SearchText:GetText();
@@ -769,13 +762,13 @@ function CompendiumDeedControl:BuildCursor()
 			end
 			self:LoadDeeds(self.cursor:CurPage());
 			return;
-		end 	
+		end
     end
 
-	-- build data set	
+	-- build data set
 	local data = deedtable;
 	if ids ~= nil then
-		data = ids 
+		data = ids
 	end;
 	local recs = {};
     local count = 0;
@@ -783,7 +776,7 @@ function CompendiumDeedControl:BuildCursor()
 		local id = a;
 		if ids ~= nil then id = b end;
 
-		--Turbine.Shell.WriteLine('a:' .. a .. ' b:' .. b .. ' id:' .. id);		
+		--Turbine.Shell.WriteLine('a:' .. a .. ' b:' .. b .. ' id:' .. id);
 		local rec = deedtable[id];
         local include = true;
         if not ise then
@@ -800,8 +793,8 @@ function CompendiumDeedControl:BuildCursor()
 					if to == nil then to = 1000 end;
 					if rec['level'] < from or rec['level'] > to then
 						include = false;
-						break; 
-					end	
+						break;
+					end
 				elseif filter.type == 'progression' then
 					local prog = self.deedprogression[rec["name"]];
 					if filter.value and (prog == nil or false == prog ) then
@@ -813,28 +806,28 @@ function CompendiumDeedControl:BuildCursor()
 					end
 				end
 			end
-		end        
+		end
 
         if include then
             count = count + 1;
             table.insert(recs,rec);
         end
 	end;
-	
+
 	-- create pagination cursor for results
 	self.cursor = Compendium.Common.Utils.DataCursor(recs, pagesize);
 	self.pagination:SetCursor(self.cursor);
 	if self.cursor:PageCount() > 1 then
 		self.pagination:SetVisible(true);
 	end
-	
+
 	-- load current page
 	self:LoadDeeds(self.cursor:CurPage());
 
 end
 
 function CompendiumDeedControl:AddFilters(filters)
-	
+
 	local count = 0;
 	local filterText = rsrc["filters"] .. ' ';
 
@@ -842,23 +835,23 @@ function CompendiumDeedControl:AddFilters(filters)
 	for i,cat in pairs(self.currentIndexFilters) do distinctCats[cat] = i end;
 	if filters.indexes ~= nil then
 		for i,cat in pairs(filters.indexes) do
-			if deedindexes[cat] ~= nil then distinctCats[cat] = i end; 
+			if deedindexes[cat] ~= nil then distinctCats[cat] = i end;
 		end
 	end
 	self.currentIndexFilters = {};
 	for cat,v in pairs(distinctCats) do
 		if count > 0 then filterText = filterText .. ', ' end;
 		filterText = filterText .. cat;
-		table.insert(self.currentIndexFilters, cat) 
+		table.insert(self.currentIndexFilters, cat)
 		count = count + 1;
 	end
 
 	local manuals = {};
 	for i,filter in pairs(self.currentManualFilters) do table.insert(manuals,filter) end;
 	if filters.manual ~= nil then
-		for cat,rec in pairs(filters.manual) do 
-			rec.type = cat; 
-			table.insert(manuals,rec); 
+		for cat,rec in pairs(filters.manual) do
+			rec.type = cat;
+			table.insert(manuals,rec);
 		end
 	end
 	self.currentManualFilters = {};
@@ -867,10 +860,10 @@ function CompendiumDeedControl:AddFilters(filters)
 		if rec.type == 'level' then
 			if rec.from ~= nil and rec.to ~= nil then
 				filterText = filterText .. string.format(rsrc["levelbtwn"], rec.from, rec.to);
-				table.insert(self.currentManualFilters, rec); 
+				table.insert(self.currentManualFilters, rec);
 			elseif rec.from ~= nil then
 				filterText = filterText .. string.format(rsrc["levelgt"],rec.from);
-				table.insert(self.currentManualFilters, rec); 
+				table.insert(self.currentManualFilters, rec);
 			elseif rec.to ~= nil then
 				filterText = filterText .. string.format(rsrc["levellt"],rec.to);
 				table.insert(self.currentManualFilters, rec);
@@ -881,11 +874,11 @@ function CompendiumDeedControl:AddFilters(filters)
 			else
 				filterText = filterText .. rsrc["incomplete"];
 			end
-			table.insert(self.currentManualFilters, rec);			
+			table.insert(self.currentManualFilters, rec);
 		end
 		count = count + 1;
 	end
-	
+
 	self.filtersLabel:SetText(filterText);
 	self:BuildCursor();
 end
@@ -897,17 +890,17 @@ function CompendiumDeedControl:UpdateAllFilteredRecord(type, data)
 			self:UpdateLocalRecord(rec, type, data);
 		end
 		self:ClearDeeds();
-		self:LoadDeeds(records);		
+		self:LoadDeeds(records);
 	end
 end
-	
+
 function CompendiumDeedControl:UpdateLocalRecord(deedrecord, type, data)
 
 	local deed = deedrecord['name'];
-	if self.localdeeddata[deed] == nil then 
+	if self.localdeeddata[deed] == nil then
 		self.localdeeddata[deed] = {};
 	end
-	
+
 	if type == 'addcomment' then
 		if self.localdeeddata[deed]['c'] == nil then
 			self.localdeeddata[deed]['c'] = { data }
@@ -921,21 +914,21 @@ function CompendiumDeedControl:UpdateLocalRecord(deedrecord, type, data)
 			-- nothing to do
 		else
 			local comments = {};
-			for i,c in pairs(self.localdeeddata[deed]['c']) do 
+			for i,c in pairs(self.localdeeddata[deed]['c']) do
 				if c['time'] ~= data['time'] then
 					table.insert(comments,c);
 				end
 			end
 			self.localdeeddata[deed]['c'] = comments;
 			self.localdeeddatamodified = true;
-		end			
+		end
 	elseif type == 'modifyprog' then
 		self.deedprogression[deed] = data;
 		self.deedprogressionmodified = true;
 	else
 		-- unknown update type
 	end
-			
+
 end
 
 function CompendiumDeedControl:persist()
@@ -968,7 +961,7 @@ end
 
 function CompendiumDeedControl:AddCoordinate( record )
 	if record == nil then return end;
-	
+
 	local coord = '';
 	if record.target ~= rsrc["target"] then
 		coord = record.target .. ' '..rsrc["in"]..' ';
@@ -978,9 +971,9 @@ function CompendiumDeedControl:AddCoordinate( record )
 	coord = coord .. record.area;
 	if record.coord ~= nil then
 		coord = coord .. ' @ ' .. record.coord;
-	end  
+	end
 	self.comments:AddToComment(coord);
-	
+
 end
 
 
@@ -988,5 +981,5 @@ function CompendiumDeedControl:CoordClicked( y, ns, x, ew, zone, name, deed )
 	local mx, my = self:PointToClient(Turbine.UI.Display:GetMousePosition());
 	local left, top = mx - 3, my - 3;
 	self.coord:SetPosition(left, top);
-	self.coord:ShowMenu( y, ns, x, ew, zone, name, deed );
+	self.coord:ShowMenu( y, ns, x, ew, zone, false, name, deed );
 end

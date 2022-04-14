@@ -12,7 +12,7 @@ import "Compendium.Common.Utils";
 
  Translate the value on the right hand side.  The key (on the left) must stay as is.
 
-]] 
+]]
 local clientResources = {
 	en = {
 		["target"]                         = ";target",
@@ -21,12 +21,12 @@ local clientResources = {
 		["kinchat"]					       = "/k",
 		["fellowchat"]					   = "/f",
 		["raidchat"]					   = "/ra",
-		["tradechat"]					   = "/trade",		
-		["userchat1"]					   = "/1",	
-		["userchat2"]					   = "/2",	
-		["userchat3"]					   = "/3",	
-		["userchat4"]					   = "/4",	
-		["officerchat"]                    = "/o",		
+		["tradechat"]					   = "/trade",
+		["userchat1"]					   = "/1",
+		["userchat2"]					   = "/2",
+		["userchat3"]					   = "/3",
+		["userchat4"]					   = "/4",
+		["officerchat"]                    = "/o",
 		["advicechat"]                     = "/advice"
 	},
 	de = {
@@ -36,13 +36,13 @@ local clientResources = {
 		["kinchat"]					       = "/sc",
 		["fellowchat"]					   = "/g",
 		["raidchat"]					   = "/sz",
-		["tradechat"]					   = "/handel",	
-		["userchat1"]					   = "/1",	
-		["userchat2"]					   = "/2",	
-		["userchat3"]					   = "/3",	
-		["userchat4"]					   = "/4",	
-		["officerchat"]                    = "/so",		
-		["advicechat"]                     = "/beratung"		
+		["tradechat"]					   = "/handel",
+		["userchat1"]					   = "/1",
+		["userchat2"]					   = "/2",
+		["userchat3"]					   = "/3",
+		["userchat4"]					   = "/4",
+		["officerchat"]                    = "/so",
+		["advicechat"]                     = "/beratung"
 	},
 	fr ={
 		["target"]                         = ";cible",
@@ -51,13 +51,13 @@ local clientResources = {
 		["kinchat"]					       = "/conf",
 		["fellowchat"]					   = "/comm",
 		["raidchat"]					   = "/ra",
-		["tradechat"]					   = "/échanger",		
-		["userchat1"]					   = "/1",	
-		["userchat2"]					   = "/2",	
-		["userchat3"]					   = "/3",	
-		["userchat4"]					   = "/4",		
-		["officerchat"]                    = "/off",		
-		["advicechat"]                     = "/conseil"	
+		["tradechat"]					   = "/échanger",
+		["userchat1"]					   = "/1",
+		["userchat2"]					   = "/2",
+		["userchat3"]					   = "/3",
+		["userchat4"]					   = "/4",
+		["officerchat"]                    = "/off",
+		["advicechat"]                     = "/conseil"
 	}
 }
 
@@ -67,8 +67,8 @@ local resources = {
 		["en"]                        	   = "English",
 		["de"]                        	   = "German",
 		["fr"]                        	   = "French",
-	
-		["advice"]                         = "Advice",	
+
+		["advice"]                         = "Advice",
 		["officer"]                        = "Officer",
 		["say"]                        	   = "Say",
 		["kinship"]                        = "Kinship",
@@ -79,12 +79,12 @@ local resources = {
 		["user2"]                          = "User Chat 2",
 		["user3"]                          = "User Chat 3",
 		["user4"]                          = "User Chat 4",
-	
-		
+
+
 		["fontsize"]					   = "Font Size (requires reload)",
 		["fontsmall"]					   = "Small",
 		["fontlarge"]					   = "Large",
-		
+
 		["fromcomp"]					   = "from compendium",
 		["from"]						   = "from:",
 		["to"]						   	   = "to:",
@@ -92,10 +92,10 @@ local resources = {
 		["next"]						   = " Next",
 		["results"]						   = "Results",
 		["page"]						   = "Page",
-		
+
 		["linkitem"]					   = "Link Item To Chat",
 		["aboutcomp"]					   = "About Compendium",
-		["aboutmessage"]				   = "To Open Compendium:\n      /comp or /Compendium\n\nVisit us at: \n   http://lotrocompendium.sourceforge.net/\n\nMore coming soon!\n\nSpecial Thanks to the folks at lotrointerface.com\n\n© 2011 Lunarwater  |  Apache License V2.0",
+		["aboutmessage"]				   = "To Open Compendium:\n      /comp or /Compendium\n\nVisit us at: \n   https://www.lotrointerface.com/downloads/info526-LOTROCompendium.html\n\nMore coming soon!\n\nSpecial Thanks to the folks at lotrointerface.com\n\n© 2022 Lunarwater",
 		["add"]                            = "Add",
 		["area"]                           = "Area:",
 		["bestower"]                       = "Bestower:",
@@ -111,8 +111,8 @@ local resources = {
 		["deed"]                           = "Deed",
 		["deeds"]                          = "Deeds",
 		["description"]                    = "Description",
-		["destinypoints"]                  = "Dest Pts",
 		["download"]                       = "Download MoorMaps addon and Compendium can show you locations on Map!",
+		["dungeon"]                        = "Dungeon:",
 		["faction"]                        = "Faction:",
 		["fadewindow"]                     = "Fade window when mouse leaves.",
 		["filterby"]                       = "Filter By",
@@ -126,7 +126,7 @@ local resources = {
 		["icon"]                           = "Show Icon",
 		["iconmini"]                       = "Show Mini Icon (16x16)",
 		["learn"]                          = "Learn:",
-		["legendary"]					   = "Legendary",		
+		["legendary"]					   = "Legendary",
 		["level"]                          = "Level:",
 		["levellt"]                        = "Levels < %s",
 		["levelgt"]                        = "Levels > %s",
@@ -138,7 +138,6 @@ local resources = {
 		["mob"]                            = "Mob",
 		["mobsnpcsofinterest"]             = "Mobs/NPCs of Interest:",
 		["miscpoi"]						   = "Misc Point of Interest",
-		["money"]                          = "Money",
 		["name"]                           = "Name:",
 		["nextdeeds"]                      = "Next Deed(s):",
 		["nextquests"]                     = "Next Quest(s):",
@@ -154,10 +153,8 @@ local resources = {
 		["questheader"]					   = "Quest Name / Level",
 		["questchain"]                     = "Quest Chain:",
 		["questreward"]                    = "Quest Reward",
-		["receive"]                        = "Receive",
 		["reg"]                            = "Reg:",
 		["rep"]                            = "Rep",
-		["reputation"]                     = "Reputations",
 		["repeatable"]                     = "Repeatable:",
 		["reload"]						   = "Reload",
 		["reset"] 						   = "reset",
@@ -165,7 +162,6 @@ local resources = {
 		["savingdeeds"]                    = "Saving deeds...",
 		["savingquests"]                   = "Saving quests...",
 		["search"]                         = "Search:",
-		["selectoneof"]                    = "Select One Of",
 		["selectquestmsg"]				   = "This will modify all quests to be %s.  Continue?",
 		["selectdeedmsg"]				   = "This will modify all deeds to be %s.  Continue?",
 		["settings"]                       = "Settings",
@@ -173,15 +169,29 @@ local resources = {
 		["showitemquickslots"]			   = "Show Item Quickslots",
 		["showsthecompendiumwindow"]       = "Shows the Compendium window.",
 		["tier"]                           = "Tier",
-		["titles"]                         = "Titles",
-		["traits"]                         = "Traits",
 		["type"]                           = "Type:",
 		["unknown"]                        = "(unknown)",
 		["unloadingcompendium"]            = "Unloading Compendium..",
 		["usage"]                          = "Usage:",
 		["version"]                        = "version",
-		["virtues"]                        = "Virtues",
 		["zone"]                           = "Zone:",
+
+		["cp"] = "Class Points",
+		["cx"] = "Crafting XP",
+		["em"] = "Emotes",
+		["gl"] = "Glory",
+		["ix"] = "Item XP",
+		["lp"] = "Lotro Points",
+		["mo"] = "Money",
+		["mx"] = "Mount XP",
+		["rc"] = "Receive",
+		["ri"] = "Rep Item",
+		["so"] = "Select One Of",
+		["ti"] = "Titles",
+		["tr"] = "Traits",
+		["vr"] = "Virtues",
+		["vx"] = "Virtue XP",
+		["xp"] = "XP",
 
 		-- NOTE THAT IF FILTER IS NOT FOUND HERE, It just uses the key for the resource value
 		["FILTERS"]	= {
@@ -353,9 +363,9 @@ local resources = {
 		["en"]                        	   = "Englisch",
 		["de"]                        	   = "Deutsch",
 		["fr"]                        	   = "Französisch",
-		
-		["advice"]                         = "Beratung",	
-		["officer"]                        = "Offiziere",		
+
+		["advice"]                         = "Beratung",
+		["officer"]                        = "Offiziere",
 		["say"]                        	   = "sage",
 		["kinship"]                        = "Sippe",
 		["fellowship"]                     = "Gruppe",
@@ -365,11 +375,11 @@ local resources = {
 		["user2"]                          = "Benutzerchat 2",
 		["user3"]                          = "Benutzerchat 3",
 		["user4"]                          = "Benutzerchat 4",
-						
+
 		["fontsize"]					   = "Schriftgröße (reload notwendig)",
 		["fontsmall"]					   = "klein",
-		["fontlarge"]					   = "groß",		
-		
+		["fontlarge"]					   = "groß",
+
 		["fromcomp"]					   = "von Compendium",
 		["from"]						   = "von:",
 		["to"]						   	   = "an:",
@@ -377,10 +387,10 @@ local resources = {
 		["next"]						   = " weiter",
 		["results"]						   = "Ergeb.", -- might be shortend to "Ergeb."
 		["page"]						   = "Seite",
-		
+
 		["linkitem"]					   = "Verknüpfe Gegenstand mit Chat",
 		["aboutcomp"]					   = "über Compendium",
-		["aboutmessage"]				   = "Compendium öffnen:\n      /comp or /Compendium\n\nBesucht uns unter: \n   http://lotrocompendium.sourceforge.net/\n\nWeitere Neuerungen kommen bald!\n\nSpeziellen Dank an die Leute von lotrointerface.com\n\n© 2011 Lunarwater  |  Apache License V2.0",
+		["aboutmessage"]				   = "Compendium öffnen:\n      /comp or /Compendium\n\nBesucht uns unter: \n   https://www.lotrointerface.com/downloads/info526-LOTROCompendium.html\n\nWeitere Neuerungen kommen bald!\n\nSpeziellen Dank an die Leute von lotrointerface.com\n\n© 2022 Lunarwater",
 		["add"]                            = "hinzufügen",
 		["area"]                           = "Bereich:",
 		["bestower"]                       = "Verleiher:",
@@ -396,7 +406,6 @@ local resources = {
 		["deed"]                           = "Tat",
 		["deeds"]                          = "Taten",
 		["description"]                    = "Beschreibung",
-		["destinypoints"]                  = "Schicksalspunkte",
 		["download"]                       = "Lade das MoorMaps Zusatzmodul und Compendium zeigt dir die Position auf der Karte!",
 		["faction"]                        = "Fraktion:",
 		["fadewindow"]                     = "Fenster ausblenden wenn Maus abwesend.",  -- Not enough space on frame
@@ -411,7 +420,7 @@ local resources = {
 		["icon"]                           = "Zeige Icon",
 		["iconmini"]                       = "Ordnen von Klein Icon (16x16)",
 		["learn"]                          = "Lernen:",
-		["legendary"]					   = "Legendär",		
+		["legendary"]					   = "Legendär",
 		["level"]                          = "Level:",
 		["levellt"]                        = "Level < %s",
 		["levelgt"]                        = "Level > %s",
@@ -423,7 +432,6 @@ local resources = {
 		["mob"]                            = "Mob",
 		["mobsnpcsofinterest"]             = "Mobs/NPCs von Interesse:",
 		["miscpoi"]						   = "Sonstige Orte von Interesse",
-		["money"]                          = "Geld",
 		["name"]                           = "Name:",
 		["nextdeeds"]                      = "Nächste Tat(en):",
 		["nextquests"]                     = "Nächste Aufgabe(n):",
@@ -439,10 +447,8 @@ local resources = {
 		["questheader"]					   = "Aufgaben / Level",
 		["questchain"]                     = "Aufgabenreihe:",
 		["questreward"]                    = "Aufgabenbelohnung",
-		["receive"]                        = "erhalten",
 		["reg"]                            = "Reg:",
 		["rep"]                            = "Ruf",
-		["reputation"]                     = "Ruf",
 		["repeatable"]                     = "Wiederholbar:",
 		["reset"] 						   = "reset",
 		["reload"]						   = "Reload",
@@ -450,7 +456,6 @@ local resources = {
 		["savingdeeds"]                    = "Speichere Taten...",
 		["savingquests"]                   = "Speichere Aufgaben...",
 		["search"]                         = "Suche:",
-		["selectoneof"]                    = "Wähle eine von",
 		["selectquestmsg"]				   = "Dieses markiert alle aufgaben %s. Fahren Sie fort?",
 		["selectdeedmsg"]				   = "Dieses markiert alle taten %s. Fahren Sie fort?",
 		["settings"]                       = "Optionen",
@@ -458,15 +463,30 @@ local resources = {
 		["showitemquickslots"]			   = "Zeigt artikel icon",
 		["showsthecompendiumwindow"]       = "Zeigt das Compendium Fenster.",
 		["tier"]                           = "Stufe",
-		["titles"]                         = "Titel",
-		["traits"]                         = "Fertigkeiten",
 		["type"]                           = "Typ:",
 		["unknown"]                        = "(unbekannt)",
 		["unloadingcompendium"]            = "Verlasse Compendium...",
 		["usage"]                          = "Verwendung:",
 		["version"]                        = "Version",
-		["virtues"]                        = "Tugend",
 		["zone"]                           = "Zone:",
+
+		["cp"] = "Klassenpunkte",
+		["cx"] = "Herstellungs-EP",
+		["em"] = "Emotes",
+		["gl"] = "Ruhm",
+		["ix"] = "Gegenstand EP",
+		["lp"] = "Lotro-Punkte",
+		["mo"] = "Geld",
+		["mx"] = "Pferd EP",
+		["rc"] = "erhalten",
+		["ri"] = "Ruf",
+		["so"] = "Wähle eine von",
+		["ti"] = "Titel",
+		["tr"] = "Fertigkeiten",
+		["vr"] = "Tugend",
+		["vx"] = "Tugend EP",
+		["xp"] = "EP",
+
 		-- NOTE THAT IF A FILTER IS NOT FOUND HERE, It just uses the key for the resource value
 		-- For translating please see list above in the "en" section, and copy those values
 		-- you are able to translate
@@ -632,17 +652,17 @@ local resources = {
 			["Woodworker"]			=	"Drechsler",
 			["Woodworking"]			=	"drechseln",
 			["Wrist"]				=	"Handgelenk",
-			["Zone"]				=	"Zone"			
-		}		
+			["Zone"]				=	"Zone"
+		}
 	},
 	fr = {
 		["language"]                       = "Language (requires reload): ",
 		["en"]                        	   = "English",
 		["de"]                        	   = "German",
 		["fr"]                        	   = "French",
-	
-		["advice"]                         = "Advice",	
-		["officer"]                        = "Officer",		
+
+		["advice"]                         = "Advice",
+		["officer"]                        = "Officer",
 		["say"]                        	   = "Say",
 		["kinship"]                        = "Kinship",
 		["fellowship"]                     = "Fellowship",
@@ -653,11 +673,11 @@ local resources = {
 		["user3"]                          = "User Chat 3",
 		["user4"]                          = "User Chat 4",
 
-		
+
 		["fontsize"]					   = "Font Size (requires reload)",
 		["fontsmall"]					   = "Small",
 		["fontlarge"]					   = "Large",
-			
+
 		["fromcomp"]					   = "from compendium",
 		["from"]						   = "from:",
 		["to"]						   	   = "to:",
@@ -665,10 +685,10 @@ local resources = {
 		["next"]						   = " Next",
 		["results"]						   = "Results",
 		["page"]						   = "Page",
-		
+
 		["linkitem"]					   = "Link Item To Chat",
 		["aboutcomp"]					   = "About Compendium",
-		["aboutmessage"]				   = "To Open Compendium:\n      /comp or /Compendium\n\nVisit us at: \n   http://lotrocompendium.sourceforge.net/\n\nMore coming soon!\n\nSpecial Thanks to the folks at lotrointerface.com\n\n© 2011 Lunarwater  |  Apache License V2.0",
+		["aboutmessage"]				   = "To Open Compendium:\n      /comp or /Compendium\n\nVisit us at: \n   https://www.lotrointerface.com/downloads/info526-LOTROCompendium.html\n\nMore coming soon!\n\nSpecial Thanks to the folks at lotrointerface.com\n\n© 2022 Lunarwater",
 		["add"]                            = "Add",
 		["area"]                           = "Area:",
 		["bestower"]                       = "Bestower:",
@@ -699,7 +719,7 @@ local resources = {
 		["icon"]                           = "Show Icon",
 		["iconmini"]                       = "Show Mini Icon (16x16)",
 		["learn"]                          = "Learn:",
-		["legendary"]					   = "Legendary",		
+		["legendary"]					   = "Legendary",
 		["level"]                          = "Level:",
 		["levellt"]                        = "Levels < %s",
 		["levelgt"]                        = "Levels > %s",
@@ -711,7 +731,6 @@ local resources = {
 		["mob"]                            = "Mob",
 		["mobsnpcsofinterest"]             = "Mobs/NPCs of Interest:",
 		["miscpoi"]						   = "Misc Point of Interest",
-		["money"]                          = "Money",
 		["name"]                           = "Name:",
 		["nextdeeds"]                      = "Next Deed(s):",
 		["nextquests"]                     = "Next Quest(s):",
@@ -727,10 +746,8 @@ local resources = {
 		["questheader"]					   = "Quest Name / Level",
 		["questchain"]                     = "Quest Chain:",
 		["questreward"]                    = "Quest Reward",
-		["receive"]                        = "Receive",
 		["reg"]                            = "Reg:",
 		["rep"]                            = "Rep",
-		["reputation"]                     = "Reputations",
 		["repeatable"]                     = "Repeatable:",
 		["reset"] 						   = "reset",
 		["reload"]						   = "Reload",
@@ -738,7 +755,6 @@ local resources = {
 		["savingdeeds"]                    = "Saving deeds...",
 		["savingquests"]                   = "Saving quests...",
 		["search"]                         = "Search:",
-		["selectoneof"]                    = "Select One Of",
 		["selectquestmsg"]				   = "This will modify all quests to be %s.  Continue?",
 		["selectdeedmsg"]				   = "This will modify all deeds to be %s.  Continue?",
 		["settings"]                       = "Settings",
@@ -746,21 +762,35 @@ local resources = {
 		["showitemquickslots"]			   = "Show Item Quickslots",
 		["showsthecompendiumwindow"]       = "Shows the Compendium window.",
 		["tier"]                           = "Tier",
-		["titles"]                         = "Titles",
-		["traits"]                         = "Traits",
 		["type"]                           = "Type:",
 		["unknown"]                        = "(unknown)",
 		["unloadingcompendium"]            = "Unloading Compendium..",
 		["usage"]                          = "Usage:",
 		["version"]                        = "version",
-		["virtues"]                        = "Virtues",
 		["zone"]                           = "Zone:",
+
+		["cp"] = "Class Points",
+		["cx"] = "Crafting XP",
+		["em"] = "Emotes",
+		["gl"] = "Glory",
+		["ix"] = "Item XP",
+		["lp"] = "Lotro Points",
+		["mo"] = "Money",
+		["mx"] = "Mount XP",
+		["rc"] = "Receive",
+		["ri"] = "Rep Item",
+		["so"] = "Select One Of",
+		["ti"] = "Titles",
+		["tr"] = "Traits",
+		["vr"] = "Virtues",
+		["vx"] = "Virtue XP",
+		["xp"] = "XP",
 		-- NOTE THAT IF A FILTER IS NOT FOUND HERE, It just uses the key for the resource value
 		-- For translating please see list above in the "en" section, and copy those values
 		-- you are able to translate
 		["FILTERS"]	= {
-		}		
-	}	
+		}
+	}
 }
 
 BundleClass = class();
@@ -773,7 +803,7 @@ function BundleClass:Constructor()
 	elseif Turbine.Shell.IsCommand("aide") then
 	  client = "fr";
 	end
-	
+
 	self.ClientResources = clientResources[client];
 	self.Client = client;
 	self:SetLanguage('en');
@@ -781,16 +811,16 @@ function BundleClass:Constructor()
 	self.DE = "de";
 	self.FR = "fr";
 	self.EN = "en";
-	
+
 end
 
 function BundleClass:SetLanguage(lang)
 	self.lang = lang;
 	self.resources = resources[lang];
-	-- add in client specific resources to general resources 
+	-- add in client specific resources to general resources
 	for a,b in pairs(self.ClientResources) do
 		self.resources[a] = b;
-	end;	
+	end;
 end
 
 function BundleClass:GetResources()

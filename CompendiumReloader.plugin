@@ -3,8 +3,7 @@
 	<Information>
 		<Name>CompendiumReloader</Name>
 		<Author>Lunarwater</Author>
-		<Version>1.8.0-beta</Version>
-		<website>http://lotrocompendium.sourceforge.net/</website>
+		<Version>2.0</Version>
 		<Description>For Compendium Internal Use Only</Description>		
 	</Information>
 	<Package>Compendium.Launcher.Reloader</Package>

@@ -1,18 +1,4 @@
---[[
-   Copyright 2011 Kelly Riley (lunarwater)
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-]]
 deedtable = {
 {d="One would think that Wargs on a full belly would be sluggish....",id=1,level=60,name="A Full Belly and a Nap in the Dirt (Tower of Dol Guldur)",o="Find\nFind Defeat Kranklob after allowing Wargs to eat all the meat slabs throughout the Warg-pits of Dol Guldur",receive={{id="7001F098",val="Malledhrim Gold Star Emblem"}},t="Slayer"},
 {d="You have heard it whispered that the libraries of Moria yet contain many tomes, while many other volumes were brought by the dwarves seeking to reclaim their kingdom of old. One such tome in the libraries of the Iron Garrison is said to be the legendary \"A Guide to the Quiet Knife.\" If you can gain enough favour with the Iron Garrison Guards, they may let you have their copy of this book.",id=2,level=58,name="A Guide to the Quiet Knife",o="Achieve level 58\nUse A Guide to the Quiet Knife",t="Burglar",traits={{val="Practiced Bluff"}}},

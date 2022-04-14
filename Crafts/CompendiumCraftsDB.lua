@@ -1,18 +1,4 @@
---[[
-   Copyright 2011 Kelly Riley (lunarwater)
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-]]
 crafttable = {
 {tr=4,n="'Above Weathertop' Painting Recipe",r={n="'Above Weathertop' Painting",id="7000D073"},ing={{n="Bottle of Water",id="700005CB",nu="x1"},{n="Piece of Chalk",id="700005CE",nu="x1"},{n="Indigo Plant",id="70001A65",nu="x1"},{n="Onion Skin",id="70001AE4",nu="x1"}},u="Unlimited",f={n="'Above Weathertop' Decoration Recipe",id="7000D164"},t="Scholar"},
 {tr=4,n="Adamant Bracelet Recipe",r={n="Adamant Bracelet of Agility",id="700207D3"},ing={{n="Platinum Ingot",id="70001C2B",nu="x3"},{n="Polished Adamant",id="70001C30",nu="x1"},{n="Chunk of Yellow Rock-salt",id="7001AC83",nu="x1 (optional)"}},u="Unlimited",c={n="Polished Adamant Bracelet of Agility",id="700207E1"},f={n="Adamant Bracelet Recipe",id="7000AED1"},t="Jeweller"},

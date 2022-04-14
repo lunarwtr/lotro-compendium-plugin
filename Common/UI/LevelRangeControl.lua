@@ -1,19 +1,4 @@
---[[
-   Copyright 2011 Kelly Riley (lunarwater)
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-]]
 
 import "Turbine.UI";
 import "Turbine.UI.Lotro";
@@ -26,10 +11,10 @@ LevelRangeControl = class( Compendium.Common.UI.LabelMenu );
 function LevelRangeControl:Constructor( )
     Compendium.Common.UI.LabelMenu.Constructor( self );
 	rsrc = Compendium.Common.Resources.Bundle:GetResources();
-	
+
 	self:SetSize(175,25);
 	self:SetRowHighlight(false);
-	
+
     local fontColor = Turbine.UI.Color(1,.9,.5);
     local backColor = Turbine.UI.Color(.05,.05,.05);
    	local gray = Turbine.UI.Color(0.3,0.3,0.3);
@@ -41,7 +26,7 @@ function LevelRangeControl:Constructor( )
     range:SetFont(fontFace);
     range:SetForeColor(fontColor);
     self.range = range;
-    
+
 	local from = Turbine.UI.TextBox();
 	from:SetParent(range);
 	from:SetSize(30,16);
@@ -50,9 +35,9 @@ function LevelRangeControl:Constructor( )
     from:SetTextAlignment(Turbine.UI.ContentAlignment.MiddleLeft);
     from:SetFont(Turbine.UI.Lotro.Font.TrajanPro13);
     from:SetForeColor(fontColor);
-    from:SetOutlineColor(Turbine.UI.Color(0,0,0));	
+    from:SetOutlineColor(Turbine.UI.Color(0,0,0));
 	self.from = from;
-	
+
 	local to = Turbine.UI.TextBox();
 	to:SetParent(range);
 	to:SetSize(30,16);
@@ -61,26 +46,26 @@ function LevelRangeControl:Constructor( )
     to:SetTextAlignment(Turbine.UI.ContentAlignment.MiddleLeft);
     to:SetFont(Turbine.UI.Lotro.Font.TrajanPro13);
     to:SetForeColor(fontColor);
-    to:SetOutlineColor(Turbine.UI.Color(0,0,0));	
+    to:SetOutlineColor(Turbine.UI.Color(0,0,0));
     self.to = to;
-    
+
     --local player = Turbine.Gameplay.LocalPlayer:GetInstance();
     --local level = player:GetLevel();
     self.from:SetText(1);
-    self.to:SetText(65);
-    
+    self.to:SetText(140);
+
     local apply = Turbine.UI.Control();
     apply:SetParent( range );
-	apply:SetBackground( "Compendium/Common/Resources/images/apply.tga" );    
+	apply:SetBackground( "Compendium/Common/Resources/images/apply.tga" );
     apply:SetSize( 13, 13 );
     apply:SetPosition(to:GetLeft() + to:GetWidth() + 10, 4);
     apply.MouseClick = function( sender, args )
     	self:HideMenu();
     	self:RangeApplied(from:GetText(), to:GetText());
     end
-	self.apply = apply;	
+	self.apply = apply;
    	self:AddItem(range);
-   	
+
 end
 
 function LevelRangeControl:ShowMenu()

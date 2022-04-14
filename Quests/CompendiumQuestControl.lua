@@ -1,18 +1,4 @@
---[[
-   Copyright 2011 Kelly Riley (lunarwater)
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-]]
 import "Turbine";
 import "Turbine.Gameplay";
 import "Turbine.UI";
@@ -24,20 +10,24 @@ import "Compendium.Quests.QuestCategoryMenu";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 import "Compendium.Common.Resources.Bundle";
+
+---@type Quest[]
+---@diagnostic disable-next-line: lowercase-global
+questtable = questtable or {}
+
 local rsrc = {};
 
 local pagesize = 200;
-local rewardLabels = { 
-    "reputation","destinypoints","money","receive","virtues","titles","selectoneof","traits" 
+local rewardLabels = {
+	"xp", "cp", "cx", "em", "gl", "ix", "lp", "mo", "mx", "rc", "ri", "so", "ti", "tr", "vr", "vx"
 };
-
 
 CompendiumQuestControl= class( Compendium.Common.UI.CompendiumControl );
 function CompendiumQuestControl:Constructor(language)
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 	rsrc = Compendium.Common.Resources.Bundle:GetResources();
 
-	self.questprogressionmodified = false;	
+	self.questprogressionmodified = false;
 	self.questprogression = {};
 	self.localquestdatamodified = false;
 	self.localquestdata = {};
@@ -45,7 +35,7 @@ function CompendiumQuestControl:Constructor(language)
     self.currentManualFilters = {};
 	self.searchDisabled = true;
 	self:LoadLocalQuests();
-	
+
 	self.range = Compendium.Common.UI.LevelRangeControl();
 	self.range:SetParent(self);
 	self.range.RangeApplied = function( s, from, to )
@@ -66,43 +56,43 @@ function CompendiumQuestControl:Constructor(language)
 			if (top + mh) > h then top = h - mh end;
 			if (left + mw) > w then left = w - mw end;
 			self.range:SetPosition(left,top);
-			self.range:ShowMenu(true); 
+			self.range:ShowMenu(true);
     	elseif size > 0 and (categories[size] == 'Complete' or categories[size] == 'Incomplete') then
 	   		self:AddFilters({ manual = { progression = { value = (categories[size] == 'Complete') } } });
     	else
 			self:AddFilters({ indexes = categories });
     	end
-	end        
+	end
     local filterButton = Turbine.UI.Lotro.Button();
     filterButton:SetParent(self);
     filterButton:SetPosition(9,3);
     filterButton:SetSize(85,20);
     filterButton:SetText(" " .. rsrc["filterby"]);
  	filterButton:SetTextAlignment( Turbine.UI.ContentAlignment.MiddleLeft );
-	filterButton.Click = function( sender, args ) 
+	filterButton.Click = function( sender, args )
     	self.menu:ShowMenu();
     end
-    
+
     local filterIcon = Turbine.UI.Control();
     filterIcon:SetParent( filterButton );
     filterIcon:SetBackground(0x41007e19);
     filterIcon:SetBlendMode(Turbine.UI.BlendMode.Overlay);
     filterIcon:SetPosition( filterButton:GetWidth() - 20, 1 );
     filterIcon:SetSize( 16, 16 );
-    filterIcon.MouseClick = function( sender, args ) 
+    filterIcon.MouseClick = function( sender, args )
     	self.menu:ShowMenu();
     end
 
-    
-      --[[ 
+
+      --[[
 	self.logo = Turbine.UI.Control();
 	self.logo:SetBlendMode(Turbine.UI.BlendMode.Screen);
 	self.logo:SetBackground( "Compendium/Common/Resources/images/CompendiumLogoSmall.tga" );
 	self.logo:SetPosition(self:GetWidth() - 80 ,0);
 	self.logo:SetSize(75,100);
-	self.logo:SetParent( self );    
+	self.logo:SetParent( self );
      ]]
-     
+
     local searchLabel = Turbine.UI.Label();
     searchLabel:SetParent(self);
     searchLabel:SetPosition(97,5);
@@ -153,16 +143,16 @@ function CompendiumQuestControl:Constructor(language)
         end
     end
 	--]]
-	
+
     local filtersLabel = Turbine.UI.Label();
     filtersLabel:SetParent(self);
     filtersLabel:SetPosition(5,filterButton:GetTop() +  filterButton:GetHeight());
     filtersLabel:SetSize(self:GetWidth() - 7,20);
     filtersLabel:SetFont(self.fontFace);
     filtersLabel:SetForeColor(self.trimColor);
-    filtersLabel:SetText(rsrc["nofiltersset"]);	
-	self.filtersLabel = filtersLabel;	
-	
+    filtersLabel:SetText(rsrc["nofiltersset"]);
+	self.filtersLabel = filtersLabel;
+
     -- add a search reset button
     local reset = Turbine.UI.Lotro.Button();
     reset:SetParent( self );
@@ -204,7 +194,7 @@ function CompendiumQuestControl:Constructor(language)
             local item = self.qlContainer.QuestList:GetItem(idx);
             item:GetControls():Get(1):SetBackColor(self.selBackColor);
             -- Display Quest
-            self:LoadQuestDetails(questtable[item.QuestId]);
+            self:LoadQuestDetails( questtable[item.QuestId]);
         end
 
     end
@@ -225,7 +215,7 @@ function CompendiumQuestControl:Constructor(language)
     nameCol:SetFont(self.fontFace);
     nameCol:SetForeColor(self.fontColor);
     nameCol:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    nameCol:SetFontStyle(Turbine.UI.FontStyle.Outline);    
+    nameCol:SetFontStyle(Turbine.UI.FontStyle.Outline);
     nameCol:SetTextAlignment( Turbine.UI.CheckBox.MiddleCenter );
 
 	local selectAllCB = Turbine.UI.Lotro.CheckBox();
@@ -242,15 +232,15 @@ function CompendiumQuestControl:Constructor(language)
 		if not val then type = rsrc['incomplete'] end;
 		Compendium.Common.UI.Dialog.Confirm:Show(rsrc['confirm'], string.format(rsrc['selectquestmsg'],type),
 							function()
-								self:UpdateAllFilteredRecord('modifyprog',s:IsChecked()); 
+								self:UpdateAllFilteredRecord('modifyprog',s:IsChecked());
 							end,
 							function()
 								s.undo = true;
 								s:SetChecked(not val);
 								s.undo = false;
-							end);	
-	end 
-	qlHeader.SetWidth = function(s, w) 
+							end);
+	end
+	qlHeader.SetWidth = function(s, w)
 		Turbine.UI.Control.SetWidth(s, w);
 		local ncw = w - 16;
 		nameCol:SetWidth(ncw);
@@ -266,7 +256,7 @@ function CompendiumQuestControl:Constructor(language)
    		self:ClearQuests();
 		self:LoadQuests(records);
    	end
-   	pagination.VisibleChanged = function(s,a) 
+   	pagination.VisibleChanged = function(s,a)
    		local ql = self.qlContainer.QuestList;
    		local sb = ql.VScrollBar;
    		local ch = self.qlContainer:GetHeight();
@@ -278,9 +268,9 @@ function CompendiumQuestControl:Constructor(language)
    			sb:SetHeight(ch - 20);
    		end
    	end
-   	
+
     self.pagination = pagination;
-    
+
     self.qdContainer=Turbine.UI.Control();
     self.qdContainer:SetParent(self);
     self.qdContainer:SetPosition(self.qlContainer:GetLeft()+self.qlContainer:GetWidth()+5,self.qlContainer:GetTop());
@@ -298,18 +288,19 @@ function CompendiumQuestControl:Constructor(language)
     self.qdContainer.QuestDetails.VScrollBar:SetPosition(self.qdContainer:GetWidth()-16,0)
     self.qdContainer.QuestDetails.VScrollBar:SetWidth(12);
     self.qdContainer.QuestDetails.VScrollBar:SetHeight(self.qdContainer:GetHeight()-2);
-    self.qdContainer.QuestDetails:SetVerticalScrollBar(self.qdContainer.QuestDetails.VScrollBar);    
+    self.qdContainer.QuestDetails:SetVerticalScrollBar(self.qdContainer.QuestDetails.VScrollBar);
 
     local bottom = self.qdContainer:GetTop() + self.qdContainer:GetHeight() + 2;
 	local detailTabs = Compendium.Common.UI.TabControl();
 	detailTabs:SetParent(self);
 	detailTabs:SetPosition(7,bottom);
-	    
+
     self.questDesc=Turbine.UI.Label();
     self.questDesc:SetPosition(0,0);
     self.questDesc:SetFont(self.fontFace);
     self.questDesc:SetForeColor(self.fontColor);
     self.questDesc:SetSelectable(true);
+	self.questDesc:SetMarkupEnabled(true);
     self.questDesc.VScrollBar=Turbine.UI.Lotro.ScrollBar();
     self.questDesc.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
     self.questDesc.VScrollBar:SetParent(self.questDesc);
@@ -318,7 +309,7 @@ function CompendiumQuestControl:Constructor(language)
     self.questDesc.VScrollBar:SetWidth(12);
     self.questDesc.VScrollBar:SetHeight(self.questDesc:GetHeight()-2);
     self.questDesc:SetVerticalScrollBar(self.questDesc.VScrollBar);
-    self.questDesc.SizeChanged = function(s,a) 
+    self.questDesc.SizeChanged = function(s,a)
     	local width = s:GetWidth();
 		local height = s:GetHeight();
 	    self.questDesc.VScrollBar:SetPosition(width-12,0);
@@ -330,6 +321,7 @@ function CompendiumQuestControl:Constructor(language)
     self.questObj:SetFont(self.fontFace);
     self.questObj:SetForeColor(self.fontColor);
     self.questObj:SetSelectable(true);
+	self.questObj:SetMarkupEnabled(true);
     self.questObj.VScrollBar=Turbine.UI.Lotro.ScrollBar();
     self.questObj.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
     self.questObj.VScrollBar:SetParent(self.questObj);
@@ -338,7 +330,7 @@ function CompendiumQuestControl:Constructor(language)
     self.questObj.VScrollBar:SetWidth(12);
     self.questObj.VScrollBar:SetHeight(self.questObj:GetHeight()-2);
     self.questObj:SetVerticalScrollBar(self.questObj.VScrollBar);
-    self.questObj.SizeChanged = function(s,a) 
+    self.questObj.SizeChanged = function(s,a)
     	local width = s:GetWidth();
 		local height = s:GetHeight();
 	    self.questObj.VScrollBar:SetPosition(width-12,0);
@@ -346,23 +338,24 @@ function CompendiumQuestControl:Constructor(language)
     end
 
 	self.coord = Compendium.Common.UI.CoordinateControl();
-	self.coord:SetParent(self);  	
-    
+	self.coord:SetParent(self);
+
     local comments= Compendium.Quests.QuestCommentsControl();
-    comments.CommentAdded = function(s, value) 
+    comments.CommentAdded = function(s, value)
     	if self.currentRecord ~= nil then
     		self:UpdateLocalRecord(self.currentRecord,'addcomment', { val = value , modifiable = true, time = Turbine.Engine:GetLocalTime() } );
     	end
     end
-    comments.CommentDeleted  = function(s, value) 
+    comments.CommentDeleted  = function(s, value)
     	if self.currentRecord ~= nil then
     		self:UpdateLocalRecord(self.currentRecord,'delcomment', value );
     	end
     end
     comments.CoordClicked = function( sender, y, ns, x, ew )
     	if self.currentRecord ~= nil then
-    		self:CoordClicked( y, ns, x, ew, self.currentRecord['zone'], rsrc["miscpoi"], self.currentRecord['name']);
-    	end		
+			local isdungeon, target, name = self:PoiPlace(self.currentRecord);
+    		self:CoordClicked( y, ns, x, ew, target, isdungeon, rsrc["miscpoi"], self.currentRecord['name']);
+    	end
     end
 	self.comments = comments;
 
@@ -370,15 +363,15 @@ function CompendiumQuestControl:Constructor(language)
 	detailTabs:AddTab(rsrc["description"],  self.questDesc);
 	detailTabs:AddTab(rsrc["comments"],  comments);
 	detailTabs:SetSize(self:GetWidth()-10, 150);
-    
+
     self:ClearQuests();
 	self.searchDisabled = false;
 
-    
+
  	self.SetWidth = function(sender,width)
         if width<100 then width=100 end;
         Turbine.UI.Control.SetWidth(self,width);
-        
+
         local qlwidth = (width/2) - 7;
         self.qlContainer:SetWidth(qlwidth);
         self.qdContainer:SetLeft(self.qlContainer:GetLeft() + qlwidth + 5);
@@ -389,12 +382,12 @@ function CompendiumQuestControl:Constructor(language)
         self.qlContainer.QuestList.VScrollBar:SetLeft(qlwidth-16);
         self.qdContainer.QuestDetails.VScrollBar:SetLeft(qlwidth-16);
         pagination:SetWidth(qlwidth - 4);
-        
+
 		local swidth = width - (searchLabel:GetWidth()+searchLabel:GetLeft())-55;
     	self.SearchBorder:SetWidth(swidth);
     	self.SearchText:SetWidth(swidth);
 	    reset:SetLeft( self.SearchBorder:GetLeft() + self.SearchBorder:GetWidth() + 1 );
-		
+
 		detailTabs:SetWidth(width - 10);
 		for index=1,self.qlContainer.QuestList:GetItemCount() do
 			local label = self.qlContainer.QuestList:GetItem(index);
@@ -408,11 +401,11 @@ function CompendiumQuestControl:Constructor(language)
 		end
 
     end
-		
+
  	self.SetHeight = function(sender,height)
         if height<300 then height=300 end;
         local lheight = height - self.qlContainer:GetTop() - detailTabs:GetHeight() - 5;
-        
+
         Turbine.UI.Control.SetHeight(self,height);
 		self.qlContainer:SetHeight(lheight);
 		local ql = self.qlContainer.QuestList;
@@ -425,39 +418,39 @@ function CompendiumQuestControl:Constructor(language)
    			sb:SetHeight(lheight - 20);
    		end
 		pagination:SetTop(lheight - 22);
-		
+
 		self.qdContainer:SetHeight(lheight);
 		self.qdContainer.QuestDetails:SetHeight(lheight - 3);
 		self.qdContainer.QuestDetails.VScrollBar:SetHeight(lheight - 2);
-		detailTabs:SetTop(self.qdContainer:GetTop() + lheight + 2);   	
-    end	
-	
-	self.SetSize = function(sender,width, height) 
+		detailTabs:SetTop(self.qdContainer:GetTop() + lheight + 2);
+    end
+
+	self.SetSize = function(sender,width, height)
 		self:SetWidth(width);
 		self:SetHeight(height);
-	end	
-	
+	end
+
 	self:BuildCursor();
-		    
+
 end
 
 function CompendiumQuestControl:ClearQuests()
 	for index=1,self.qlContainer.QuestList:GetItemCount() do
 		local item = self.qlContainer.QuestList:GetItem(index);
 		self:strip(item, 1);
-	end	
+	end
 	self.qlContainer.QuestList:ClearItems();
 	for index=1,self.qdContainer.QuestDetails:GetItemCount() do
 		local item = self.qdContainer.QuestDetails:GetItem(index);
 		self:strip(item, 1);
-	end		
+	end
     self.qdContainer.QuestDetails:ClearItems();
     self.questDesc:SetText("");
     self.questObj:SetText("");
 	self.comments:ClearComments();
     self:AddQuestDetail(rsrc["noquestselected"]);
     self.prevIdx = nil;
-	self.currentRecord = nil;    
+	self.currentRecord = nil;
 end
 
 function CompendiumQuestControl:AddQuestDetail(text, hyperlink)
@@ -482,13 +475,13 @@ end
 
 function CompendiumQuestControl:JoinIndex(a, b)
 	if a == nil then return b; end
-	
+
     local set = {};
     local data = {};
     for i,k in pairs(a) do set[tostring(k)] = true; end
     for i,k in pairs(b) do
-        if set[tostring(k)] then 
-        	table.insert(data, k); 
+        if set[tostring(k)] then
+        	table.insert(data, k);
         end
     end
     return data;
@@ -502,14 +495,17 @@ function CompendiumQuestControl:LoadQuests(records)
 
     for i,rec in pairs(records) do
         local level = rec["level"];
-        local name = rec["name"] .. ' (' .. level .. ')';
+        local name = rec["name"];
+		if level ~= nil then
+			name = name .. ' (' .. level .. ')';
+		end
         if rec["faction"] == 'Mon' then
         	name = name .. ' (M)';
         end
 
         local quest = Turbine.UI.Control();
         quest:SetSize(width - 10, 18);
-        
+
         local label = Turbine.UI.Label();
         label:SetMultiline(false);
         label:SetParent(quest);
@@ -520,10 +516,10 @@ function CompendiumQuestControl:LoadQuests(records)
         label:SetBackColor(bgColor);
         label:SetFont(self.fontFaceSmall);
 	    label:SetTextAlignment( Turbine.UI.CheckBox.MiddelCenter );
-	    
+
 	    local complete = self.questprogression[rec["name"]];
 	    if complete == nil then complete = false end;
-	    
+
 		local checkbox = Turbine.UI.Lotro.CheckBox();
 	    checkbox:SetParent( quest );
 	    checkbox:SetPosition(label:GetWidth(), 0);
@@ -531,24 +527,34 @@ function CompendiumQuestControl:LoadQuests(records)
 	    checkbox:SetChecked(complete);
 		checkbox.CheckedChanged = function(s,a)
 			self:UpdateLocalRecord(self.currentRecord,'modifyprog',s:IsChecked());
-		end              
-        
+		end
+
         local color = self.fontColor;
-        if level ~= nil and level ~= '' then
-            color = self:GetLevelColor(playerLevel, tonumber(level));
+        if level ~= nil then
+			local relLevel = playerLevel;
+			if level == 'Scaling' then
+				if rec['minlevel'] ~= nil then
+					relLevel = tonumber(rec['minlevel']);
+				else
+					relLevel = playerLevel;
+				end
+			else
+				relLevel = tonumber(level);
+			end
+			color = self:GetLevelColor(playerLevel, relLevel);
         end
         label:SetForeColor(color);
-                
-        quest.QuestId = tonumber(rec["id"]);
+
+        quest.QuestId = tonumber(rec["ndx"]);
         self.qlContainer.QuestList:AddItem(quest);
     end
-    
+
 end
 
-function CompendiumQuestControl:Reset() 
+function CompendiumQuestControl:Reset()
 	self.searchDisabled = true;
 	self.SearchText:SetText('');
-    self:ClearQuests();	
+    self:ClearQuests();
 	self.currentIndexFilters = {};
 	self.currentManualFilters = {};
 	self.filtersLabel:SetText(rsrc["nofiltersset"]);
@@ -564,83 +570,93 @@ function CompendiumQuestControl:FormatItem(record)
 	else
 		item = '['..record['val']..']';
 	end
-	
+
 	if record['q'] ~= nil and record['q'] ~= '' then
 		item = item .. ' ' .. record['q'];
 	end
-	
-	return item; 
+
+	return item;
 end
 
+---@param record Quest
 function CompendiumQuestControl:LoadQuestDetails(record)
-    
+
     local localrecord = self.localquestdata[record['name']];
     --[[{
-    	["next"] = {1276, 2025}, 
-    	["reputation"] = {"+700 with Malledhrim"}, 
-    	["zone"] = "Mirkwood", 
-    	["area"] = "Taur Morvith", 
-    	["money"] = {"45s 36c"}, 
+    	["next"] = {1276, 2025},
+    	["reputation"] = {"+700 with Malledhrim"},
+    	["zone"] = "Mirkwood",
+    	["area"] = "Taur Morvith",
+    	["money"] = {"45s 36c"},
 		["receive"] = {"Malledhrim Bronze Feather (x4)"},
-    	["mobs"] = {{["locations"] = {"16.60S, 50.55W"}, ["name"] = "Iavassúl"}}, 
-    	["category"] = "Mirkwood", 
-    	["id"] = 2222, 
-    	["scope"] = "n/a", 
-    	["prev"] = {862, 1620}, 
-    	["name"] = "The Narrow Way", 
-    	["arcs"] = "Forts of Taur Morvith", 
-    	["d"] = "The Elven scout Ianudirel was sent ahead to explore the far side of the river from Krul Lugu, but she has not yet returned.", 
-    	["minlevel"] = 59, 
-    	["repeatable"] = "No", 
-    	["faction"] = "FrP", 
-    	["instanced"] = "No"
+    	["mobs"] = {{["locations"] = {"16.60S, 50.55W"}, ["name"] = "Iavassúl"}},
+    	["category"] = "Mirkwood",
+    	["id"] = 2222,
+    	["scope"] = "n/a",
+    	["prev"] = {862, 1620},
+    	["name"] = "The Narrow Way",
+    	["arcs"] = "Forts of Taur Morvith",
+    	["d"] = "The Elven scout Ianudirel was sent ahead to explore the far side of the river from Krul Lugu, but she has not yet returned.",
+    	["minlevel"] = 59,
+    	["repeatable"] = "No",
+    	["faction"] = "FrP",
+    	["instance"] = "No"
     },]]
-    
+
     self.qdContainer.QuestDetails:ClearItems();
 	self.comments:ClearComments();
     self.currentRecord = record;
-    
+
     self:AddQuestDetail(rsrc['name']);
     self:AddQuestDetail("  " .. record['name']);
-    local levelinfo = rsrc["level"] .. " " .. record['level'];
-    if record['minlevel'] ~= nil then levelinfo = levelinfo  .. " / ".. rsrc["minlevel"] .. " " .. record['minlevel'] end;
-    self:AddQuestDetail(levelinfo);
+	if record['level'] ~= nil then
+		local levelinfo = rsrc["level"] .. " " .. record['level'];
+		if record['minlevel'] ~= nil then levelinfo = levelinfo  .. " / ".. rsrc["minlevel"] .. " " .. record['minlevel'] end;
+		self:AddQuestDetail(levelinfo);
+	end
     if record['t'] ~= nil then self:AddQuestDetail(rsrc["type"] .. " "  .. record['t']); end
     local repinst = rsrc["repeatable"] .. " "  .. record['repeatable'];
-    if record['instanced'] ~= nil then repinst = repinst .. " / ".. rsrc["instanced"] .. " " .. record['instanced'] end;
+    if record['instance'] ~= nil then repinst = repinst .. " / ".. rsrc["instanced"] .. " " .. record['instance'] end;
     self:AddQuestDetail(repinst);
 
     if record['zone'] ~= nil then self:AddQuestDetail(rsrc["zone"] .. " " .. record['zone']); end
     if record['area'] ~= nil then self:AddQuestDetail(rsrc["area"] .. " " .. record['area']); end
+	if record['dungeon'] ~= nil then self:AddQuestDetail(rsrc["dungeon"] .. " " .. record['dungeon']); end
     if record['faction'] ~= nil then self:AddQuestDetail(rsrc["faction"] .. " " .. record['faction']); end
     if record['b'] ~= nil then self:AddQuestDetail(rsrc["bestower"] .. " " .. record['b']); end
-    
-    for j, reward in pairs(rewardLabels) do
-    	local display = rsrc[reward];
-    	if record[reward] ~= nil then
-    		local vals = record[reward];
-	    	if #vals > 1 then
-	    		for i,item in pairs(vals) do
-	    			local prefix = "     ";
-	    			if i == 1 then prefix = display .. ": "; end
-	    			
-	    			local dispval = item['val']
-	    			if reward == 'receive' or reward == 'selectoneof' then
-	    				dispval = self:FormatItem(item);
-	    			end
-	    			
-	    			self:AddQuestDetail(prefix .. dispval)
-	    		end
-	    	else
-    			local dispval = vals[1]['val']
-    			if reward == 'receive' or reward == 'selectoneof' then
-    				dispval = self:FormatItem(vals[1]);
-    			end	    	
-	    		self:AddQuestDetail(display .. ": " .. dispval);
-	    	end
-    	end
-    end
-        		
+
+	if record['r'] ~= nil then
+		for j, reward in pairs(rewardLabels) do
+			local display = rsrc[reward];
+			if record['r'][reward] ~= nil then
+				local vals = record['r'][reward];
+				if #vals > 1 then
+					for i,item in pairs(vals) do
+						local prefix = "     ";
+						if i == 1 then prefix = display .. ": "; end
+
+						local dispval = item['val']
+						if reward == 'rc' or reward == 'so' then
+							dispval = self:FormatItem(item);
+						elseif reward == 'cx' then
+							dispval = item['craft'] .. ' ' .. item['val'];
+						end
+
+						self:AddQuestDetail(prefix .. dispval)
+					end
+				else
+					local dispval = vals[1]['val']
+					if reward == 'rc' or reward == 'so' then
+						dispval = self:FormatItem(vals[1]);
+					elseif reward == 'cx' then
+						dispval = vals[1]['craft'] .. ' ' .. vals[1]['val'];
+					end
+					self:AddQuestDetail(display .. ": " .. dispval);
+				end
+			end
+		end
+	end
+
     local sep = false;
     if record['arcs'] ~= nil then
         self:AddQuestDetail("");
@@ -658,8 +674,8 @@ function CompendiumQuestControl:LoadQuestDetails(record)
         if sep == false then self:AddQuestDetail(""); end
         sep = true
         self:AddQuestDetail(rsrc["prereqs"]);
-        for i,previd in pairs(record['prev']) do     
-        	local name = questtable[previd]['name'];   
+        for i,previd in pairs(record['prev']) do
+        	local name = questtable[previd]['name'];
 	        self:AddQuestDetail("  " .. name, true).MouseClick = function(sender, args)
 	            self:LoadQuestDetails(questtable[previd]);
 	        end;
@@ -669,42 +685,33 @@ function CompendiumQuestControl:LoadQuestDetails(record)
         if sep == false then self:AddQuestDetail(""); end
         sep = true
         self:AddQuestDetail(rsrc["nextquests"]);
-        for i,nextid in pairs(record['next']) do     
-        	local name = questtable[nextid]['name'];   
+        for i,nextid in pairs(record['next']) do
+        	local name = questtable[nextid]['name'];
 	        self:AddQuestDetail("  " .. name, true).MouseClick = function(sender, args)
 	            self:LoadQuestDetails(questtable[nextid]);
 	        end;
         end
     end
-    
+
     sep = false
     if record['mobs'] ~= nil and #record['mobs'] > 0 then
         if sep == false then self:AddQuestDetail(""); end
         sep = true
         self:AddQuestDetail(rsrc["mobsnpcsofinterest"]);
         for i,mob in pairs(record['mobs']) do
-            local name = "  " .. mob['name'];
-            if mob['locations'] ~= nil then
-	            if #mob['locations'] > 1 then
-	            	self:AddQuestDetail(name); 
-	            	for i,loc in pairs(mob['locations']) do
-		            	self:AddQuestDetail('       ' .. loc).MouseClick = function(s,a)
-		            		local tmp, tmp, tmp, y, ns, x, ew = string.find(loc, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
-		            		if i ~= nil then
-		            			self:CoordClicked( y, ns, x, ew, mob['zone'], mob['name'], rsrc['quest'] .. ' - ' .. string.gsub(record['name'],':','-') .. ' / '.. rsrc["mob"] .. ' - ' .. mob['name']);
-		            		end
-		            	end
-	            	end
-	            elseif #mob['locations'] == 1 then
-	            	name = name .. ' (' .. mob['locations'][1] .. ')';
-	            	self:AddQuestDetail(name).MouseClick = function(s,a)
-	            		local tmp, tmp, tmp, y, ns, x, ew = string.find(mob['locations'][1], "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
-	            		if i ~= nil then
-	            			self:CoordClicked( y, ns, x, ew, mob['zone'], mob['name'], rsrc['quest'] .. ' - ' .. string.gsub(record['name'],':','-') .. ' / '.. rsrc["mob"] .. ' - ' .. mob['name']);
-	            		end
-	            	end
-	            end
-	        else 
+            local isdungeon, target, name = self:PoiPlace(mob);
+            if mob['loc'] ~= nil then
+				self:AddQuestDetail("  " .. name);
+				for i, loc in pairs(mob['loc']) do
+					self:AddQuestDetail('       ' .. loc).MouseClick = function(s,a)
+						local start, len, tmp, y, ns, x, ew = string.find(loc, "(([%d%.]+)([NSns])[, ]+([%d%.]+)([EWOewo]))");
+						--Turbine.Shell.WriteLine('start: ' .. tostring(start) .. ', len: ' .. tostring(len) .. ', y: ' .. tostring(y) .. ', ns: ' .. tostring(ns) .. ', x: ' .. tostring(x) .. ', ew: '.. tostring(ew));
+						if start ~= nil then
+							self:CoordClicked( y, ns, x, ew, target, isdungeon, mob['name'], rsrc['quest'] .. ' - ' .. string.gsub(record['name'],':','-') .. ' / '.. rsrc["mob"] .. ' - ' .. mob['name']);
+						end
+					end
+				end
+	        else
 	        	self:AddQuestDetail(name);
 	        end
         end
@@ -715,33 +722,24 @@ function CompendiumQuestControl:LoadQuestDetails(record)
         sep = true
         self:AddQuestDetail(rsrc["pointsofinterest"]);
         for i,poi in pairs(record['pois']) do
-            local name = "  " .. poi['name'];
-            if poi['locations'] ~= nil then
-	            if #poi['locations'] > 1 then
-	            	self:AddQuestDetail(name); 
-	            	for i,loc in pairs(poi['locations']) do
-		            	self:AddQuestDetail('       ' .. loc).MouseClick = function(s,a)
-		            		local tmp, tmp, tmp, y, ns, x, ew = string.find(loc, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
-		            		if i ~= nil then
-		            			self:CoordClicked( y, ns, x, ew, poi['zone'], poi['name'], rsrc['quest'] .. ' - ' .. string.gsub(record['name'],':','-') .. ' / ' .. poi['name']);
-		            		end
-		            	end            	
-	            	end
-	            elseif #poi['locations'] == 1 then
-	            	name = name .. ' (' .. poi['locations'][1] .. ')';
-	            	self:AddQuestDetail(name).MouseClick = function(s,a)
-	            		local tmp, tmp, tmp, y, ns, x, ew = string.find(poi['locations'][1], "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
-	            		if i ~= nil then
-	            			self:CoordClicked( y, ns, x, ew, poi['zone'], poi['name'], rsrc['quest'] .. ' - ' .. string.gsub(record['name'],':','-') .. ' / ' .. poi['name']);
-	            		end
-	            	end
-	            end
-	        else 
+            local isdungeon, target, name = self:PoiPlace(poi);
+            if poi['loc'] ~= nil then
+				self:AddQuestDetail("  " .. name);
+				for i,loc in pairs(poi['loc']) do
+					self:AddQuestDetail('       ' .. loc).MouseClick = function(s,a)
+						local start, len, tmp, y, ns, x, ew = string.find(loc, "(([%d%.]+)([NSns])[, ]+([%d%.]+)([EWOewo]))");
+						--Turbine.Shell.WriteLine('start: ' .. tostring(start) .. ', len: ' .. tostring(len) .. ', y: ' .. tostring(y) .. ', ns: ' .. tostring(ns) .. ', x: ' .. tostring(x) .. ', ew: '.. tostring(ew));
+						if start ~= nil then
+							self:CoordClicked( y, ns, x, ew, target, isdungeon, poi['name'], rsrc['quest'] .. ' - ' .. string.gsub(record['name'],':','-') .. ' / ' .. poi['name']);
+						end
+					end
+				end
+	        else
 	        	self:AddQuestDetail(name);
 	        end
         end
     end
-    
+
     -- description
     self.questDesc:SetVerticalScrollBar(nil);
     self.questDesc:SetText(record['d']);
@@ -750,7 +748,7 @@ function CompendiumQuestControl:LoadQuestDetails(record)
     self.questObj:SetVerticalScrollBar(nil);
     self.questObj:SetText(record['o']);
     self.questObj:SetVerticalScrollBar(self.questObj.VScrollBar);
-    
+
     if record['c'] ~= nil then
     	local comrecs = {};
     	for i, value in pairs(record['c']) do
@@ -767,6 +765,18 @@ function CompendiumQuestControl:LoadQuestDetails(record)
 
 end
 
+function CompendiumQuestControl:PoiPlace(poi)
+	local zad = {};
+	local target = poi['zone'];
+	if poi['zone'] ~= nil then table.insert(zad, poi['zone']); end
+	if poi['area'] ~= nil then 
+		table.insert(zad, poi['area']);
+		--target = poi['area'];
+	end
+	if poi['dungeon'] ~= nil then table.insert(zad, poi['dungeon']); end
+	return poi['dungeon'] ~= nil, target, poi['name'] .. ' (' .. table.concat(zad, " > ") .. ')';
+end
+
 function CompendiumQuestControl:BuildCursor()
 
 	if self.searchDisabled then
@@ -775,13 +785,13 @@ function CompendiumQuestControl:BuildCursor()
     self:ClearQuests();
 	self.pagination:SetCursor(nil);
 	self.pagination:SetVisible(false);
-	
+
 	-- filter results using our category indexes
 	local ids = nil;
 	for i,cat in pairs(self.currentIndexFilters) do
 		if questindexes[cat] ~= nil then
 			ids = self:JoinIndex(ids,questindexes[cat]);
-		end 
+		end
 	end
 	-- determine if a text search was used
 	local searchText = self.SearchText:GetText();
@@ -805,10 +815,10 @@ function CompendiumQuestControl:BuildCursor()
 		end
     end
 
-	-- build data set	
+	-- build data set
 	local data = questtable;
 	if ids ~= nil then
-		data = ids 
+		data = ids
 	end;
 	local recs = {};
     local count = 0;
@@ -816,7 +826,7 @@ function CompendiumQuestControl:BuildCursor()
 		local id = a;
 		if ids ~= nil then id = b end;
 
-		--Turbine.Shell.WriteLine('a:' .. a .. ' b:' .. b .. ' id:' .. id);		
+		--Turbine.Shell.WriteLine('a:' .. a .. ' b:' .. b .. ' id:' .. id);
 		local rec = questtable[id];
         local include = true;
         if not ise then
@@ -831,10 +841,17 @@ function CompendiumQuestControl:BuildCursor()
 					local from, to = filter.from, filter.to;
 					if from == nil then from = 0 end;
 					if to == nil then to = 1000 end;
-					if rec['level'] < from or rec['level'] > to then
-						include = false;
-						break; 
-					end		
+					if rec['level'] == 'Scaling' then
+						if rec['minlevel'] ~= nil and (rec['minlevel'] < from or rec['minlevel'] > to) then
+							include = false;
+							break;
+						end
+					else
+						if rec['level'] < from or rec['level'] > to then
+							include = false;
+							break;
+						end
+					end
 				elseif filter.type == 'progression' then
 					local prog = self.questprogression[rec["name"]];
 					if filter.value and (prog == nil or false == prog ) then
@@ -846,28 +863,28 @@ function CompendiumQuestControl:BuildCursor()
 					end
 				end
 			end
-		end        
-        
+		end
+
         if include then
             count = count + 1;
             table.insert(recs,rec);
         end
 	end;
-	
+
 	-- create pagination cursor for results
 	self.cursor = Compendium.Common.Utils.DataCursor(recs, pagesize);
 	self.pagination:SetCursor(self.cursor);
 	if self.cursor:PageCount() > 1 then
 		self.pagination:SetVisible(true);
 	end
-	
+
 	-- load current page
 	self:LoadQuests(self.cursor:CurPage());
 
 end
 
 function CompendiumQuestControl:AddFilters(filters)
-	
+
 	local count = 0;
 	local filterText = rsrc["filters"] .. ' ';
 
@@ -875,23 +892,23 @@ function CompendiumQuestControl:AddFilters(filters)
 	for i,cat in pairs(self.currentIndexFilters) do distinctCats[cat] = i end;
 	if filters.indexes ~= nil then
 		for i,cat in pairs(filters.indexes) do
-			if questindexes[cat] ~= nil then distinctCats[cat] = i end; 
+			if questindexes[cat] ~= nil then distinctCats[cat] = i end;
 		end
 	end
 	self.currentIndexFilters = {};
 	for cat,v in pairs(distinctCats) do
 		if count > 0 then filterText = filterText .. ', ' end;
 		filterText = filterText .. cat;
-		table.insert(self.currentIndexFilters, cat) 
+		table.insert(self.currentIndexFilters, cat)
 		count = count + 1;
 	end
 
 	local manuals = {};
 	for i,filter in pairs(self.currentManualFilters) do table.insert(manuals,filter) end;
 	if filters.manual ~= nil then
-		for cat,rec in pairs(filters.manual) do 
-			rec.type = cat; 
-			table.insert(manuals,rec); 
+		for cat,rec in pairs(filters.manual) do
+			rec.type = cat;
+			table.insert(manuals,rec);
 		end
 	end
 	self.currentManualFilters = {};
@@ -900,10 +917,10 @@ function CompendiumQuestControl:AddFilters(filters)
 		if rec.type == 'level' then
 			if rec.from ~= nil and rec.to ~= nil then
 				filterText = filterText .. string.format(rsrc["levelbtwn"], rec.from, rec.to);
-				table.insert(self.currentManualFilters, rec); 
+				table.insert(self.currentManualFilters, rec);
 			elseif rec.from ~= nil then
 				filterText = filterText .. string.format(rsrc["levelgt"],rec.from);
-				table.insert(self.currentManualFilters, rec); 
+				table.insert(self.currentManualFilters, rec);
 			elseif rec.to ~= nil then
 				filterText = filterText .. string.format(rsrc["levellt"],rec.to);
 				table.insert(self.currentManualFilters, rec);
@@ -918,7 +935,7 @@ function CompendiumQuestControl:AddFilters(filters)
 		end
 		count = count + 1;
 	end
-	
+
 	self.filtersLabel:SetText(filterText);
 	self:BuildCursor();
 end
@@ -931,17 +948,17 @@ function CompendiumQuestControl:UpdateAllFilteredRecord(type, data)
 			self:UpdateLocalRecord(rec, type, data);
 		end
 		self:ClearQuests();
-		self:LoadQuests(records);		
+		self:LoadQuests(records);
 	end
 end
 
 function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
 
 	local quest = questrecord['name'];
-	if self.localquestdata[quest] == nil then 
+	if self.localquestdata[quest] == nil then
 		self.localquestdata[quest] = {};
 	end
-	
+
 	if type == 'addcomment' then
 		if self.localquestdata[quest]['c'] == nil then
 			self.localquestdata[quest]['c'] = { data }
@@ -955,7 +972,7 @@ function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
 			-- nothing to do
 		else
 			local comments = {};
-			for i,c in pairs(self.localquestdata[quest]['c']) do 
+			for i,c in pairs(self.localquestdata[quest]['c']) do
 				if c['time'] ~= data['time'] then
 					table.insert(comments,c);
 				end
@@ -965,11 +982,11 @@ function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
 		end
 	elseif type == 'modifyprog' then
 		self.questprogression[quest] = data;
-		self.questprogressionmodified = true;					
+		self.questprogressionmodified = true;
 	else
 		-- unknown update type
 	end
-			
+
 end
 
 function CompendiumQuestControl:persist()
@@ -986,8 +1003,8 @@ function CompendiumQuestControl:persist()
 	end
 	if self.localquestdatamodified or self.questprogressionmodified then
 		Turbine.Shell.WriteLine(rsrc["savingcomplete"]);
-	end	
-	
+	end
+
 end
 
 function CompendiumQuestControl:LoadLocalQuests()
@@ -998,12 +1015,12 @@ function CompendiumQuestControl:LoadLocalQuests()
 	self.questprogression = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Character , "CompendiumQuestProgression")
 	if self.questprogression == nil then
 		self.questprogression = {};
-	end	
+	end
 end
 
 function CompendiumQuestControl:AddCoordinate( record )
 	if record == nil then return end;
-	
+
 	local coord = '';
 	if record.target ~= rsrc["target"] then
 		coord = record.target .. ' '..rsrc["in"]..' ';
@@ -1013,14 +1030,14 @@ function CompendiumQuestControl:AddCoordinate( record )
 	coord = coord .. record.area;
 	if record.coord ~= nil then
 		coord = coord .. ' @ ' .. record.coord;
-	end  
+	end
 	self.comments:AddToComment(coord);
-	
+
 end
 
-function CompendiumQuestControl:CoordClicked( y, ns, x, ew, zone, name, quest )
+function CompendiumQuestControl:CoordClicked( y, ns, x, ew, target, isdungeon, name, quest )
 	local mx, my = self:PointToClient(Turbine.UI.Display:GetMousePosition());
 	local left, top = mx - 3, my - 3;
 	self.coord:SetPosition(left, top);
-	self.coord:ShowMenu( y, ns, x, ew, zone, name, quest );
+	self.coord:ShowMenu( y, ns, x, ew, target, isdungeon, name, quest );
 end
