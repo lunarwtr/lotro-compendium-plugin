@@ -42,6 +42,10 @@ function QuestCategoryMenu:Constructor()
 			["Custom"] = 0,
 			["Scaling"] = 0
 		},
+		["Progression"] = {
+			["Complete"] = 0,
+			["Incomplete"] = 0
+		},
 		["Quest Chains"] = {
 			["A-I"] = {
 				["A"] = {
@@ -529,7 +533,6 @@ function QuestCategoryMenu:Constructor()
 					["Andrath"] = 0,
 					["Archet"] = 0,
 					["Bree"] = 0,
-					["Bree-land Homesteads"] = 0,
 					["Buckland"] = 0,
 					["Chetwood"] = 0,
 					["Combe"] = 0,
@@ -677,7 +680,6 @@ function QuestCategoryMenu:Constructor()
 				["Forochel"] = {
 					["All"] = 0,
 					["Itä-mâ"] = 0,
-					["Jä-kuru"] = 0,
 					["Jä-rannit"] = 0,
 					["Länsi-mâ"] = 0,
 					["Sâri-surma"] = 0,
@@ -837,7 +839,6 @@ function QuestCategoryMenu:Constructor()
 					["Isengard"] = 0,
 					["Isengard Depths"] = 0,
 					["Kingstead"] = 0,
-					["Kingstead Meadows"] = 0,
 					["Nan Curunír"] = 0,
 					["Stonedeans"] = 0,
 					["Westfold"] = 0
@@ -865,11 +866,11 @@ function QuestCategoryMenu:Constructor()
 					["Hill"] = 0,
 					["Hobbiton-Bywater"] = 0,
 					["Marish"] = 0,
-					["Northcotton Farm"] = 0,
 					["Rushock Bog"] = 0,
 					["Sandson's Farm"] = 0,
 					["Taste of Hobbiton"] = 0,
-					["Tookland"] = 0
+					["Tookland"] = 0,
+					["Yondershire"] = 0
 				},
 				["Strongholds of the North"] = {
 					["All"] = 0,

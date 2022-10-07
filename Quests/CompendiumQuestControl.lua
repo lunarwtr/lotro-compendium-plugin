@@ -7,6 +7,7 @@ import "Turbine.UI.Lotro";
 import "Compendium.Quests.CompendiumQuestsDB";
 import "Compendium.Quests.QuestCommentsControl";
 import "Compendium.Quests.QuestCategoryMenu";
+import "Compendium.Quests.QuestTypeInfo";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 import "Compendium.Common.Resources.Bundle";
@@ -222,7 +223,7 @@ function CompendiumQuestControl:Constructor(language)
     selectAllCB:SetParent( qlHeader );
     selectAllCB:SetPosition(nameCol:GetWidth(), 1);
     selectAllCB:SetSize( 25, 18 );
-    selectAllCB:SetChecked(complete);
+    selectAllCB:SetChecked(false);
     selectAllCB:SetText('');
     selectAllCB.undo = false;
 	selectAllCB.CheckedChanged = function(s,a)
@@ -517,7 +518,7 @@ function CompendiumQuestControl:LoadQuests(records)
         label:SetFont(self.fontFaceSmall);
 	    label:SetTextAlignment( Turbine.UI.CheckBox.MiddelCenter );
 
-	    local complete = self.questprogression[rec["name"]];
+	    local complete = self.questprogression[rec["id"]];
 	    if complete == nil then complete = false end;
 
 		local checkbox = Turbine.UI.Lotro.CheckBox();
@@ -769,7 +770,7 @@ function CompendiumQuestControl:PoiPlace(poi)
 	local zad = {};
 	local target = poi['zone'];
 	if poi['zone'] ~= nil then table.insert(zad, poi['zone']); end
-	if poi['area'] ~= nil then 
+	if poi['area'] ~= nil then
 		table.insert(zad, poi['area']);
 		--target = poi['area'];
 	end
@@ -853,7 +854,7 @@ function CompendiumQuestControl:BuildCursor()
 						end
 					end
 				elseif filter.type == 'progression' then
-					local prog = self.questprogression[rec["name"]];
+					local prog = self.questprogression[rec["id"]];
 					if filter.value and (prog == nil or false == prog ) then
 						include = false;
 						break;
@@ -954,34 +955,34 @@ end
 
 function CompendiumQuestControl:UpdateLocalRecord(questrecord, type, data)
 
-	local quest = questrecord['name'];
-	if self.localquestdata[quest] == nil then
-		self.localquestdata[quest] = {};
+	local id = questrecord['id'];
+	if self.localquestdata[id] == nil then
+		self.localquestdata[id] = {};
 	end
 
 	if type == 'addcomment' then
-		if self.localquestdata[quest]['c'] == nil then
-			self.localquestdata[quest]['c'] = { data }
+		if self.localquestdata[id]['c'] == nil then
+			self.localquestdata[id]['c'] = { data }
 		else
-			table.insert(self.localquestdata[quest]['c'],data);
+			table.insert(self.localquestdata[id]['c'],data);
 		end
 		self.comments:AddCommentRecord(data, true);
 		self.localquestdatamodified = true;
 	elseif type == 'delcomment' then
-		if self.localquestdata[quest]['c'] == nil then
+		if self.localquestdata[id]['c'] == nil then
 			-- nothing to do
 		else
 			local comments = {};
-			for i,c in pairs(self.localquestdata[quest]['c']) do
+			for i,c in pairs(self.localquestdata[id]['c']) do
 				if c['time'] ~= data['time'] then
 					table.insert(comments,c);
 				end
 			end
-			self.localquestdata[quest]['c'] = comments;
+			self.localquestdata[id]['c'] = comments;
 			self.localquestdatamodified = true;
 		end
 	elseif type == 'modifyprog' then
-		self.questprogression[quest] = data;
+		self.questprogression[id] = data;
 		self.questprogressionmodified = true;
 	else
 		-- unknown update type
@@ -1008,13 +1009,61 @@ function CompendiumQuestControl:persist()
 end
 
 function CompendiumQuestControl:LoadLocalQuests()
-	self.localquestdata = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Account , "LocalQuestData")
-	if self.localquestdata == nil then
-		self.localquestdata = {};
+	self:LoadLocalQuestsData(Turbine.DataScope.Account, "LocalQuestData", "localquestdata", "localquestdatamodified")
+	self:LoadLocalQuestsData(Turbine.DataScope.Character, "CompendiumQuestProgression", "questprogression", "questprogressionmodified")
+
+	-- check for companion progression data to import
+	local lcd = Compendium.Common.Utils.PluginData.Load(Turbine.DataScope.Character, "CompendiumQuestProgression_CompanionImport")
+	if type(lcd) == 'table' and lcd["SKIP"] == nil then
+		local completedCount = 0;
+		for key, value in pairs(lcd) do
+			if value == 'COMPLETED' then
+				completedCount = completedCount + 1
+			end
+		end
+		if completedCount == 0 then
+			self:ClearLCQuestsFile()
+		else
+			Compendium.Common.UI.Dialog.Confirm:Show(rsrc['importtitle'], string.format(rsrc['importquest'], completedCount),
+			function()
+				for key, value in pairs(lcd) do
+					local id = string.upper(string.format('%x', key))
+					if value == 'COMPLETED' then
+						self.questprogression[id] = true
+						self.questprogressionmodified = true
+					end
+				end
+				self:ClearLCQuestsFile()
+				self:BuildCursor();
+			end,
+			function()
+				self:ClearLCQuestsFile()
+			end);
+		end
 	end
-	self.questprogression = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Character , "CompendiumQuestProgression")
-	if self.questprogression == nil then
-		self.questprogression = {};
+end
+
+function CompendiumQuestControl:ClearLCQuestsFile()
+	Compendium.Common.Utils.PluginData.Save(Turbine.DataScope.Character, "CompendiumQuestProgression_CompanionImport", {["SKIP"] = true})
+end
+
+function CompendiumQuestControl:LoadLocalQuestsData( scope, name, property, flag)
+	local data = Compendium.Common.Utils.PluginData.Load(scope , name)
+	if data ~= nil then
+		if data["__version"] == nil then
+			-- upgrade progression to version 2
+			self[property] = {["__version"] = 2};
+			for a, b in pairs(questtable) do
+				if data[b.name] then
+					self[property][b.id] = true;
+					self[flag] = true;
+				end
+			end
+		else
+			self[property] = data;
+		end
+	else
+		self[property] = {["__version"] = 2};
 	end
 end
 
@@ -1033,6 +1082,26 @@ function CompendiumQuestControl:AddCoordinate( record )
 	end
 	self.comments:AddToComment(coord);
 
+end
+
+function CompendiumQuestControl:ProcessQuestChat( message )
+	local chatComplete = rsrc["chatcompleted"];
+	local name = string.match(message, '^.*' .. chatComplete .. "%s*(.-)'?%s*$")
+	if (name) then
+        name = string.gsub(name,"\n","");
+		self:MarkQuestCompleted(name);
+    end
+end
+
+function CompendiumQuestControl:MarkQuestCompleted( name )
+	for i, rec in ipairs(questtable) do
+		if rec.name == name then
+			self.questprogression[rec.id] = true;
+			self.questprogressionmodified = true;
+			self:BuildCursor();
+			break;
+		end
+	end
 end
 
 function CompendiumQuestControl:CoordClicked( y, ns, x, ew, target, isdungeon, name, quest )

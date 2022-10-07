@@ -1,0 +1,27 @@
+---@alias boolstr '"Yes"' | '"No"'
+
+---@class POI
+---@field name string name of quest
+---@field area? string
+---@field zone string
+---@field dungeon? string
+---@field locs string[]
+
+---@class Quest
+---@field id string hex id of quest
+---@field name string name of quest
+---@field area string
+---@field zone string
+---@field dungeon string
+---@field b string
+---@field category string
+---@field d string description
+---@field faction '"FrP"' | '"Mob"'
+---@field instance boolstr
+---@field level number | '"Scaling"'
+---@field minlevel number | '"Scaling"'
+---@field mobs POI[]
+---@field pois POI[]
+---@field ndx number
+---@field o string
+---@field repeatable boolstr

@@ -229,7 +229,7 @@ function CompendiumLauncherWindow:Constructor()
     end
 	cbtop = cbtop + 40;
 
-	local itemTabId = nil;
+	local tabMap = {};
 	for i, rec in pairs(compendiumdbs) do
 		local db = rec.key;
 		checkbox = Turbine.UI.Lotro.CheckBox();
@@ -255,9 +255,7 @@ function CompendiumLauncherWindow:Constructor()
 
 		if self.Settings.Components[db] == true then
 			local curId = tabs:AddTab(rec.title, rec.init());
-			if db == 'Items' then
-				itemTabId = curId;
-			end
+			tabMap[db] = curId;
 		end
 	end
 
@@ -338,8 +336,8 @@ function CompendiumLauncherWindow:Constructor()
 			self.Settings.ShowItemQuickslots = false;
 		end
 		self:SaveSettings();
-		if itemTabId ~= nil then
-			local it = tabs:GetTabById(itemTabId);
+		if tabMap.Items ~= nil then
+			local it = tabs:GetTabById(tabMap.Items);
 			if it ~= nil then
 				it.control:Reset();
 			end;
@@ -553,6 +551,15 @@ function CompendiumLauncherWindow:Constructor()
 
     self.allowFade = true;
 
+	Turbine.Chat.Received = function (sender, args)
+        local msg = tostring(args.Message);
+        if args.ChatType == Turbine.ChatType.Quest then
+            if tabMap.Quest ~= nil then
+				local qt = self.tabs:GetTabById(tabMap.Quest);
+				qt.control:ProcessQuestChat(msg);
+			end
+        end
+    end
 end
 
 function CompendiumLauncherWindow:LoadSettings()

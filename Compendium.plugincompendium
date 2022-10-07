@@ -2,7 +2,7 @@
 <PluginConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Id>526</Id>
   <Name>LOTRO Compendium</Name>
-  <Version>2.0</Version>
+  <Version>2.1</Version>
   <Author>Lunarwater</Author>
   <InfoUrl>http://www.lotrointerface.com/downloads/info526</InfoUrl>
   <DownloadUrl>http://www.lotrointerface.com/downloads/download526</DownloadUrl>
@@ -11,6 +11,6 @@
     <descriptor>Compendium\CompendiumReloader.plugin</descriptor>
   </Descriptors>
   <Dependencies>
-	  <dependency>640</dependency>
+    <dependency>640</dependency>
   </Dependencies>
 </PluginConfig>
