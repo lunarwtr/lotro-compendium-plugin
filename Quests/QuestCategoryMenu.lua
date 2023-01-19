@@ -476,7 +476,6 @@ function QuestCategoryMenu:Constructor()
 			["Small Fellowship"] = 0
 		},
 		["Rewarded"] = {
-			["Class Points"] = 0,
 			["Crafting XP"] = {
 				["All"] = 0,
 				["Cook"] = 0,
@@ -533,6 +532,7 @@ function QuestCategoryMenu:Constructor()
 					["Andrath"] = 0,
 					["Archet"] = 0,
 					["Bree"] = 0,
+					["Bree-land Homesteads"] = 0,
 					["Buckland"] = 0,
 					["Chetwood"] = 0,
 					["Combe"] = 0,
@@ -551,6 +551,16 @@ function QuestCategoryMenu:Constructor()
 					["Unexplored Territory"] = 0,
 					["Weather Hills"] = 0,
 					["Wildwood"] = 0
+				},
+				["Cardolan"] = {
+					["All"] = 0,
+					["Ruddymore"] = 0,
+					["Sedgemead"] = 0,
+					["South Downs"] = 0,
+					["Southern Andrath"] = 0,
+					["Southern Old Forest"] = 0,
+					["Tharbad"] = 0,
+					["Tyrn Gorthad"] = 0
 				},
 				["Central Gondor"] = {
 					["All"] = 0,
@@ -585,8 +595,7 @@ function QuestCategoryMenu:Constructor()
 				["Dwarf-holds"] = {
 					["All"] = 0,
 					["Ered Mithrin"] = 0,
-					["Ironfold"] = 0,
-					["Withered Heath"] = 0
+					["Ironfold"] = 0
 				},
 				["Eastern Gondor"] = {
 					["All"] = 0,
@@ -612,7 +621,6 @@ function QuestCategoryMenu:Constructor()
 				},
 				["Erebor"] = {
 					["All"] = 0,
-					["Abodes of Erebor"] = 0,
 					["Tumnu-dûm, the Dwelling-halls"] = 0
 				},
 				["Ered Luin"] = {
@@ -731,6 +739,7 @@ function QuestCategoryMenu:Constructor()
 					["Egladil"] = 0,
 					["Eryn Laer"] = 0,
 					["Gelirdor"] = 0,
+					["Nan Celebrant"] = 0,
 					["Nanduhirion"] = 0,
 					["Nimrodel"] = 0,
 					["Taur Hith"] = 0
@@ -839,6 +848,7 @@ function QuestCategoryMenu:Constructor()
 					["Isengard"] = 0,
 					["Isengard Depths"] = 0,
 					["Kingstead"] = 0,
+					["Kingstead Meadows"] = 0,
 					["Nan Curunír"] = 0,
 					["Stonedeans"] = 0,
 					["Westfold"] = 0
@@ -866,6 +876,7 @@ function QuestCategoryMenu:Constructor()
 					["Hill"] = 0,
 					["Hobbiton-Bywater"] = 0,
 					["Marish"] = 0,
+					["Northcotton Farm"] = 0,
 					["Rushock Bog"] = 0,
 					["Sandson's Farm"] = 0,
 					["Taste of Hobbiton"] = 0,
@@ -880,6 +891,15 @@ function QuestCategoryMenu:Constructor()
 					["Eryn Lasgalen"] = 0,
 					["Felegoth"] = 0,
 					["Lake-town"] = 0
+				},
+				["Swanfleet"] = {
+					["All"] = 0,
+					["Caras Gelebren"] = 0,
+					["Eastern Old South Road"] = 0,
+					["Mossward"] = 0,
+					["Stoor-vales"] = 0,
+					["Wadewater"] = 0,
+					["Western Eregion"] = 0
 				},
 				["Tales of Yore: Azanulbizar"] = {
 					["All"] = 0,
