@@ -40,7 +40,8 @@ function QuestCategoryMenu:Constructor()
 			["91-95"] = 0,
 			["96-100"] = 0,
 			["Custom"] = 0,
-			["Scaling"] = 0
+			["Scaling"] = 0,
+			["Non-Scaling"] = 0
 		},
 		["Progression"] = {
 			["Complete"] = 0,

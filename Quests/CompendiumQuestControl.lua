@@ -1060,6 +1060,13 @@ function CompendiumQuestControl:LoadLocalQuestsData( scope, name, property, flag
 				end
 			end
 		else
+			if name == "questprogression" then
+				local copy = {};
+				for k, v in pairs(data) do
+					copy[tostring(k)] = v;
+				end
+				data = copy;
+			end
 			self[property] = data;
 		end
 	else
