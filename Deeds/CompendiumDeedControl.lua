@@ -10,31 +10,29 @@ import "Compendium.Deeds.DeedCategoryMenu";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 import "Compendium.Common.Resources.Bundle";
+
+---@type Deed[]
+---@diagnostic disable-next-line: lowercase-global
+deedtable = deedtable or {}
+
 local rsrc = {};
 
 local pagesize = 200;
 local rewardLabels = {
-    ["reputation"] = "ri" ,
-	["destinypoints"] = "destinypoints",
-	["money"] = "mo",
-	["receive"] = "rc",
-	["virtues"] = "vr",
-	["titles"] = "ti",
-	["selectoneof"] = "so",
-	["traits"] = "tr"
+	"xp", "cp", "cx", "em", "gl", "ix", "lp", "mo", "mx", "rc", "ri", "so", "ti", "tr", "vr", "vx"
 };
 
 CompendiumDeedControl= class( Compendium.Common.UI.CompendiumControl );
-function CompendiumDeedControl:Constructor()
+function CompendiumDeedControl:Constructor(language)
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 	rsrc = Compendium.Common.Resources.Bundle:GetResources();
 
-	self.localdeeddatamodified = false;
 	self.deedprogressionmodified = false;
-	self.localdeeddata = {};
 	self.deedprogression = {};
-	self.currentIndexFilters = {};
-	self.currentManualFilters = {};
+	self.localdeeddatamodified = false;
+	self.localdeeddata = {};
+    self.currentIndexFilters = {};
+    self.currentManualFilters = {};
 	self.searchDisabled = true;
 	self:LoadLocalDeeds();
 
@@ -61,7 +59,7 @@ function CompendiumDeedControl:Constructor()
 			self.range:ShowMenu(true);
     	elseif size > 0 and (categories[size] == 'Complete' or categories[size] == 'Incomplete') then
 	   		self:AddFilters({ manual = { progression = { value = (categories[size] == 'Complete') } } });
-   		else
+    	else
 			self:AddFilters({ indexes = categories });
     	end
 	end
@@ -85,6 +83,7 @@ function CompendiumDeedControl:Constructor()
     	self.menu:ShowMenu();
     end
 
+
       --[[
 	self.logo = Turbine.UI.Control();
 	self.logo:SetBlendMode(Turbine.UI.BlendMode.Screen);
@@ -102,7 +101,7 @@ function CompendiumDeedControl:Constructor()
     searchLabel:SetForeColor(self.fontColor);
     searchLabel:SetOutlineColor(Turbine.UI.Color(0,0,0));
     searchLabel:SetFontStyle(Turbine.UI.FontStyle.Outline);
-    searchLabel:SetText(rsrc["search"]);
+    searchLabel:SetText(rsrc['search']);
 
     local searchWidth = self:GetWidth()-(searchLabel:GetWidth()+searchLabel:GetLeft())-55;
     self.SearchBorder=Turbine.UI.Control();
@@ -164,8 +163,6 @@ function CompendiumDeedControl:Constructor()
 		self:Reset();
     end
 
-
-
     self.qlContainer=Turbine.UI.Control();
     self.qlContainer:SetParent(self);
     self.qlContainer:SetPosition(5,filtersLabel:GetTop() + filtersLabel:GetHeight() + 1);
@@ -197,7 +194,7 @@ function CompendiumDeedControl:Constructor()
             local item = self.qlContainer.DeedList:GetItem(idx);
             item:GetControls():Get(1):SetBackColor(self.selBackColor);
             -- Display Deed
-            self:LoadDeedDetails(deedtable[item.DeedId]);
+            self:LoadDeedDetails( deedtable[item.DeedId]);
         end
 
     end
@@ -213,7 +210,7 @@ function CompendiumDeedControl:Constructor()
     nameCol:SetPosition( 2, 1 );
     nameCol:SetSize(qlHeader:GetWidth() - 30, 17);
     nameCol:SetSelectable(true);
-    nameCol:SetText('Deed Name / Level');
+    nameCol:SetText(rsrc['deedheader']);
     nameCol:SetBackColor( self.colorDarkGrey);
     nameCol:SetFont(self.fontFace);
     nameCol:SetForeColor(self.fontColor);
@@ -225,7 +222,7 @@ function CompendiumDeedControl:Constructor()
     selectAllCB:SetParent( qlHeader );
     selectAllCB:SetPosition(nameCol:GetWidth(), 1);
     selectAllCB:SetSize( 25, 18 );
-    selectAllCB:SetChecked(complete);
+    selectAllCB:SetChecked(false);
     selectAllCB:SetText('');
     selectAllCB.undo = false;
 	selectAllCB.CheckedChanged = function(s,a)
@@ -249,7 +246,6 @@ function CompendiumDeedControl:Constructor()
 		nameCol:SetWidth(ncw);
 		selectAllCB:SetLeft(ncw);
 	end
-
 
     local pagination = Compendium.Common.UI.PaginationControl();
     pagination:SetParent(self.qlContainer);
@@ -304,6 +300,7 @@ function CompendiumDeedControl:Constructor()
     self.deedDesc:SetFont(self.fontFace);
     self.deedDesc:SetForeColor(self.fontColor);
     self.deedDesc:SetSelectable(true);
+	self.deedDesc:SetMarkupEnabled(true);
     self.deedDesc.VScrollBar=Turbine.UI.Lotro.ScrollBar();
     self.deedDesc.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
     self.deedDesc.VScrollBar:SetParent(self.deedDesc);
@@ -324,6 +321,7 @@ function CompendiumDeedControl:Constructor()
     self.deedObj:SetFont(self.fontFace);
     self.deedObj:SetForeColor(self.fontColor);
     self.deedObj:SetSelectable(true);
+	self.deedObj:SetMarkupEnabled(true);
     self.deedObj.VScrollBar=Turbine.UI.Lotro.ScrollBar();
     self.deedObj.VScrollBar:SetOrientation(Turbine.UI.Orientation.Vertical);
     self.deedObj.VScrollBar:SetParent(self.deedObj);
@@ -338,7 +336,6 @@ function CompendiumDeedControl:Constructor()
 	    self.deedObj.VScrollBar:SetPosition(width-12,0);
 	    self.deedObj.VScrollBar:SetHeight(height - 2);
     end
-
 
 	self.coord = Compendium.Common.UI.CoordinateControl();
 	self.coord:SetParent(self);
@@ -356,7 +353,8 @@ function CompendiumDeedControl:Constructor()
     end
     comments.CoordClicked = function( sender, y, ns, x, ew )
     	if self.currentRecord ~= nil then
-    		self:CoordClicked( y, ns, x, ew, self.currentRecord['zone'], rsrc["miscpoi"], self.currentRecord['name']);
+			local isdungeon, target, name = self:PoiPlace(self.currentRecord);
+    		self:CoordClicked( y, ns, x, ew, target, isdungeon, rsrc["miscpoi"], self.currentRecord['name']);
     	end
     end
 	self.comments = comments;
@@ -497,15 +495,16 @@ function CompendiumDeedControl:LoadDeeds(records)
 
     for i,rec in pairs(records) do
         local level = rec["level"];
-        local name = rec["name"] .. ' (' .. level .. ')';
+        local name = rec["name"];
+		if level ~= nil then
+			name = name .. ' (' .. level .. ')';
+		end
         if rec["faction"] == 'Mon' then
         	name = name .. ' (M)';
         end
 
         local deed = Turbine.UI.Control();
-        --deed:SetMultiline(false);
         deed:SetSize(width - 10, 18);
-        --deed:SetBackColor(bgColor);
 
         local label = Turbine.UI.Label();
         label:SetMultiline(false);
@@ -518,7 +517,7 @@ function CompendiumDeedControl:LoadDeeds(records)
         label:SetFont(self.fontFaceSmall);
 	    label:SetTextAlignment( Turbine.UI.CheckBox.MiddelCenter );
 
-	    local complete = self.deedprogression[rec["name"]];
+	    local complete = self.deedprogression[rec["id"]];
 	    if complete == nil then complete = false end;
 
 		local checkbox = Turbine.UI.Lotro.CheckBox();
@@ -531,12 +530,22 @@ function CompendiumDeedControl:LoadDeeds(records)
 		end
 
         local color = self.fontColor;
-        if level ~= nil and level ~= '' then
-            color = self:GetLevelColor(playerLevel, tonumber(level));
+        if level ~= nil then
+			local relLevel = playerLevel;
+			if level == 'Scaling' then
+				if rec['minlevel'] ~= nil then
+					relLevel = tonumber(rec['minlevel']);
+				else
+					relLevel = playerLevel;
+				end
+			else
+				relLevel = tonumber(level);
+			end
+			color = self:GetLevelColor(playerLevel, relLevel);
         end
         label:SetForeColor(color);
 
-        deed.DeedId = tonumber(rec["id"]);
+        deed.DeedId = tonumber(rec["ndx"]);
         self.qlContainer.DeedList:AddItem(deed);
     end
 
@@ -546,8 +555,8 @@ function CompendiumDeedControl:Reset()
 	self.searchDisabled = true;
 	self.SearchText:SetText('');
     self:ClearDeeds();
-    self.currentIndexFilters = {};
-    self.currentManualFilters = {};
+	self.currentIndexFilters = {};
+	self.currentManualFilters = {};
 	self.filtersLabel:SetText(rsrc["nofiltersset"]);
 	self.cursor = nil;
 	self.searchDisabled = false;
@@ -569,9 +578,30 @@ function CompendiumDeedControl:FormatItem(record)
 	return item;
 end
 
+---@param record Deed
 function CompendiumDeedControl:LoadDeedDetails(record)
 
     local localrecord = self.localdeeddata[record['name']];
+    --[[{
+    	["next"] = {1276, 2025},
+    	["reputation"] = {"+700 with Malledhrim"},
+    	["zone"] = "Mirkwood",
+    	["area"] = "Taur Morvith",
+    	["money"] = {"45s 36c"},
+		["receive"] = {"Malledhrim Bronze Feather (x4)"},
+    	["mobs"] = {{["locations"] = {"16.60S, 50.55W"}, ["name"] = "Iavassúl"}},
+    	["category"] = "Mirkwood",
+    	["id"] = 2222,
+    	["scope"] = "n/a",
+    	["prev"] = {862, 1620},
+    	["name"] = "The Narrow Way",
+    	["arcs"] = "Forts of Taur Morvith",
+    	["d"] = "The Elven scout Ianudirel was sent ahead to explore the far side of the river from Krul Lugu, but she has not yet returned.",
+    	["minlevel"] = 59,
+    	["repeatable"] = "No",
+    	["faction"] = "FrP",
+    	["instance"] = "No"
+    },]]
 
     self.qdContainer.DeedDetails:ClearItems();
 	self.comments:ClearComments();
@@ -579,36 +609,52 @@ function CompendiumDeedControl:LoadDeedDetails(record)
 
     self:AddDeedDetail(rsrc['name']);
     self:AddDeedDetail("  " .. record['name']);
-    self:AddDeedDetail(rsrc["level"] .. " " .. record['level']);
-    if record['t'] ~= nil then self:AddDeedDetail(rsrc["type"] .. " " .. record['t']); end
+	if record['level'] ~= nil then
+		local levelinfo = rsrc["level"] .. " " .. record['level'];
+		if record['minlevel'] ~= nil then levelinfo = levelinfo  .. " / ".. rsrc["minlevel"] .. " " .. record['minlevel'] end;
+		self:AddDeedDetail(levelinfo);
+	end
+    if record['t'] ~= nil then
+		local typeval = record['t'];
+		if record['class'] ~= nil then typeval = typeval .. " (" .. record['class'] .. ")" end
+		self:AddDeedDetail(rsrc["type"] .. " "  .. typeval);
+	end
     if record['zone'] ~= nil then self:AddDeedDetail(rsrc["zone"] .. " " .. record['zone']); end
+    if record['area'] ~= nil then self:AddDeedDetail(rsrc["area"] .. " " .. record['area']); end
+	if record['dungeon'] ~= nil then self:AddDeedDetail(rsrc["dungeon"] .. " " .. record['dungeon']); end
+    if record['faction'] ~= nil then self:AddDeedDetail(rsrc["faction"] .. " " .. record['faction']); end
 
-    for reward, rewardkey in pairs(rewardLabels) do
+	if record['r'] ~= nil then
+		for j, reward in pairs(rewardLabels) do
+			local display = rsrc[reward];
+			if record['r'][reward] ~= nil then
+				local vals = record['r'][reward];
+				if #vals > 1 then
+					for i,item in pairs(vals) do
+						local prefix = "     ";
+						if i == 1 then prefix = display .. ": "; end
 
-    	local display = rsrc[rewardkey];
-    	if record[reward] ~= nil then
-    		local vals = record[reward];
-	    	if #vals > 1 then
-	    		for i,item in pairs(vals) do
-	    			local prefix = "     ";
-	    			if i == 1 then prefix = display .. ": "; end
+						local dispval = item['val']
+						if reward == 'rc' or reward == 'so' then
+							dispval = self:FormatItem(item);
+						elseif reward == 'cx' then
+							dispval = item['craft'] .. ' ' .. item['val'];
+						end
 
-	    			local dispval = item['val']
-	    			if reward == 'receive' or reward == 'selectoneof' then
-	    				dispval = self:FormatItem(item);
-	    			end
-
-	    			self:AddDeedDetail(prefix .. dispval)
-	    		end
-	    	else
-    			local dispval = vals[1]['val']
-    			if reward == 'receive' or reward == 'selectoneof' then
-    				dispval = self:FormatItem(vals[1]);
-    			end
-	    		self:AddDeedDetail(display .. ": " .. dispval);
-	    	end
-    	end
-    end
+						self:AddDeedDetail(prefix .. dispval)
+					end
+				else
+					local dispval = vals[1]['val']
+					if reward == 'rc' or reward == 'so' then
+						dispval = self:FormatItem(vals[1]);
+					elseif reward == 'cx' then
+						dispval = vals[1]['craft'] .. ' ' .. vals[1]['val'];
+					end
+					self:AddDeedDetail(display .. ": " .. dispval);
+				end
+			end
+		end
+	end
 
     local sep = false;
     if record['prev'] ~= nil then
@@ -640,27 +686,18 @@ function CompendiumDeedControl:LoadDeedDetails(record)
         sep = true
         self:AddDeedDetail(rsrc["mobsnpcsofinterest"]);
         for i,mob in pairs(record['mobs']) do
-            local name = "  " .. mob['name'];
-            if mob['locations'] ~= nil then
-	            if #mob['locations'] > 1 then
-	            	self:AddDeedDetail(name);
-	            	for i,loc in pairs(mob['locations']) do
-		            	self:AddDeedDetail('       ' .. loc).MouseClick = function(s,a)
-		            		local tmp, tmp, tmp, y, ns, x, ew = string.find(loc, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
-		            		if i ~= nil then
-		            			self:CoordClicked( y, ns, x, ew, mob['zone'], mob['name'], rsrc['deed']..' - ' .. string.gsub(record['name'],':','-') .. ' / '..rsrc['mob']..' - ' .. mob['name']);
-		            		end
-		            	end
-	            	end
-	            elseif #mob['locations'] == 1 then
-	            	name = name .. ' (' .. mob['locations'][1] .. ')';
-	            	self:AddDeedDetail(name).MouseClick = function(s,a)
-	            		local tmp, tmp, tmp, y, ns, x, ew = string.find(mob['locations'][1], "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
-	            		if i ~= nil then
-	            			self:CoordClicked( y, ns, x, ew, mob['zone'], mob['name'], rsrc['deed']..' - ' .. string.gsub(record['name'],':','-') .. ' / '..rsrc['mob']..' - ' .. mob['name']);
-	            		end
-	            	end
-	            end
+            local isdungeon, target, name = self:PoiPlace(mob);
+            if mob['loc'] ~= nil then
+				self:AddDeedDetail("  " .. name);
+				for i, loc in pairs(mob['loc']) do
+					self:AddDeedDetail('       ' .. loc).MouseClick = function(s,a)
+						local start, len, tmp, y, ns, x, ew = string.find(loc, "(([%d%.]+)([NSns])[, ]+([%d%.]+)([EWOewo]))");
+						--Turbine.Shell.WriteLine('start: ' .. tostring(start) .. ', len: ' .. tostring(len) .. ', y: ' .. tostring(y) .. ', ns: ' .. tostring(ns) .. ', x: ' .. tostring(x) .. ', ew: '.. tostring(ew));
+						if start ~= nil then
+							self:CoordClicked( y, ns, x, ew, target, isdungeon, mob['name'], rsrc['deed'] .. ' - ' .. string.gsub(record['name'],':','-') .. ' / '.. rsrc["mob"] .. ' - ' .. mob['name']);
+						end
+					end
+				end
 	        else
 	        	self:AddDeedDetail(name);
 	        end
@@ -672,27 +709,18 @@ function CompendiumDeedControl:LoadDeedDetails(record)
         sep = true
         self:AddDeedDetail(rsrc["pointsofinterest"]);
         for i,poi in pairs(record['pois']) do
-            local name = "  " .. poi['name'];
-            if poi['locations'] ~= nil then
-	            if #poi['locations'] > 1 then
-	            	self:AddDeedDetail(name);
-	            	for i,loc in pairs(poi['locations']) do
-		            	self:AddDeedDetail('       ' .. loc).MouseClick = function(s,a)
-		            		local tmp, tmp, tmp, y, ns, x, ew = string.find(loc, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
-		            		if i ~= nil then
-		            			self:CoordClicked( y, ns, x, ew, poi['zone'], poi['name'], rsrc['deed']..' - ' .. string.gsub(record['name'],':','-') .. ' / ' .. poi['name']);
-		            		end
-		            	end
-	            	end
-	            elseif #poi['locations'] == 1 then
-	            	name = name .. ' (' .. poi['locations'][1] .. ')';
-	            	self:AddDeedDetail(name).MouseClick = function(s,a)
-	            		local tmp, tmp, tmp, y, ns, x, ew = string.find(poi['locations'][1], "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
-	            		if i ~= nil then
-	            			self:CoordClicked( y, ns, x, ew, poi['zone'], poi['name'], rsrc['deed']..' - ' .. string.gsub(record['name'],':','-') .. ' / ' .. poi['name']);
-	            		end
-	            	end
-	            end
+            local isdungeon, target, name = self:PoiPlace(poi);
+            if poi['loc'] ~= nil then
+				self:AddDeedDetail("  " .. name);
+				for i,loc in pairs(poi['loc']) do
+					self:AddDeedDetail('       ' .. loc).MouseClick = function(s,a)
+						local start, len, tmp, y, ns, x, ew = string.find(loc, "(([%d%.]+)([NSns])[, ]+([%d%.]+)([EWOewo]))");
+						--Turbine.Shell.WriteLine('start: ' .. tostring(start) .. ', len: ' .. tostring(len) .. ', y: ' .. tostring(y) .. ', ns: ' .. tostring(ns) .. ', x: ' .. tostring(x) .. ', ew: '.. tostring(ew));
+						if start ~= nil then
+							self:CoordClicked( y, ns, x, ew, target, isdungeon, poi['name'], rsrc['deed'] .. ' - ' .. string.gsub(record['name'],':','-') .. ' / ' .. poi['name']);
+						end
+					end
+				end
 	        else
 	        	self:AddDeedDetail(name);
 	        end
@@ -708,23 +736,32 @@ function CompendiumDeedControl:LoadDeedDetails(record)
     self.deedObj:SetText(record['o']);
     self.deedObj:SetVerticalScrollBar(self.deedObj.VScrollBar);
 
-
-
-
     if record['c'] ~= nil then
     	local comrecs = {};
     	for i, value in pairs(record['c']) do
     		table.insert(comrecs,  { val = value , modifiable = false, time = 0 } );
     	end
-    	self.comments:AddCommentRecords(comrecs);
+    	self.comments:AddCommentRecords(comrecs, false);
     else
-    	self.comments:AddCommentRecords({});
+    	self.comments:AddCommentRecords({}, false);
     end
     -- add any custom added comments user may have added
 	if localrecord ~= nil and localrecord['c'] ~= nil then
-    	self.comments:AddCommentRecords(localrecord['c']);
+		self.comments:AddCommentRecords(localrecord['c']);
 	end
 
+end
+
+function CompendiumDeedControl:PoiPlace(poi)
+	local zad = {};
+	local target = poi['zone'];
+	if poi['zone'] ~= nil then table.insert(zad, poi['zone']); end
+	if poi['area'] ~= nil then
+		table.insert(zad, poi['area']);
+		--target = poi['area'];
+	end
+	if poi['dungeon'] ~= nil then table.insert(zad, poi['dungeon']); end
+	return poi['dungeon'] ~= nil, target, poi['name'] .. ' (' .. table.concat(zad, " > ") .. ')';
 end
 
 function CompendiumDeedControl:BuildCursor()
@@ -784,19 +821,26 @@ function CompendiumDeedControl:BuildCursor()
                 include = false;
             end
         end
-       -- only need to apply manual filters if passed text search
+        -- only need to apply manual filters if passed text search
         if include then
 			for i,filter in pairs(self.currentManualFilters) do
 				if filter.type == 'level' then
 					local from, to = filter.from, filter.to;
 					if from == nil then from = 0 end;
 					if to == nil then to = 1000 end;
-					if rec['level'] < from or rec['level'] > to then
-						include = false;
-						break;
+					if rec['level'] == 'Scaling' then
+						if rec['minlevel'] ~= nil and (rec['minlevel'] < from or rec['minlevel'] > to) then
+							include = false;
+							break;
+						end
+					else
+						if rec['level'] < from or rec['level'] > to then
+							include = false;
+							break;
+						end
 					end
 				elseif filter.type == 'progression' then
-					local prog = self.deedprogression[rec["name"]];
+					local prog = self.deedprogression[rec["id"]];
 					if filter.value and (prog == nil or false == prog ) then
 						include = false;
 						break;
@@ -883,6 +927,7 @@ function CompendiumDeedControl:AddFilters(filters)
 	self:BuildCursor();
 end
 
+
 function CompendiumDeedControl:UpdateAllFilteredRecord(type, data)
 	if self.cursor ~= nil then
 		local records = self.cursor.data;
@@ -896,34 +941,34 @@ end
 
 function CompendiumDeedControl:UpdateLocalRecord(deedrecord, type, data)
 
-	local deed = deedrecord['name'];
-	if self.localdeeddata[deed] == nil then
-		self.localdeeddata[deed] = {};
+	local id = deedrecord['id'];
+	if self.localdeeddata[id] == nil then
+		self.localdeeddata[id] = {};
 	end
 
 	if type == 'addcomment' then
-		if self.localdeeddata[deed]['c'] == nil then
-			self.localdeeddata[deed]['c'] = { data }
+		if self.localdeeddata[id]['c'] == nil then
+			self.localdeeddata[id]['c'] = { data }
 		else
-			table.insert(self.localdeeddata[deed]['c'],data);
+			table.insert(self.localdeeddata[id]['c'],data);
 		end
 		self.comments:AddCommentRecord(data, true);
 		self.localdeeddatamodified = true;
 	elseif type == 'delcomment' then
-		if self.localdeeddata[deed]['c'] == nil then
+		if self.localdeeddata[id]['c'] == nil then
 			-- nothing to do
 		else
 			local comments = {};
-			for i,c in pairs(self.localdeeddata[deed]['c']) do
+			for i,c in pairs(self.localdeeddata[id]['c']) do
 				if c['time'] ~= data['time'] then
 					table.insert(comments,c);
 				end
 			end
-			self.localdeeddata[deed]['c'] = comments;
+			self.localdeeddata[id]['c'] = comments;
 			self.localdeeddatamodified = true;
 		end
 	elseif type == 'modifyprog' then
-		self.deedprogression[deed] = data;
+		self.deedprogression[id] = data;
 		self.deedprogressionmodified = true;
 	else
 		-- unknown update type
@@ -946,16 +991,79 @@ function CompendiumDeedControl:persist()
 	if self.localdeeddatamodified or self.deedprogressionmodified then
 		Turbine.Shell.WriteLine(rsrc["savingcomplete"]);
 	end
+
+end
+
+function CompendiumDeedControl:ImportLotroCompanion()
+	if self.lcData == nil then return end;
+
+	-- check for companion progression data to import
+	local completedCount = 0;
+	for key, value in pairs(self.lcData) do
+		if value == 'COMPLETED' then
+			completedCount = completedCount + 1
+		end
+	end
+	if completedCount == 0 then
+		self:ClearLCDeedsFile()
+	else
+		Compendium.Common.UI.Dialog.Confirm:Show(rsrc['importtitle'], string.format(rsrc['importdeed'], completedCount),
+		function()
+			for key, value in pairs(self.lcData) do
+				local id = string.upper(string.format('%x', key))
+				if value == 'COMPLETED' then
+					self.deedprogression[id] = true
+					self.deedprogressionmodified = true
+				end
+			end
+			self:ClearLCDeedsFile()
+			self:BuildCursor();
+		end,
+		function()
+			self:ClearLCDeedsFile()
+		end);
+	end
 end
 
 function CompendiumDeedControl:LoadLocalDeeds()
-	self.localdeeddata = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Account , "LocalDeedData")
-	if self.localdeeddata == nil then
-		self.localdeeddata = {};
+	self:LoadLocalDeedsData(Turbine.DataScope.Account, "LocalDeedData", "localdeeddata", "localdeeddatamodified")
+	self:LoadLocalDeedsData(Turbine.DataScope.Character, "CompendiumDeedProgression", "deedprogression", "deedprogressionmodified")
+
+	local lcd = Compendium.Common.Utils.PluginData.Load(Turbine.DataScope.Character, "CompendiumDeedProgression_CompanionImport")
+	if type(lcd) == 'table' and lcd["SKIP"] == nil then
+		self.lcData = lcd;
 	end
-	self.deedprogression = Compendium.Common.Utils.PluginData.Load( Turbine.DataScope.Character , "CompendiumDeedProgression")
-	if self.deedprogression == nil then
-		self.deedprogression = {};
+end
+
+function CompendiumDeedControl:ClearLCDeedsFile()
+	Compendium.Common.Utils.PluginData.Save(Turbine.DataScope.Character, "CompendiumDeedProgression_CompanionImport", {["SKIP"] = true})
+	self.lcData = nil;
+end
+
+function CompendiumDeedControl:LoadLocalDeedsData( scope, name, property, flag)
+	local data = Compendium.Common.Utils.PluginData.Load(scope , name)
+	if data ~= nil then
+		if data["__version"] == nil then
+			-- upgrade progression to version 2
+			self[property] = {["__version"] = 2};
+			for a, b in pairs(deedtable) do
+				if data[b.name] then
+					self[property][b.id] = true;
+					self[flag] = true;
+				end
+			end
+		else
+			if name == "deedprogression" then
+				local copy = {};
+				for k, v in pairs(data) do
+					copy[tostring(k)] = v;
+				end
+				data = copy;
+			end
+			self[property] = data;
+		end
+	else
+		self[property] = {["__version"] = 2};
 	end
 end
 
@@ -976,10 +1084,32 @@ function CompendiumDeedControl:AddCoordinate( record )
 
 end
 
+--[[
+-- not sure how to do this yet
+function CompendiumDeedControl:ProcessDeedChat( message )
+	local chatComplete = rsrc["chatcompleted"];
+	local name = string.match(message, '^.*' .. chatComplete .. "%s*(.-)'?%s*$")
+	if (name) then
+        name = string.gsub(name,"\n","");
+		self:MarkDeedCompleted(name);
+    end
+end
 
-function CompendiumDeedControl:CoordClicked( y, ns, x, ew, zone, name, deed )
+function CompendiumDeedControl:MarkDeedCompleted( name )
+	for i, rec in ipairs(deedtable) do
+		if rec.name == name then
+			self.deedprogression[rec.id] = true;
+			self.deedprogressionmodified = true;
+			self:BuildCursor();
+			break;
+		end
+	end
+end
+]]
+
+function CompendiumDeedControl:CoordClicked( y, ns, x, ew, target, isdungeon, name, deed )
 	local mx, my = self:PointToClient(Turbine.UI.Display:GetMousePosition());
 	local left, top = mx - 3, my - 3;
 	self.coord:SetPosition(left, top);
-	self.coord:ShowMenu( y, ns, x, ew, zone, false, name, deed );
+	self.coord:ShowMenu( y, ns, x, ew, target, isdungeon, name, deed );
 end

@@ -414,6 +414,7 @@ function CompendiumLauncherWindow:Constructor()
 	tabs.OnActiveTabChange = function (sender,index)
 		self.Settings.ActiveTabIndex = index;
 		self:SaveSettings();
+		self:CheckActiveTabImport();
 	end
 	self.tabs = tabs;
 
@@ -560,6 +561,14 @@ function CompendiumLauncherWindow:Constructor()
 			end
         end
     end
+	self:CheckActiveTabImport();
+end
+
+function CompendiumLauncherWindow:CheckActiveTabImport()
+	local control = self.tabs:GetActiveControl();
+	if control ~= nil and control.ImportLotroCompanion ~= nil then
+		control:ImportLotroCompanion();
+	end
 end
 
 function CompendiumLauncherWindow:LoadSettings()

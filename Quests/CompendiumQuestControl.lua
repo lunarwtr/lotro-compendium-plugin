@@ -1008,6 +1008,36 @@ function CompendiumQuestControl:persist()
 
 end
 
+function CompendiumQuestControl:ImportLotroCompanion()
+	if self.lcData == nil then return end;
+
+	local completedCount = 0;
+	for key, value in pairs(self.lcData) do
+		if value == 'COMPLETED' then
+			completedCount = completedCount + 1
+		end
+	end
+	if completedCount == 0 then
+		self:ClearLCQuestsFile()
+	else
+		Compendium.Common.UI.Dialog.Confirm:Show(rsrc['importtitle'], string.format(rsrc['importquest'], completedCount),
+		function()
+			for key, value in pairs(self.lcData) do
+				local id = string.upper(string.format('%x', key))
+				if value == 'COMPLETED' then
+					self.questprogression[id] = true
+					self.questprogressionmodified = true
+				end
+			end
+			self:ClearLCQuestsFile()
+			self:BuildCursor();
+		end,
+		function()
+			self:ClearLCQuestsFile()
+		end);
+	end
+end
+
 function CompendiumQuestControl:LoadLocalQuests()
 	self:LoadLocalQuestsData(Turbine.DataScope.Account, "LocalQuestData", "localquestdata", "localquestdatamodified")
 	self:LoadLocalQuestsData(Turbine.DataScope.Character, "CompendiumQuestProgression", "questprogression", "questprogressionmodified")
@@ -1015,36 +1045,14 @@ function CompendiumQuestControl:LoadLocalQuests()
 	-- check for companion progression data to import
 	local lcd = Compendium.Common.Utils.PluginData.Load(Turbine.DataScope.Character, "CompendiumQuestProgression_CompanionImport")
 	if type(lcd) == 'table' and lcd["SKIP"] == nil then
-		local completedCount = 0;
-		for key, value in pairs(lcd) do
-			if value == 'COMPLETED' then
-				completedCount = completedCount + 1
-			end
-		end
-		if completedCount == 0 then
-			self:ClearLCQuestsFile()
-		else
-			Compendium.Common.UI.Dialog.Confirm:Show(rsrc['importtitle'], string.format(rsrc['importquest'], completedCount),
-			function()
-				for key, value in pairs(lcd) do
-					local id = string.upper(string.format('%x', key))
-					if value == 'COMPLETED' then
-						self.questprogression[id] = true
-						self.questprogressionmodified = true
-					end
-				end
-				self:ClearLCQuestsFile()
-				self:BuildCursor();
-			end,
-			function()
-				self:ClearLCQuestsFile()
-			end);
-		end
+		self.lcData = lcd;
 	end
+
 end
 
 function CompendiumQuestControl:ClearLCQuestsFile()
 	Compendium.Common.Utils.PluginData.Save(Turbine.DataScope.Character, "CompendiumQuestProgression_CompanionImport", {["SKIP"] = true})
+	self.lcData = nil;
 end
 
 function CompendiumQuestControl:LoadLocalQuestsData( scope, name, property, flag)

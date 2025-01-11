@@ -1,7 +1,7 @@
 <head>
-<title>Import Quest Completion from LOTRO Companion</title>
+<title>Import Deed And Quest Completion from LOTRO Companion</title>
 <HTA:APPLICATION 
-     APPLICATIONNAME="Import Quest Completion from LOTRO Companion"
+     APPLICATIONNAME="Import Deed And Quest Completion from LOTRO Companion"
      SCROLL="yes"
      SINGLEINSTANCE="yes"
      WINDOWSTATE="normal"
@@ -95,6 +95,15 @@ Function GetFullServerName(lotroCompanionCharServer)
 	GetFullServerName = Null
 End Function
 
+' Inspired by https://stackoverflow.com/a/7377535:
+Function truncate_period(s)
+  If Right(s, 1) = "." Then 
+    truncate_period = Left(s, Len(s) - 1) 
+  Else 
+    truncate_period = s
+  End If
+End Function
+
 '
 ' LOTRO Companion has summary files for each imported character.
 ' This iterates through each of them.
@@ -110,13 +119,46 @@ Function GetCompanionCharacters(byref accounts)
 		defaultAccount = accounts(0)
 	end if
 
-	strHomeFolder = oShell.ExpandEnvironmentStrings("%USERPROFILE%")
-	strLotroCompanionFolder = oFSO.BuildPath(strHomeFolder, ".lotrocompanion")
-	strLotroCompanionDataFolder = oFSO.BuildPath(strLotroCompanionFolder, "data")
-	strCharFolder = oFSO.BuildPath(strLotroCompanionDataFolder, "characters")
+	strConfigurationFilePath = oShell.ExpandEnvironmentStrings("%USERPROFILE%") & "\.lotrocompanion\data\preferences\DataConfiguration.properties"
+	AddTextToDiv pathInfo, "Looking for LOTRO Companion configuration file: " & strConfigurationFilePath & "<br>"
+	if Not oFSO.FileExists(strConfigurationFilePath) Then
+		' Show an error message, and exit
+		AddTextToDiv pathInfo, "<h2 style='color=red'>ERROR: Could not find the LOTRO Companion file listed on the previous line!<br>Please ensure LOTRO Companion is installed and that you have imported at least one character.</h2><br>"
+		EXIT FUNCTION
+	End If
+
+	Set objConfigurationFile = oFSO.OpenTextFile(strConfigurationFilePath)
+	strDataPath = ""
+	Do Until objConfigurationFile.AtEndOfStream
+	    line = objConfigurationFile.ReadLine
+	    If InStr(1, line, "RootPath=") = 1 Then
+            ' Get rid of the RootPath prefix:
+            strDataPath = Replace(line, "RootPath=", "")
+
+            ' Change unicode encoding to vbscript style:
+            strDataPath = Replace(strDataPath, "\u", "%u")
+
+            ' Unescape escaped backslash characters:
+            strDataPath = Replace(strDataPath, "\\", "\")
+
+            ' Unescape escaped colons:
+            strDataPath = Replace(strDataPath, "\:", ":")
+
+            ' UnEscape escaped unicode characters:
+            strDataPath = UnEscape(strDataPath)
+		End If
+	Loop
+
+	If strDataPath = "" Then
+		AddTextToDiv pathInfo, "Could not find path to LOTRO Companion data. Exiting.<br>"
+		Exit Function
+	End If
+
+	strCharFolder = strDataPath & "\" & "characters"
+	AddTextToDiv pathInfo, "Found it! Using LOTRO Companion charactor folder: " & strCharFolder & "<br>"
 
 	If Not oFSO.FolderExists(strCharFolder) Then
-		AddTextToDiv divCompanionCharactersToImport, "<h2 style='color=red'>ERROR: Could not find Plugin Companion data</h2>"
+		AddTextToDiv divCompanionCharactersToImport, "<h2 style='color=red'>ERROR: Could not find LOTRO Companion data " & strCharFolder & "</h2>"
 		Exit Function
 	End If
 
@@ -130,8 +172,8 @@ Function GetCompanionCharacters(byref accounts)
 	charactersToImport = Array()
 	Dim charactersToSkip
 	charactersToSkip = Array()
-	Dim charactersWithoutQuests
-	charactersWithoutQuests = Array()
+	Dim charactersWithoutDeeds
+	charactersWithoutDeeds = Array()
 	Dim charactersWithBadAccounts
 	charactersWithBadAccounts = Array()
 	Dim charactersMissingServers
@@ -139,11 +181,11 @@ Function GetCompanionCharacters(byref accounts)
 
 	currentCharToImport = 0
 	currentCharToSkip = 0
-	currentCharWithoutQuests = 0
+	currentCharWithoutDeeds = 0
 	currentCharWithBadAccount = 0
 	currentCharMissingServer = 0
 	For Each oCompanionCharacterDir in charFolders
-		Do ' null loop for skipping missing questsStatus.xml files
+		Do ' null loop for skipping missing deedsStatus.xml files
 
 		strCharSummaryFileName = oFSO.BuildPath(oCompanionCharacterDir.Path, "summary.xml")
 		' Make sure there's a summary.xml file, otherwise there's nothing to do.
@@ -164,7 +206,7 @@ Function GetCompanionCharacters(byref accounts)
 		Set oCharAccount = characterNode.attributes.GetNamedItem("account")
 		char.CharAccount = defaultAccount
 		if Not oCharAccount is Nothing then
-			char.CharAccount = oCharAccount.Text
+			char.CharAccount = truncate_period(oCharAccount.Text)
 		End If
 
 		char.CharServer = GetFullServerName(characterNode.GetAttribute("server"))
@@ -183,12 +225,12 @@ Function GetCompanionCharacters(byref accounts)
 			End If
 		Next
 
-		' Make sure there's a questsStatus.xml file, otherwise there's nothing to do.
-		strQuestFileName = oFSO.BuildPath(oCompanionCharacterDir.Path, "questsStatus.xml")
-		If Not oFSO.FileExists(strQuestFileName) Then
-			ReDim Preserve charactersWithoutQuests(currentCharWithoutQuests)
-			Set charactersWithoutQuests(currentCharWithoutQuests) = char
-			currentCharWithoutQuests = currentCharWithoutQuests + 1
+		' Make sure there's a deedStatus.xml file, otherwise there's nothing to do.
+		strDeedFileName = oFSO.BuildPath(oCompanionCharacterDir.Path, "deedsStatus.xml")
+		If Not oFSO.FileExists(strDeedFileName) Then
+			ReDim Preserve charactersWithoutDeeds(currentCharWithoutDeeds)
+			Set charactersWithoutDeeds(currentCharWithoutDeeds) = char
+			currentCharWithoutDeeds = currentCharWithoutDeeds + 1
 		ElseIf char.CharAccount = unknownAccount Then
 			' If the character doesn't have an account, 
 			'   this is only a problem if we found more than one account on the LOTRO side
@@ -212,7 +254,7 @@ Function GetCompanionCharacters(byref accounts)
 		Loop While False ' end of null loop
 	Next
 
-	PrintCompanionAccounts charactersToImport, charactersToSkip, charactersWithoutQuests, charactersWithBadAccounts, charactersMissingServers
+	PrintCompanionAccounts charactersToImport, charactersToSkip, charactersWithoutDeeds, charactersWithBadAccounts, charactersMissingServers
 
 	GetCompanionCharacters = charactersToImport
 End Function
@@ -233,7 +275,7 @@ End Sub
 ' Print out which Companion accounts we can and can't import
 '
 '
-Sub PrintCompanionAccounts(ByRef charactersToImport, ByRef charactersToSkip, ByRef charactersWithoutQuests, ByRef charactersWithBadAccounts, ByRef charactersMissingServers)
+Sub PrintCompanionAccounts(ByRef charactersToImport, ByRef charactersToSkip, ByRef charactersWithoutDeeds, ByRef charactersWithBadAccounts, ByRef charactersMissingServers)
 
 	text = ""
 	If UBound(charactersToImport) >= 0 Then
@@ -275,17 +317,17 @@ Sub PrintCompanionAccounts(ByRef charactersToImport, ByRef charactersToSkip, ByR
 		divCompanionCharactersToSkipHr.style.display = "none"
 	End If
 
-	If UBound(charactersWithoutQuests) >= 0 Then
-		text = "The following LOTRO Companion characters do not have quest information and cannot be imported: <list>"
+	If UBound(charactersWithoutDeeds) >= 0 Then
+		text = "The following LOTRO Companion characters do not have deed information and cannot be imported: <list>"
 
-		For Each oCharacter in charactersWithoutQuests
+		For Each oCharacter in charactersWithoutDeeds
 			text = text & "<li>" & oCharacter.CharAccount & ": " & oCharacter.CharServer & " / " & oCharacter.CharName & " (" & oCharacter.CharClass & ")" & "</li>"
 		Next
 		text = text & "</list>"
-		AddTextToDiv divCompanionCharactersWithoutQuests, text
+		AddTextToDiv divCompanionCharactersWithoutDeeds, text
 	Else
-		divCompanionCharactersWithoutQuests.style.display = "none"
-		divCompanionCharactersWithoutQuestsHr.style.display = "none"
+		divCompanionCharactersWithoutDeeds.style.display = "none"
+		divCompanionCharactersWithoutDeedsHr.style.display = "none"
 	End If
 
 	If UBound(charactersWithBadAccounts) >= 0 Then
@@ -333,27 +375,27 @@ End Sub
 
 ''''''''''''''''''''''''''''''''''''''''''''
 '
-' Functions to write out LUA files containing quest completion status.
+' Functions to write out LUA files containing deed completion status.
 '
 
 '
 ' Import a specific character
 '
 '
-Sub ImportCharFromLotroCompanion(oCharacter)
+Sub ImportCharFromLotroCompanion(oCharacter, importTypeDisplay, importFile, nodeSelector, outputFile)
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 
 	AddTextToDiv divImport, "Importing " & oCharacter.CharName & "...<br>"
 
-	questFileName = oFSO.BuildPath(oCharacter.CharDirectory, "questsStatus.xml")
+	fullImportPath = oFSO.BuildPath(oCharacter.CharDirectory, importFile)
 	
-	AddTextToDiv divImport, "&nbsp;Reading " & questFileName & "...<br>"
+	AddTextToDiv divImport, "&nbsp;Reading " & fullImportPath & "...<br>"
 
-	Set strCharQuestFile = oFSO.OpenTextFile(questFileName, 1)
-	strCharQuestXmlText = strCharQuestFile.ReadAll
+	Set strCharDeedFile = oFSO.OpenTextFile(fullImportPath, 1)
+	strCharDeedXmlText = strCharDeedFile.ReadAll
 
-	Set strCharQuestsFileParsed = CreateObject("MSXML2.DOMDocument")
-	strCharQuestsFileParsed.loadXML(strCharQuestXmlText)
+	Set strCharDeedsFileParsed = CreateObject("MSXML2.DOMDocument")
+	strCharDeedsFileParsed.loadXML(strCharDeedXmlText)
 
 	' A user reported that the character directory might not always be present.
 	' Make sure each directory is there:
@@ -368,49 +410,49 @@ Sub ImportCharFromLotroCompanion(oCharacter)
 		oFSO.CreateFolder(charDir)
 	End If
 
-	outputFileName = oFSO.BuildPath(charDir, "CompendiumQuestProgression_CompanionImport.plugindata")
+	fullOutputPath = oFSO.BuildPath(charDir, outputFile)
 
-	AddTextToDiv divImport, "&nbsp;Writing " & outputFileName & "..."
+	AddTextToDiv divImport, "&nbsp;Writing " & fullOutputPath & "..."
 
 	outputText = "return " & vbCrLf
 	outputText = outputText & "{" & vbCrLf
 
-	' Convert Companion quest into lua structure:
-	Set questStatusNodes = strCharQuestsFileParsed.SelectNodes("questsStatus/questStatus")
-	questStatusNodesCount = questStatusNodes.length
+	' Convert Companion deed / quest into lua structure:
+	Set curStatusNodes = strCharDeedsFileParsed.SelectNodes(nodeSelector)
+	curStatusNodesCount = curStatusNodes.length
 	lineCount = 0
-	For Each questStatusNode in questStatusNodes
+	For Each curStatusNode in curStatusNodes
 		lineCount = lineCount + 1
 		trailingComma = ","
-		If lineCount = questStatusNodesCount Then
+		If lineCount = curStatusNodesCount Then
 			trailingComma = ""
 		End If
 
-		questKeyText = ""
-		questKey = questStatusNode.GetAttribute("key")
-		If Not IsNull(questKey) Then
-			questKeyText = questKey
+		curKeyText = ""
+		curKey = curStatusNode.GetAttribute("key")
+		If Not IsNull(curKey) Then
+			curKeyText = curKey
 		End If
 
-		questStateText = ""
-		questState = questStatusNode.GetAttribute("state")
-		If Not IsNull(questState) Then
-			questStateText = questState
+		stateText = ""
+		curState = curStatusNode.GetAttribute("state")
+		If Not IsNull(curState) Then
+			stateText = curState
 		Else
-			' An older way of encoding the quest completian as a boolean:
-			questCompleted = questStatusNode.GetAttribute("completed")
-			If Not IsNull(questCompleted) and questCompleted = "true" Then
-				AddTextToDiv divImport, "<br><b>Warning: Quest file is outdated, please re-import in LOTRO Companion!</b><br><br>"
+			' An older way of encoding the deed / quest completian as a boolean:
+			curCompleted = curStatusNode.GetAttribute("completed")
+			If Not IsNull(curCompleted) and curCompleted = "true" Then
+				AddTextToDiv divImport, "<br><b>Warning: " & importTypeDisplay & " file is outdated, please re-import in LOTRO Companion!</b><br><br>"
 				Exit Sub
 			End If
 		End If
 
-		outputText = outputText & vbTab & "[""" & questKeyText & """] = " & """" & questStateText & """" & trailingComma & vbCrLf
+		outputText = outputText & vbTab & "[""" & curKeyText & """] = " & """" & curState & """" & trailingComma & vbCrLf
 	Next
 
 	outputText = outputText & "}" & vbCrLf
 
-	Set outputFile = oFSO.CreateTextFile(outputFileName, true)
+	Set outputFile = oFSO.CreateTextFile(fullOutputPath, true)
 	outputFile.WriteLine outputText
 	outputFile.Close
 
@@ -425,7 +467,8 @@ Sub ImportOneFromLotroCompanion(account, server, character)
 		if oCharacter.CharAccount = account and _
 		    oCharacter.CharServer = server and _
 		    oCharacter.CharName = character then
-			ImportCharFromLotroCompanion oCharacter
+				ImportCharFromLotroCompanion oCharacter, "Deed", "deedsStatus.xml", "deedsStatus/deedStatus", "CompendiumDeedProgression_CompanionImport.plugindata"
+				ImportCharFromLotroCompanion oCharacter, "Quest", "questsStatus.xml", "questsStatus/questStatus", "CompendiumQuestProgression_CompanionImport.plugindata"
 			Exit Sub
 	   	end if
 	Next	
@@ -439,15 +482,25 @@ Sub ImportFromLotroCompanion()
 	import_button.style.display = "none"
 
 	For Each oCharacter in charactersToImport
-		ImportCharFromLotroCompanion oCharacter
+		ImportCharFromLotroCompanion oCharacter, "Deed", "deedsStatus.xml", "deedsStatus/deedStatus", "CompendiumDeedProgression_CompanionImport.plugindata"
+		ImportCharFromLotroCompanion oCharacter, "Quest", "questsStatus.xml", "questsStatus/questStatus", "CompendiumQuestProgression_CompanionImport.plugindata"
 	Next
 	AddTextToDiv divImport, "<b>Import process complete!</b>"
+End Sub
+
+Sub Window_onLoad
+    window.resizeTo 800,800
 End Sub
 
 </script>
 
 <body onload="GetCharacters()">
-<h2>Import Quest Completion from<br>LOTRO Companion</h2>
+<h2>Import Deed And Quest Completion from LOTRO Companion v2.2</h2>
+This importer is a part of the LOTRO Compendium plugin.<br>
+<hr>
+<div id="pathInfo">
+</div>
+<hr>
 <div id="divLotroAccounts">
 </div>
 <hr>
@@ -457,9 +510,9 @@ End Sub
 <div id="divCompanionCharactersToSkip">
 </div>
 <hr id="divCompanionCharactersToSkipHr">
-<div id="divCompanionCharactersWithoutQuests">
+<div id="divCompanionCharactersWithoutDeeds">
 </div>
-<hr id="divCompanionCharactersWithoutQuestsHr">
+<hr id="divCompanionCharactersWithoutDeedsHr">
 <div id="divCompanionCharactersWithBadAccounts">
 </div>
 <hr id="divCompanionCharactersWithBadAccountsHr">
