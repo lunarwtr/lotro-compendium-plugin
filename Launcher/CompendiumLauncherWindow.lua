@@ -236,7 +236,7 @@ function CompendiumLauncherWindow:Constructor()
 	    checkbox:SetParent( settingControl );
 	    checkbox:SetMultiline( true );
 	    checkbox:SetPosition( 20, cbtop );
-	    checkbox:SetSize( 400, 20 );
+	    checkbox:SetSize( 450, 20 );
 	    checkbox:SetFont(self.fontFace);
 	    checkbox:SetForeColor(self.fontColor);
 	    checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );
@@ -323,7 +323,7 @@ function CompendiumLauncherWindow:Constructor()
     checkbox:SetParent( settingControl );
     checkbox:SetMultiline( true );
     checkbox:SetPosition( 20, cbtop );
-    checkbox:SetSize( 250, 20 );
+    checkbox:SetSize( 300, 20 );
     checkbox:SetFont(self.fontFace);
     checkbox:SetForeColor(self.fontColor);
     checkbox:SetTextAlignment( Turbine.UI.CheckBox.BottomCenter );

@@ -6,13 +6,21 @@ import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
 import "Compendium.Common.Resources";
 
-local moormapZones = {
-	["gundabad"] = 515,
-	["rohaneastemnet"] = 228,
-	["rohanwestemnet"] = 287,
-	["rohanwildermore"] = 277
+local moormapZones = {}
+-- these are zones that the name is different in moormap
+local moormapZoneMismatch = {
+    [228] = "Rohan - Eastemnet", -- East Rohan
+    [277] = "Rohan - Wildermore", -- Wildermore
+    [287] = "Rohan - Westemnet", -- Western Rohan
+    [39] = "Forochel", -- Forochell
+    [403] = "Imlad Morgul", -- Morgul Vale
+    [512] = "Tales of Yore: Azanulbizar", -- Azanulbizar T.A.2977
+    [635] = "Pinnath Gelin", -- Pinneth Gelin
+    [638] = "The Shield Isles", -- Zîrar Tarka - The Shield Isles
+    [639] = "Umbar", -- Cape of Umbar
+    [642] = "Umbar-môkh", -- Umbar-môkh: the neaths
+    [656] = "Urash Dâr", -- urush dâr
 }
-
 
 CoordinateControl = class( Compendium.Common.UI.LabelMenu );
 function CoordinateControl:Constructor()
@@ -26,6 +34,8 @@ function CoordinateControl:Constructor()
 	for i, p in pairs(loaded) do
 		if p.Name=="MoorMap" then
 			foundMoor=true;
+			-- Loading MoorMap IDS
+			self:LoadMoorMapIDS();
 		elseif p.Name=="Waypoint" then
 			foundWay=true;
 		end
@@ -48,20 +58,8 @@ function CoordinateControl:Constructor()
 			Turbine.PluginManager.LoadPlugin("MoorMap");
 			foundMoor = true;
 			self.moormap = true;
-
 			-- Loading MoorMap IDS
-			assert(pcall(function()
-				import 'GaranStuff.MoorMap.Defaults';
-				import 'GaranStuff.MoorMap.Strings';
-				import 'GaranStuff.MoorMap.Table';
-				local MM = GaranStuff.MoorMap;
-				MM.PatchDataSave = function() end
-				local mapData = {}
-				MM.LoadDefaults({}, mapData);
-				for i, rec in pairs(mapData) do
-					moormapZones[self:CleanZone(MM.Resource[1][rec[2]])] = rec[1];
-				end
-			end))
+			self:LoadMoorMapIDS();
 		end
 		if wayCfg ~= nil then
 			Turbine.PluginManager.LoadPlugin("Waypoint");
@@ -136,6 +134,27 @@ function CoordinateControl:Constructor()
 
 end
 
+function CoordinateControl:LoadMoorMapIDS()
+	assert(pcall(function()
+		import 'GaranStuff.MoorMap.Defaults';
+		import 'GaranStuff.MoorMap.Strings';
+		import 'GaranStuff.MoorMap.Table';
+		local MM = GaranStuff.MoorMap;
+		MM.PatchDataSave = function() end
+		local mapData = {}
+		MM.LoadDefaults({}, mapData);
+		for i, rec in pairs(mapData) do
+			-- Turbine.Shell.WriteLine("MM Zone: " .. MM.Resource[1][rec[2]])
+			local cleanMMName = self:CleanZone(MM.Resource[1][rec[2]]);
+			moormapZones[cleanMMName] = rec[1];
+			if moormapZoneMismatch[rec[2]] ~= nil then
+				local alternateName = self:CleanZone(moormapZoneMismatch[rec[2]]);
+				moormapZones[alternateName] = rec[1];
+			end
+		end
+	end))
+end
+
 function CoordinateControl:ShowMenu( y, ns, x, ew, zone, isdungeon, name, quest )
 	--Turbine.Shell.WriteLine( y .. ', ' .. ns .. ', ' .. x .. ', ' .. ew .. ', ' .. zone);
 	-- no support
@@ -146,6 +165,7 @@ function CoordinateControl:ShowMenu( y, ns, x, ew, zone, isdungeon, name, quest 
 	if zone == nil then zone = 'Unknown' end;
 	if self.moormap then
 		local id = moormapZones[self:CleanZone(zone)];
+		--Turbine.Shell.WriteLine('mmid: ' .. tostring(id));
 		if not isdungeon and id ~= nil then
 			local mmy, mmx = y, x;
 			if string.lower(ns) == 's' then
@@ -189,7 +209,6 @@ function CoordinateControl:CleanZone( zone )
 	zone = string.gsub(zone, "^the%s+", "");
 	zone = string.gsub(zone, "^die%s+", "");
 	zone = string.gsub(zone, "^das%s+", "");
-	--zone = string.gsub(zone, "^rohan%s+-%s+", "");
 	zone = string.gsub(zone, "[^a-z0-9]", "");
 	return zone;
 end
