@@ -29,10 +29,7 @@ function DeedCategoryMenu:Constructor()
 			["Reputation"] = 0,
 			["Slayer"] = 0
 		},
-		["Faction"] = {
-			["Free People"] = 0,
-			["Monster"] = 0
-		},
+		["Faction"] = {["Free People"] = 0, ["Monster"] = 0},
 		["Level Ranges"] = {
 			["1-5"] = 0,
 			["6-10"] = 0,
@@ -63,12 +60,11 @@ function DeedCategoryMenu:Constructor()
 			["136-140"] = 0,
 			["141-145"] = 0,
 			["146-150"] = 0,
+			["151-155"] = 0,
+			["156-160"] = 0,
 			["Custom"] = 0
 		},
-		["Progression"] = {
-			["Complete"] = 0,
-			["Incomplete"] = 0
-		},
+		["Progression"] = {["Complete"] = 0, ["Incomplete"] = 0},
 		["Rewarded"] = {
 			["Emotes"] = 0,
 			["Glory"] = 0,
@@ -81,237 +77,263 @@ function DeedCategoryMenu:Constructor()
 			["Virtue XP"] = 0,
 			["XP"] = 0
 		},
-		["Zone"] = {
-			["All"] = 0,
-			["A-E"] = {
-				["All"] = 0,
-				["Ambarûl"] = {
-					["All"] = 0,
-					["Fields of Duragâr"] = 0,
-					["Unknown"] = 0
+		["Zone"]={
+			["All"]=0,
+			["A-E"]={
+				["All"]=0,
+				["Agarnaith"]=0,
+				["Ambarûl"]={
+					["All"]=0,
+					["Fields of Duragâr"]=0,
+					["Unknown"]=0
+					},
+				["An Shêru, the Height of the Sky"]={
+					["All"]=0,
+					["Uhumêlu"]=0
+					},
+				["Anfalas"]=0,
+				["Angmar"]={
+					["All"]=0,
+					["Carn Dûm"]=0,
+					["Fasach-larran"]=0,
+					["Nan Gurth"]=0,
+					["Rift of Nûrz Ghâshu"]=0,
+					["Unknown"]=0,
+					["Urugarth"]=0
+					},
+				["Anórien"]={
+					["All"]=0,
+					["Minas Tirith"]=0
+					},
+				["Bree-land"]={
+					["All"]=0,
+					["Bree"]=0,
+					["Northern Barrow-downs"]=0,
+					["Southern Bree-fields"]=0,
+					["Unknown"]=0
+					},
+				["Cardolan"]={
+					["All"]=0,
+					["Sarch Vorn"]=0,
+					["Unknown"]=0
+					},
+				["Central Gondor"]=0,
+				["Croftlands"]={
+					["All"]=0,
+					["East Wall"]=0,
+					["Norcrofts"]=0
+					},
+				["Dunland"]={
+					["All"]=0,
+					["Isengard"]=0,
+					["Nan Curunír"]=0,
+					["Unknown"]=0
+					},
+				["Dwarf-holds"]={
+					["All"]=0,
+					["Ered Mithrin"]=0,
+					["Glimmerdeep"]=0,
+					["Stormwall"]=0,
+					["Unknown"]=0
+					},
+				["Eastern Gondor"]={
+					["All"]=0,
+					["Osgiliath"]=0,
+					["Unknown"]=0
+					},
+				["Eastfold"]={
+					["All"]=0,
+					["Kingstead"]=0
+					},
+				["Elderslade"]={
+					["All"]=0,
+					["Gundabad"]=0,
+					["Unknown"]=0,
+					["War of Three Peaks"]=0
+					},
+				["Enedwaith"]={
+					["All"]=0,
+					["Lich Bluffs"]=0,
+					["Thrór's Coomb"]=0,
+					["Unknown"]=0
+					},
+				["Entwash"]={
+					["All"]=0,
+					["Broadacres"]=0,
+					["Entwash Vale"]=0
+					},
+				["Erebor"]=0,
+				["Ered Luin"]={
+					["All"]=0,
+					["Thorin's Gate"]=0,
+					["Unknown"]=0
+					},
+				["Eregion"]={
+					["All"]=0,
+					["Emyn Naer"]=0,
+					["Mirobel"]=0,
+					["Tham Mírdain"]=0,
+					["Unknown"]=0
+					},
+				["Ettenmoors"]=0,
+				["Evendim"]=0
 				},
-				["Anfalas"] = 0,
-				["Angmar"] = {
-					["All"] = 0,
-					["Carn Dûm"] = 0,
-					["Fasach-larran"] = 0,
-					["Nan Gurth"] = 0,
-					["Rift of Nûrz Ghâshu"] = 0,
-					["Unknown"] = 0,
-					["Urugarth"] = 0
+			["F-M"]={
+				["All"]=0,
+				["Fangorn"]={
+					["All"]=0,
+					["Eaves of Fangorn"]=0,
+					["Unknown"]=0
+					},
+				["Far Anórien"]=0,
+				["Festival Grounds"]={
+					["All"]=0,
+					["Frostbluff"]=0
+					},
+				["Forochel"]={
+					["All"]=0,
+					["Sâri-surma"]=0,
+					["Unknown"]=0
+					},
+				["Great River"]=0,
+				["Gundabad"]={
+					["All"]=0,
+					["Clovengap"]=0,
+					["Deepscrave"]=0,
+					["Gloomingtarn"]=0,
+					["Pit of Stonejaws"]=0
+					},
+				["Idagâl, the Dry-whelm"]={
+					["All"]=0,
+					["Emax Dûl"]=0,
+					["Nabir Crags"]=0
+					},
+				["Imhûlar"]={
+					["All"]=0,
+					["Sugâkh Mire"]=0,
+					["Unknown"]=0
+					},
+				["Ithilien"]={
+					["All"]=0,
+					["North Ithilien"]=0,
+					["Osgiliath (After-battle)"]=0
+					},
+				["Khûd Zagin"]={
+					["All"]=0,
+					["Imênki Waste"]=0,
+					["Sang Dûshu"]=0,
+					["Unknown"]=0
+					},
+				["Kighân, the Shornvale"]={
+					["All"]=0,
+					["Ghun Shâna"]=0
+					},
+				["King's Gondor"]={
+					["All"]=0,
+					["Lossarnach (King's Gondor)"]=0
+					},
+				["Lebennin"]={
+					["All"]=0,
+					["Lower Lebennin"]=0,
+					["Lower Lebennin (King's Gondor)"]=0,
+					["Upper Lebennin"]=0,
+					["Upper Lebennin (King's Gondor)"]=0
+					},
+				["Lone-lands"]={
+					["All"]=0,
+					["Annunlos"]=0,
+					["Unknown"]=0
+					},
+				["Lossarnach"]=0,
+				["Lothlórien"]=0,
+				["Mirkwood"]={
+					["All"]=0,
+					["Dol Guldur"]=0,
+					["Unknown"]=0
+					},
+				["Misty Mountains"]={
+					["All"]=0,
+					["Helegrod"]=0,
+					["Northern High Pass"]=0,
+					["Unknown"]=0
+					},
+				["Mordor"]={
+					["All"]=0,
+					["Gorgoroth"]=0,
+					["Imlad Morgul"]=0,
+					["Minas Morgul"]=0,
+					["Mordath"]=0,
+					["Talath Úrui"]=0
+					},
+				["Moria"]={
+					["All"]=0,
+					["Flaming Deeps"]=0,
+					["Foundations of Stone"]=0,
+					["Grand Stair"]=0,
+					["Silvertine Lodes"]=0,
+					["Unknown"]=0,
+					["Water-works"]=0,
+					["Zirakzigil"]=0
+					}
 				},
-				["Anórien (After Battle)"] = {
-					["All"] = 0,
-					["Osgiliath (After-battle)"] = 0
-				},
-				["Bree-land"] = {
-					["All"] = 0,
-					["Bree"] = 0,
-					["Northern Barrow-downs"] = 0,
-					["Southern Bree-fields"] = 0,
-					["Unknown"] = 0
-				},
-				["Cardolan"] = {
-					["All"] = 0,
-					["Sarch Vorn"] = 0,
-					["Unknown"] = 0
-				},
-				["Central Gondor"] = {
-					["All"] = 0,
-					["Lower Lebennin"] = 0,
-					["Unknown"] = 0
-				},
-				["Dunland"] = {
-					["All"] = 0,
-					["Isengard"] = 0,
-					["Nan Curunír"] = 0,
-					["Unknown"] = 0
-				},
-				["Dwarf-holds"] = {
-					["All"] = 0,
-					["Ered Mithrin"] = 0,
-					["Glimmerdeep"] = 0,
-					["Stormwall"] = 0,
-					["Unknown"] = 0
-				},
-				["Eastern Gondor"] = {
-					["All"] = 0,
-					["Lossarnach"] = 0,
-					["Osgiliath"] = 0,
-					["Unknown"] = 0,
-					["Upper Lebennin"] = 0
-				},
-				["Elderslade"] = {
-					["All"] = 0,
-					["Unknown"] = 0,
-					["War of Three Peaks"] = 0
-				},
-				["Enedwaith"] = {
-					["All"] = 0,
-					["Lich Bluffs"] = 0,
-					["Thrór's Coomb"] = 0,
-					["Unknown"] = 0
-				},
-				["Erebor"] = 0,
-				["Ered Luin"] = {
-					["All"] = 0,
-					["Thorin's Gate"] = 0,
-					["Unknown"] = 0
-				},
-				["Eregion"] = {
-					["All"] = 0,
-					["Emyn Naer"] = 0,
-					["Mirobel"] = 0,
-					["Tham Mírdain"] = 0,
-					["Unknown"] = 0
-				},
-				["Ettenmoors"] = 0,
-				["Evendim"] = 0
-			},
-			["F-Z"] = {
-				["All"] = 0,
-				["Far Anórien"] = {
-					["All"] = 0,
-					["Minas Tirith"] = 0,
-					["Pelennor"] = 0,
-					["Unknown"] = 0
-				},
-				["Festival Grounds"] = {
-					["All"] = 0,
-					["Frostbluff"] = 0
-				},
-				["Forochel"] = 0,
-				["Great River"] = 0,
-				["Gundabad"] = {
-					["All"] = 0,
-					["Clovengap"] = 0,
-					["Deepscrave"] = 0,
-					["Dhúrstrok"] = 0,
-					["Gloomingtarn"] = 0,
-					["Pit of Stonejaws"] = 0,
-					["Unknown"] = 0
-				},
-				["Imhûlar"] = {
-					["All"] = 0,
-					["Sugâkh Mire"] = 0,
-					["Unknown"] = 0
-				},
-				["Ithilien"] = {
-					["All"] = 0,
-					["North Ithilien"] = 0
-				},
-				["Khûd Zagin"] = {
-					["All"] = 0,
-					["Sang Dûshu"] = 0,
-					["Unknown"] = 0
-				},
-				["King's Gondor"] = {
-					["All"] = 0,
-					["Blackroot Vale (King's Gondor)"] = 0,
-					["Lossarnach (King's Gondor)"] = 0,
-					["Lower Lebennin (King's Gondor)"] = 0,
-					["Upper Lebennin (King's Gondor)"] = 0
-				},
-				["Lone-lands"] = {
-					["All"] = 0,
-					["Annunlos"] = 0,
-					["Unknown"] = 0
-				},
-				["Lothlórien"] = 0,
-				["Mirkwood"] = {
-					["All"] = 0,
-					["Dol Guldur"] = 0,
-					["Unknown"] = 0
-				},
-				["Misty Mountains"] = {
-					["All"] = 0,
-					["Helegrod"] = 0,
-					["Northern High Pass"] = 0,
-					["Unknown"] = 0
-				},
-				["Mordor"] = {
-					["All"] = 0,
-					["Agarnaith"] = 0,
-					["Gorgoroth"] = 0,
-					["Imlad Morgul"] = 0,
-					["Minas Morgul"] = 0,
-					["Mordath"] = 0,
-					["Talath Úrui"] = 0
-				},
-				["Moria"] = {
-					["All"] = 0,
-					["Flaming Deeps"] = 0,
-					["Foundations of Stone"] = 0,
-					["Grand Stair"] = 0,
-					["Silvertine Lodes"] = 0,
-					["Unknown"] = 0,
-					["Water-works"] = 0,
-					["Zirakzigil"] = 0
-				},
-				["North Downs"] = {
-					["All"] = 0,
-					["Stoneheight"] = 0,
-					["Unknown"] = 0
-				},
-				["Old Anórien"] = 0,
-				["Pinnath Gelin"] = 0,
-				["Rohan - Eastemnet"] = {
-					["All"] = 0,
-					["East Wall"] = 0,
-					["Eaves of Fangorn"] = 0,
-					["Entwash Vale"] = 0,
-					["Norcrofts"] = 0
-				},
-				["Rohan - Westemnet"] = {
-					["All"] = 0,
-					["Broadacres"] = 0,
-					["Eastfold"] = 0,
-					["Isengard"] = 0,
-					["Kingstead"] = 0,
-					["Nan Curunír"] = 0,
-					["Stonedeans"] = 0,
-					["Westfold"] = 0
-				},
-				["Rohan - Wildermore"] = {
-					["All"] = 0,
-					["Balewood"] = 0,
-					["Fallows"] = 0,
-					["Forlaw"] = 0,
-					["High Knolls"] = 0,
-					["Whitshaws"] = 0
-				},
-				["Shield Isles"] = 0,
-				["Shire"] = {
-					["All"] = 0,
-					["Northcotton Farm"] = 0,
-					["Unknown"] = 0
-				},
-				["Strongholds of the North"] = 0,
-				["Swanfleet"] = 0,
-				["Tales of Yore: Azanulbizar"] = {
-					["All"] = 0,
-					["Azanulbizar, T.A. 2799"] = 0
-				},
-				["Trollshaws"] = {
-					["All"] = 0,
-					["Nan Tornaeth"] = 0,
-					["Rivendell Valley"] = 0,
-					["Unknown"] = 0
-				},
-				["Umbar"] = {
-					["All"] = 0,
-					["Bej Mâgha"] = 0,
-					["Umbar Baharbêl, City of the Corsairs"] = 0,
-					["Unknown"] = 0
-				},
-				["Umbar-môkh"] = 0,
-				["Unknown"] = 0,
-				["Urash Dâr"] = 0,
-				["Vales of Anduin"] = 0,
-				["Wastes"] = 0,
-				["Wells of Langflood"] = 0,
-				["Western Gondor"] = 0
+			["N-Z"]={
+				["All"]=0,
+				["North Downs"]={
+					["All"]=0,
+					["Stoneheight"]=0,
+					["Unknown"]=0
+					},
+				["Old Anórien"]=0,
+				["Pinnath Gelin"]=0,
+				["Rohan - Westemnet"]={
+					["All"]=0,
+					["Isengard"]=0
+					},
+				["Shield Isles"]=0,
+				["Shire"]={
+					["All"]=0,
+					["Northcotton Farm"]=0,
+					["Unknown"]=0
+					},
+				["Strongholds of the North"]=0,
+				["Swanfleet"]=0,
+				["Tales of Yore: Azanulbizar"]={
+					["All"]=0,
+					["Azanulbizar, T.A. 2799"]=0
+					},
+				["Trollshaws"]={
+					["All"]=0,
+					["Nan Tornaeth"]=0,
+					["Rivendell Valley"]=0,
+					["Unknown"]=0
+					},
+				["Umbar"]={
+					["All"]=0,
+					["Bej Mâgha"]=0,
+					["Umbar Baharbêl, City of the Corsairs"]=0,
+					["Unknown"]=0
+					},
+				["Umbar-môkh"]=0,
+				["Unknown"]=0,
+				["Urash Dâr"]={
+					["All"]=0,
+					["Sûr Akil"]=0,
+					["Unknown"]=0
+					},
+				["Vales of Anduin"]=0,
+				["Wastes"]=0,
+				["Wells of Langflood"]=0,
+				["Western Gondor"]={
+					["All"]=0,
+					["Blackroot Vale (King's Gondor)"]=0,
+					["Unknown"]=0
+					},
+				["Westfold"]={
+					["All"]=0,
+					["Stonedeans"]=0
+					},
+				["Wildermore"]=0
+				}
 			}
-		}
 	});
 end

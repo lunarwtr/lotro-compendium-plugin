@@ -619,7 +619,7 @@ function CompendiumQuestControl:LoadQuestDetails(record)
     local repinst = rsrc["repeatable"] .. " "  .. record['repeatable'];
     if record['instance'] ~= nil then repinst = repinst .. " / ".. rsrc["instanced"] .. " " .. record['instance'] end;
     self:AddQuestDetail(repinst);
-
+	if record['rc'] ~= nil then self:AddQuestDetail(rsrc["reqclass"] .. " " .. record['rc']); end
     if record['zone'] ~= nil then self:AddQuestDetail(rsrc["zone"] .. " " .. record['zone']); end
     if record['area'] ~= nil then self:AddQuestDetail(rsrc["area"] .. " " .. record['area']); end
 	if record['dungeon'] ~= nil then self:AddQuestDetail(rsrc["dungeon"] .. " " .. record['dungeon']); end
