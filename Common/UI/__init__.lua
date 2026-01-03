@@ -10,6 +10,7 @@ import "Compendium.Common.UI.PaginationControl";
 import "Compendium.Common.UI.CoordinateControl";
 import "Compendium.Common.UI.LevelRangeControl";
 import "Compendium.Common.UI.AutoSizingLabel";
+import "Compendium.Common.UI.CoordinateAwareLabel";
 import "Compendium.Common.UI.CategoryMenu";
 import "Compendium.Common.UI.CompendiumWindow";
 import "Compendium.Common.UI.CompendiumAboutWindow";

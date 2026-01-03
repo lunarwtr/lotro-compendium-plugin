@@ -13,7 +13,7 @@ function QuestCommentsControl:Constructor()
     Compendium.Common.UI.CompendiumControl.Constructor( self );
 	rsrc = Compendium.Common.Resources.Bundle:GetResources();
 
-    local comments=Turbine.UI.Label();
+    local comments = Compendium.Common.UI.CoordinateAwareLabel();
     comments:SetParent(self);
     comments:SetPosition(0,0);
     comments:SetFont(self.fontFaceSmall);
@@ -29,22 +29,10 @@ function QuestCommentsControl:Constructor()
     comments.VScrollBar:SetWidth(12);
     comments.VScrollBar:SetHeight(comments:GetHeight()-2);
     comments:SetVerticalScrollBar(comments.VScrollBar);
-	self.comments = comments;
-
-	comments.MouseClick = function(s,args)
-		local text = comments:GetText();
-		if text ~= nil then
-			local s = math.max(comments:GetSelectionStart() - 13,1);
-			local e = math.min(string.len(text),s + 26);
-			local piece = string.sub(text,s,e);
-			local i, j, whole, y, ns, x, ew = string.find(piece, "((%d+%.%d+)([NSns])[, .]+(%d+%.%d+)([EWOewo]))");
-			if i ~= nil then
-				comments:SetSelection(nil,nil);
-				comments:SetSelection(s + (i - 1), string.len(whole));
-				self:CoordClicked(y, ns, x, ew);
-			end
-		end
+	comments.CoordClicked = function(s,y,ns,x,ew)
+		self:CoordClicked(y,ns,x,ew);
 	end
+	self.comments = comments;
 
 
     local pagination = Compendium.Common.UI.PaginationControl();
