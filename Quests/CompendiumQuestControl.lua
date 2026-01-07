@@ -10,6 +10,7 @@ import "Compendium.Quests.QuestCategoryMenu";
 import "Compendium.Quests.QuestTypeInfo";
 import "Compendium.Common.Utils";
 import "Compendium.Common.UI";
+import "Compendium.Common.UI.CompendiumListHeader";
 import "Compendium.Common.Resources.Bundle";
 
 ---@type Quest[]
@@ -83,7 +84,6 @@ function CompendiumQuestControl:Constructor(language)
     filterIcon.MouseClick = function( sender, args )
     	self.menu:ShowMenu();
     end
-
 
       --[[
 	self.logo = Turbine.UI.Control();
@@ -200,53 +200,36 @@ function CompendiumQuestControl:Constructor(language)
 
     end
 
-    local qlHeader = Turbine.UI.Control();
-    qlHeader:SetSize(self.qlContainer:GetWidth()-16, 19);
-    qlHeader:SetParent(self.qlContainer);
-    qlHeader:SetPosition(2, 1);
-    qlHeader:SetBackColor( self.colorDarkGrey);
-    local nameCol = Turbine.UI.Label();
-    nameCol:SetMultiline(false);
-    nameCol:SetParent(qlHeader);
-    nameCol:SetPosition( 2, 1 );
-    nameCol:SetSize(qlHeader:GetWidth() - 30, 17);
-    nameCol:SetSelectable(true);
-    nameCol:SetText(rsrc['questheader']);
-    nameCol:SetBackColor( self.colorDarkGrey);
-    nameCol:SetFont(self.fontFace);
-    nameCol:SetForeColor(self.fontColor);
-    nameCol:SetOutlineColor(Turbine.UI.Color(0,0,0));
-    nameCol:SetFontStyle(Turbine.UI.FontStyle.Outline);
-    nameCol:SetTextAlignment( Turbine.UI.CheckBox.MiddleCenter );
+	local qlHeader = Compendium.Common.UI.CompendiumListHeader({
+		nameLabelText = rsrc["questname"],
+		levelLabelText = rsrc["questlevel"],
+	});
+	qlHeader:SetSize(self.qlContainer:GetWidth() - 16, 19)
+	qlHeader:SetParent(self.qlContainer);
+	qlHeader:SetPosition(2, 1);
 
-	local selectAllCB = Turbine.UI.Lotro.CheckBox();
-    selectAllCB:SetParent( qlHeader );
-    selectAllCB:SetPosition(nameCol:GetWidth(), 1);
-    selectAllCB:SetSize( 25, 18 );
-    selectAllCB:SetChecked(false);
-    selectAllCB:SetText('');
-    selectAllCB.undo = false;
-	selectAllCB.CheckedChanged = function(s,a)
-		if s.undo then return end;
-		local val = s:IsChecked();
+	-- SortChanged event: parent handles sorting logic
+	qlHeader.SortChanged = function(sender, column, direction)
+		self.sortColumn = column;
+		self.sortDirection = direction;
+		self:BuildCursor();
+	end
+	self.sortColumn = "name";
+	self.sortDirection = "asc";
+
+	-- CheckChanged event: parent handles select all logic
+	qlHeader.CheckChanged = function(sender, checked)
 		local type = rsrc['complete'];
-		if not val then type = rsrc['incomplete'] end;
-		Compendium.Common.UI.Dialog.Confirm:Show(rsrc['confirm'], string.format(rsrc['selectquestmsg'],type),
-							function()
-								self:UpdateAllFilteredRecord('modifyprog',s:IsChecked());
-							end,
-							function()
-								s.undo = true;
-								s:SetChecked(not val);
-								s.undo = false;
-							end);
+		if not checked then type = rsrc['incomplete'] end;
+		Compendium.Common.UI.Dialog.Confirm:Show(rsrc['confirm'], string.format(rsrc['selectquestmsg'], type),
+			function()
+				self:UpdateAllFilteredRecord('modifyprog', checked);
+			end,
+			function()
+				qlHeader:SetSelectAllChecked(not checked, true);
+			end);
 	end
-	qlHeader.SetWidth = function(s, w)
-		Turbine.UI.Control.SetWidth(s, w);
-		local ncw = w - 16;
-		nameCol:SetWidth(ncw);
-		selectAllCB:SetLeft(ncw);
-	end
+	self.qlHeader = qlHeader;
 
     local pagination = Compendium.Common.UI.PaginationControl();
     pagination:SetParent(self.qlContainer);
@@ -534,8 +517,13 @@ function CompendiumQuestControl:LoadQuests(records)
         if level ~= nil then
 			local relLevel = playerLevel;
 			if level == 'Scaling' then
-				if rec['minlevel'] ~= nil then
-					relLevel = tonumber(rec['minlevel']);
+				local minlevel = tonumber(rec['minlevel']);
+				if minlevel ~= nil then
+					if playerLevel < minlevel then
+						relLevel = minlevel;
+					else
+						relLevel = playerLevel;
+					end
 				else
 					relLevel = playerLevel;
 				end
@@ -805,7 +793,7 @@ function CompendiumQuestControl:BuildCursor()
     	-- we'll take care of it below
     else
     	-- if no search and no indexes use default cursor
-    	if ids == nil then
+    	if ids == nil and self.sortColumn == 'name' and self.sortDirection == 'asc' then
 			self.cursor = Compendium.Common.Utils.DataCursor(questtable, pagesize);
 			self.pagination:SetCursor(self.cursor);
 			if self.cursor:PageCount() > 1 then
@@ -871,6 +859,15 @@ function CompendiumQuestControl:BuildCursor()
             table.insert(recs,rec);
         end
 	end;
+
+	if self.sortColumn ~= 'name' or self.sortDirection ~= 'asc' then
+		-- sort records
+		table.sort(recs, Compendium.Common.UI.CreateSortComparator(
+			self.sortColumn,
+			self.sortDirection,
+			Turbine.Gameplay.LocalPlayer.GetInstance():GetLevel()
+		));
+	end
 
 	-- create pagination cursor for results
 	self.cursor = Compendium.Common.Utils.DataCursor(recs, pagesize);

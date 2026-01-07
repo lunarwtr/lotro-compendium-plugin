@@ -15,3 +15,4 @@ import "Compendium.Common.UI.CategoryMenu";
 import "Compendium.Common.UI.CompendiumWindow";
 import "Compendium.Common.UI.CompendiumAboutWindow";
 import "Compendium.Common.UI.DialogWindows";
+import "Compendium.Common.UI.CompendiumListHeader";
